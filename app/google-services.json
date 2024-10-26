@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "542657467951",
+    "project_id": "mindtrade-55249",
+    "storage_bucket": "mindtrade-55249.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:542657467951:android:32a2440647bb5ddd3398da",
+        "android_client_info": {
+          "package_name": "com.example.mindtrade"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxUidxwKslU9OKhxZ4qwvI76ZXK7BZ7uU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
