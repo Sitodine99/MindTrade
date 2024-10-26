@@ -8,6 +8,31 @@
     android:layout_height="match_parent"
     tools:context=".LoginActivity">
 
+    <!-- Logo de la aplicación -->
+    <ImageView
+        android:id="@+id/logoImage"
+        android:layout_width="407dp"
+        android:layout_height="276dp"
+        android:src="@drawable/mindtrade"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_marginTop="40dp"/>
+
+    <!-- Texto de bienvenida -->
+    <TextView
+        android:id="@+id/textViewWelcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Te damos la bienvenida"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toBottomOf="@id/logoImage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
     <!-- Campo de correo electrónico -->
     <EditText
         android:id="@+id/editTextEmail"
@@ -15,12 +40,12 @@
         android:layout_height="wrap_content"
         android:hint="Email"
         android:inputType="textEmailAddress"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textViewWelcome"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginTop="100dp"/>
+        android:layout_marginTop="40dp"/>
 
     <!-- Campo de contraseña -->
     <EditText
@@ -42,6 +67,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Iniciar sesión"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#000000"
         app:layout_constraintTop_toBottomOf="@id/editTextPassword"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -55,7 +82,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="¿No tienes una cuenta? Regístrate"
-        android:textColor="@color/purple_500"
+        android:textColor="@color/black"
         app:layout_constraintTop_toBottomOf="@id/buttonLogin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
