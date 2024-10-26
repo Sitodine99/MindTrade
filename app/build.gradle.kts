@@ -34,6 +34,11 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    // Habilitar View Binding
+    viewBinding {
+        enable = true
+    }
 }
 
 dependencies {
@@ -54,5 +59,8 @@ dependencies {
     implementation("com.google.firebase:firebase-database-ktx:20.3.0")
     // Firebase Cloud Storage (para fotos o gráficos)
     implementation("com.google.firebase:firebase-storage-ktx:20.2.0")
+    // Firebase Firestore
+    implementation("com.google.firebase:firebase-firestore-ktx:24.5.0")
+
 
 }

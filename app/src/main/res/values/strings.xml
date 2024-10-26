@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">MindTrade</string>
+    <!-- Opciones para el Spinner de preferencias de trading -->
+    <string-array name="trading_preferences">
+        <item>Daytrading</item>
+        <item>Scalping</item>
+        <item>Swing trading</item>
+    </string-array>
 </resources>
