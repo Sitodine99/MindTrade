@@ -1,5 +1,6 @@
 package com.example.mindtrade
 
+import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
@@ -75,8 +76,11 @@ class RegisterActivity : AppCompatActivity() {
 
         // Redirigir a Login si ya tiene cuenta
         binding.textViewLogin.setOnClickListener {
-            startActivity(Intent(this, LoginActivity::class.java))
+            val intent = Intent(this, LoginActivity::class.java)
+            val options = ActivityOptions.makeCustomAnimation(this, R.anim.fade_in, R.anim.fade_out)
+            startActivity(intent, options.toBundle())
         }
+
     }
 }
 

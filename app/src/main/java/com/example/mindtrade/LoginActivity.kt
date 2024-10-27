@@ -1,5 +1,6 @@
 package com.example.mindtrade
 
+import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -48,7 +49,9 @@ class LoginActivity : AppCompatActivity() {
         // Configuración del texto para ir al registro
         binding.textViewRegister.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
-            startActivity(intent)
+            val options = ActivityOptions.makeCustomAnimation(this, R.anim.fade_in, R.anim.fade_out)
+            startActivity(intent, options.toBundle())
+
         }
     }
 }
