@@ -12,27 +12,25 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MindTrade"
         tools:targetApi="31">
-
+        <activity
+            android:name=".welcome_activity"
+            android:exported="false" />
         <!-- LoginActivity como actividad de inicio, con exportación habilitada -->
         <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- RegisterActivity -->
+        </activity> <!-- RegisterActivity -->
         <activity
             android:name=".RegisterActivity"
-            android:exported="false" />
-
-        <!-- MainActivity -->
+            android:exported="false" /> <!-- MainActivity -->
         <activity
             android:name=".MainActivity"
             android:exported="true" />
-
     </application>
 
 </manifest>

@@ -7,8 +7,11 @@
         <item name="android:statusBarColor">@color/black</item>
 
         <!-- Configura el color del texto en la barra de estado -->
-        <!-- Usa "true" para texto oscuro en la barra de estado y "false" para texto claro -->
         <item name="android:windowLightStatusBar">false</item>
+
+        <!-- Configura el color de texto para todos los EditText -->
+        <item name="android:textColor">@color/black</item> <!-- Color oscuro para buen contraste -->
+        <item name="android:textColorHint">@color/gray_dark</item> <!-- Color del hint con buen contraste -->
     </style>
 
     <style name="Theme.MindTrade" parent="Base.Theme.MindTrade" />
