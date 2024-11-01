@@ -65,5 +65,8 @@ dependencies {
     // Firebase Firestore
     implementation("com.google.firebase:firebase-firestore-ktx:24.5.0")
 
+    implementation("com.google.android.material:material:1.4.0")
+
+
 
 }

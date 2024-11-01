@@ -1,18 +1,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- Base application theme -->
     <style name="Base.Theme.MindTrade" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Personaliza el tema claro aquí. -->
+        <!-- Personaliza el tema aquí -->
 
-        <!-- Color de la barra de estado -->
+        <!-- Color de la barra de estado en negro -->
         <item name="android:statusBarColor">@color/black</item>
 
-        <!-- Configura el color del texto en la barra de estado -->
+        <!-- Iconos claros en la barra de estado (si usas barra de estado oscura) -->
         <item name="android:windowLightStatusBar">false</item>
-
-        <!-- Configura el color de texto para todos los EditText -->
-        <item name="android:textColor">@color/black</item> <!-- Color oscuro para buen contraste -->
-        <item name="android:textColorHint">@color/gray_dark</item> <!-- Color del hint con buen contraste -->
     </style>
 
+    <!-- Tema principal que extiende el tema base -->
     <style name="Theme.MindTrade" parent="Base.Theme.MindTrade" />
 </resources>

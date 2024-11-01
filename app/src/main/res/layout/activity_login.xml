@@ -114,5 +114,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.785"
-        app:srcCompat="@drawable/edificios01" />
+        app:srcCompat="@drawable/edificios" />
 </androidx.constraintlayout.widget.ConstraintLayout>

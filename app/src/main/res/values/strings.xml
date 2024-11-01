@@ -3,7 +3,7 @@
     <!-- Descripción para la imagen del logo -->
     <string name="logo_image" translatable="false">Logo MindTrade</string>
     <!-- Descripción para el texto pantalla inicial -->
-    <string name="textviewExplore" translatable="false">Domina tus estrategias</string>
+    <string name="textviewExplore" translatable="false">Domina tus estrategias de trading</string>
     <!-- Descripción para el texto email -->
     <string name="textviewEmail" translatable="false">Email</string>
     <!-- Descripción para el texto password -->
@@ -18,14 +18,31 @@
 
     <!-- Descripción para la imagen de dos traders en la pantalla de bienvenida -->
     <string name="traders_image_description" translatable="false">Imagen de dos traders en la pantalla de bienvenida</string>
-    <!-- Descripción para la máscara -->
-    <string name="mascara_image_description" translatable="false">Fondo Blanco</string>
     <!-- Descripción para el texto de bienvenida -->
     <string name="welcome_TextView_description" translatable="false">Bienvenido a MindTrade</string>
     <!-- Descripción para el texto de presentación -->
-    <string name="presentation_TextView" translatable="false">Gestiona y mejora tus estrategias de trading combinando análisis técnico y emocional. Lleva un registro de tus operaciones, comparte tus ideas y optimiza tus decisiones.</string>
+    <string name="presentation_TextView" translatable="false">Gestiona y mejora tus estrategias de trading. Lleva un registro de tus operaciones, comparte tus ideas y optimiza tus decisiones.</string>
     <!-- Descripción para el texto de presentación -->
     <string name="getStart_TextView" translatable="false">¡Comencemos!</string>
+
+    <!-- Descripción para el título de estilo de trading -->
+    <string name="titleStyle" translatable="false">Selecciona tu estilo:</string>
+    <!-- Descripción para el título de estilo de scalping -->
+    <string name="titleScalping" translatable="false">Scalping</string>
+    <!-- Descripción para la tarjeta de scalping -->
+    <string name="scalping_TexView" translatable="false">Estilo ultrarrápido, busca pequeñas ganancias en minutos.</string>
+    <!-- Descripción para el título de estilo de daytrading -->
+    <string name="titleDaytrading" translatable="false">Day Trading</string>
+    !-- Descripción para la tarjeta de daytrading -->
+    <string name="daytrading_TexView" translatable="false">Opera en el mismo día para captar fluctuaciones del mercado.</string>
+    <!-- Descripción para el título de estilo de swingtrading -->
+    <string name="titleSwingtrading" translatable="false">Swing Trading</string>
+    !-- Descripción para la tarjeta de daytrading -->
+    <string name="swingtrading_TexView" translatable="false">Sigue tendencias en periodos de días o semanas.</string>
+
+
+
+
     <!-- Opciones para el Spinner de preferencias de trading -->
     <string-array name="trading_preferences">
         <item>Daytrading</item>
