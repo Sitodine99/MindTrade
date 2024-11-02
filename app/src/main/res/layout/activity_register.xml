@@ -20,13 +20,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:srcCompat="@drawable/edificios" />
 
-    <!-- Logo de la aplicación -->
-
-    <!-- Título de registro -->
-
-    <!-- Campo de correo electrónico -->
-
-    <!-- Campo de contraseña -->
 
     <ImageView
         android:id="@+id/imageView"
@@ -41,13 +34,13 @@
 
     <TextView
         android:id="@+id/textViewTitle"
+        android:text="@string/textviewCreate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:fontFamily="serif"
-        android:text="Crea tu cuenta"
         android:textColor="@color/black"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
@@ -58,13 +51,14 @@
         android:id="@+id/editTextEmail"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:autofillHints="emailAddress"
+        android:hint="@string/textviewEmail"
+        android:inputType="textEmailAddress"
+        android:drawableStart="@drawable/ic_email"
+        android:drawablePadding="15dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="48dp"
         android:layout_marginEnd="32dp"
-        android:drawableStart="@drawable/ic_email"
-        android:drawablePadding="15dp"
-        android:hint="Correo electrónico"
-        android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -77,7 +71,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="32dp"
-        android:hint="Contraseña"
+        android:hint="@string/textviewPassword"
         android:inputType="textPassword"
         android:drawableStart="@drawable/ic_key"
         android:drawablePadding="15dp"
@@ -93,7 +87,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="32dp"
-        android:hint="Repetir Contraseña"
+        android:hint="@string/textviewPassword2"
         android:inputType="textPassword"
         android:drawableStart="@drawable/baseline_password_24"
         android:drawablePadding="15dp"
@@ -117,56 +111,11 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <!-- Separador para el registro social -->
-    <TextView
-        android:id="@+id/textViewOr"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:fontFamily="serif"
-        android:text="O continúa con:"
-        android:textColor="@color/black"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/buttonRegister" />
 
     <!-- Botón de registro con Google -->
     <!-- Botón de registro con Google -->
 
     <!-- Botón de registro con Facebook -->
-
-    <Button
-        android:id="@+id/buttonGoogleRegister"
-        android:layout_width="165dp"
-        android:layout_height="46dp"
-        android:layout_marginTop="24dp"
-        android:backgroundTint="@color/google_red"
-        android:drawableLeft="@drawable/ic_google"
-        android:drawablePadding="8dp"
-        android:gravity="start|center_vertical"
-        android:text="  Google"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textViewOr" />
-
-    <Button
-        android:id="@+id/buttonFacebookRegister"
-        android:layout_width="165dp"
-        android:layout_height="47dp"
-        android:layout_marginTop="20dp"
-        android:backgroundTint="@color/facebook_blue"
-        android:drawableLeft="@drawable/ic_facebook"
-        android:drawablePadding="8dp"
-        android:gravity="start|center_vertical"
-        android:text=" Facebook"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/buttonGoogleRegister" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

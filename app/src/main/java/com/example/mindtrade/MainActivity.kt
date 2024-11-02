@@ -1,6 +1,7 @@
 package com.example.mindtrade
 
 import YourAdapter
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -8,6 +9,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
+import android.widget.Button
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,6 +31,18 @@ class MainActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        // Configuración del botón de cierre de sesión
+        val signOutButton = findViewById<Button>(R.id.button)
+        signOutButton.setOnClickListener {
+            // Cerrar sesión de Firebase
+            FirebaseAuth.getInstance().signOut()
+
+            // Redirigir a LoginActivity después de cerrar sesión
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish() // Finalizar MainActivity para que no esté en el historial
         }
     }
 }

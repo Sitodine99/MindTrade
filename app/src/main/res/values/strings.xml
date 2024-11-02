@@ -1,13 +1,20 @@
 <resources>
+    <string name="default_web_client_id">542657467951-gf798m6df5hnrgl5b8n2or8gd1c02daq.apps.googleusercontent.com</string>
     <string name="app_name" translatable="false">MindTrade</string>
     <!-- Descripción para la imagen del logo -->
     <string name="logo_image" translatable="false">Logo MindTrade</string>
     <!-- Descripción para el texto pantalla inicial -->
     <string name="textviewExplore" translatable="false">Domina tus estrategias de trading</string>
+    <!-- Descripción para el texto crea tu cuenta -->
+    <string name="textviewCreate" translatable="false">Crea tu cuenta</string>
     <!-- Descripción para el texto email -->
-    <string name="textviewEmail" translatable="false">Email</string>
+    <string name="textviewEmail" translatable="false">Correo electrónico</string>
     <!-- Descripción para el texto password -->
-    <string name="textviewPassword" translatable="false">Password</string>
+    <string name="textviewPassword" translatable="false">Contraseña</string>
+    <!-- Descripción para el texto repetir pasword -->
+    <string name="textviewPassword2" translatable="false">Repetir Contraseña</string>
+
+
     <!-- Descripción para el botón de inicio de sesión -->
     <string name="sessionButton" translatable="false">Iniciar sesión</string>
     <!-- Descripción para el botón de inicio de sesión -->
@@ -39,8 +46,6 @@
     <string name="titleSwingtrading" translatable="false">Swing Trading</string>
     !-- Descripción para la tarjeta de daytrading -->
     <string name="swingtrading_TexView" translatable="false">Sigue tendencias en periodos de días o semanas.</string>
-
-
 
 
     <!-- Opciones para el Spinner de preferencias de trading -->

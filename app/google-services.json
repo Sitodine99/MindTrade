@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "542657467951",
     "project_id": "mindtrade-55249",
-    "storage_bucket": "mindtrade-55249.appspot.com"
+    "storage_bucket": "mindtrade-55249.firebasestorage.app"
   },
   "client": [
     {
@@ -12,7 +12,20 @@
           "package_name": "com.example.mindtrade"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "542657467951-br2lhd490e7rtudjjhiao231pcc0hc7q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mindtrade",
+            "certificate_hash": "4228fde844137210b05962b112b493a45d778d25"
+          }
+        },
+        {
+          "client_id": "542657467951-gf798m6df5hnrgl5b8n2or8gd1c02daq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCxUidxwKslU9OKhxZ4qwvI76ZXK7BZ7uU"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "542657467951-gf798m6df5hnrgl5b8n2or8gd1c02daq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

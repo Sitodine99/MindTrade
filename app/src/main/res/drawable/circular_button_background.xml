@@ -1,0 +1,5 @@
+<!-- circular_button_background.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/facebook_blue" />
+    <corners android:radius="25dp" />
+</shape>

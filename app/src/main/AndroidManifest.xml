@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" >
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
         android:allowBackup="true"
@@ -11,27 +11,30 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MindTrade"
-        tools:targetApi="31" >
+        tools:targetApi="31">
         <activity
-            android:name=".TradingStyleActivity"
+            android:name=".EmotionsActivity"
             android:exported="false" />
-        <!-- WelcomeActivity configurada como actividad inicial -->
+        <!-- LoginActivity como punto de entrada inicial -->
         <activity
-            android:name=".Welcome_Activity"
+            android:name=".LoginActivity"
             android:exported="true"
-            android:theme="@style/Theme.MindTrade" >
+            android:theme="@style/Theme.MindTrade">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- Otras actividades -->
-        <activity
-            android:name=".LoginActivity"
-            android:exported="true" />
+        </activity> <!-- com.example.mindtrade.RegisterActivity para usuarios nuevos -->
         <activity
             android:name=".RegisterActivity"
-            android:exported="false" />
+            android:exported="false" /> <!-- WelcomeActivity para dar la bienvenida tras el registro -->
+        <activity
+            android:name=".WelcomeActivity"
+            android:exported="false" /> <!-- TradingStyleActivity para seleccionar estilo de trading -->
+        <activity
+            android:name=".TradingStyleActivity"
+            android:exported="false" /> <!-- MainActivity como pantalla principal para usuarios autenticados -->
         <activity
             android:name=".MainActivity"
             android:exported="true" />
