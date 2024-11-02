@@ -32,7 +32,7 @@
         android:fontFamily="serif"
         android:text="@string/welcome_TextView_description"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="#070707"
+        android:textColor="@color/black"
         android:textSize="24sp"
         android:textStyle="bold"
         android:typeface="normal"

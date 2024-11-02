@@ -26,23 +26,15 @@ class RegisterActivity : AppCompatActivity() {
         // Inicializamos Firebase Auth
         auth = FirebaseAuth.getInstance()
 
-        // Configurar el Spinner de preferencias de trading
-        val preferencesAdapter = ArrayAdapter.createFromResource(
-            this,
-            R.array.trading_preferences, // Asegúrate de tener este array en strings.xml
-            android.R.layout.simple_spinner_item
-        )
-        preferencesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spinnerTradingPreference.adapter = preferencesAdapter
+
 
         // Configuración del botón de registro
         binding.buttonRegister.setOnClickListener {
             val email = binding.editTextEmail.text.toString().trim()
             val password = binding.editTextPassword.text.toString().trim()
-            val username = binding.editTextUsername.text.toString().trim()
-            val tradingPreference = binding.spinnerTradingPreference.selectedItem.toString()
 
-            if (email.isEmpty() || password.isEmpty() || username.isEmpty()) {
+
+            if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -53,9 +45,8 @@ class RegisterActivity : AppCompatActivity() {
                     if (task.isSuccessful) {
                         val userId = auth.currentUser?.uid ?: ""
                         val userData = hashMapOf(
-                            "username" to username,
                             "email" to email,
-                            "tradingPreference" to tradingPreference
+
                         )
 
                         // Guardar datos adicionales en Firestore
@@ -74,12 +65,6 @@ class RegisterActivity : AppCompatActivity() {
                 }
         }
 
-        // Redirigir a Login si ya tiene cuenta
-        binding.textViewLogin.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            val options = ActivityOptions.makeCustomAnimation(this, R.anim.fade_in, R.anim.fade_out)
-            startActivity(intent, options.toBundle())
-        }
 
     }
 }
