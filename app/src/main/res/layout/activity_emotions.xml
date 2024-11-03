@@ -7,4 +7,150 @@
     android:layout_height="match_parent"
     tools:context=".EmotionsActivity">
 
+    <ImageView
+        android:id="@+id/Edificios"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/buildings_image_description"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:srcCompat="@drawable/edificios" />
+
+    <!-- Título de la Pantalla -->
+    <TextView
+        android:id="@+id/titlePsico"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:fontFamily="serif"
+        android:text="@string/titlePsico"
+        android:textAlignment="center"
+        android:textColor="#070707"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Tarjeta para Psico + -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardPositive"
+        style="@style/CustomCardStyle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/titlePsico">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <!-- Imagen de Scalping con padding para evitar recorte -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/traderPsicoPositive"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginEnd="16dp"
+                android:padding="4dp"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/CircularImage"
+                app:srcCompat="@drawable/positive"
+                app:strokeColor="@android:color/white"
+                app:strokeWidth="4dp" />
+
+            <!-- Contenedor vertical para el título y la descripción -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <!-- Título para Scalping -->
+                <TextView
+                    android:id="@+id/traderPsicoNegative"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="serif"
+                    android:text="@string/psicoPositiveTitle"
+                    android:textColor="@android:color/holo_green_light"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <!-- Descripción para Scalping -->
+                <TextView
+                    android:id="@+id/psicoPositiveDescription"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="serif"
+                    android:text="@string/psicoPositiveTexview"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Tarjeta Psico - -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardNegative"
+        style="@style/CustomCardStyle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardPositive">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <!-- Imagen de Scalping con padding para evitar recorte -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/tarderPsicoNegative"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginEnd="16dp"
+                android:padding="4dp"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/CircularImage"
+                app:srcCompat="@drawable/negative"
+                app:strokeColor="@android:color/white"
+                app:strokeWidth="4dp" />
+
+            <!-- Contenedor vertical para el título y la descripción -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <!-- Título para Psico - -->
+                <TextView
+                    android:id="@+id/scalpingTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="serif"
+                    android:text="@string/psicoNegativeTitle"
+                    android:textColor="@color/my_red"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <!-- Descripción para Psico - -->
+                <TextView
+                    android:id="@+id/scalpingDescription"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="serif"
+                    android:text="@string/psicoNegativeTexview"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

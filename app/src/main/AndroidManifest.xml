@@ -12,32 +12,40 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MindTrade"
         tools:targetApi="31">
-        <activity
-            android:name=".EmotionsActivity"
-            android:exported="false" />
-        <!-- LoginActivity como punto de entrada inicial -->
-        <activity
-            android:name=".LoginActivity"
-            android:exported="true"
-            android:theme="@style/Theme.MindTrade">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity> <!-- com.example.mindtrade.RegisterActivity para usuarios nuevos -->
-        <activity
-            android:name=".RegisterActivity"
-            android:exported="false" /> <!-- WelcomeActivity para dar la bienvenida tras el registro -->
-        <activity
-            android:name=".WelcomeActivity"
-            android:exported="false" /> <!-- TradingStyleActivity para seleccionar estilo de trading -->
-        <activity
-            android:name=".TradingStyleActivity"
-            android:exported="false" /> <!-- MainActivity como pantalla principal para usuarios autenticados -->
-        <activity
-            android:name=".MainActivity"
-            android:exported="true" />
-    </application>
+    <activity
+        android:name=".EmotionsActivity"
+        android:exported="false" />
 
-</manifest>
+    <!-- LoginActivity como punto de entrada inicial -->
+    <activity
+        android:name=".LoginActivity"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
+
+    <activity
+        android:name=".RegisterActivity"
+        android:exported="false" />
+
+    <!-- WelcomeActivity para dar la bienvenida tras el registro -->
+    <activity
+        android:name=".WelcomeActivity"
+        android:exported="false" />
+
+    <!-- TradingStyleActivity para seleccionar estilo de trading -->
+    <activity
+        android:name=".TradingStyleActivity"
+        android:exported="false" />
+
+    <!-- MainActivity como pantalla principal para usuarios autenticados -->
+    <activity
+        android:name=".MainActivity"
+        android:exported="true" />
+
+</application>
+
+    </manifest>

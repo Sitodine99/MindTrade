@@ -76,7 +76,11 @@ class TradingStyleActivity : AppCompatActivity() {
             db.collection("users").document(userId!!).set(userData, SetOptions.merge())
                 .addOnSuccessListener {
                     Toast.makeText(this, "Estilo de trading guardado", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this, MainActivity::class.java))
+
+
+                    val emotionsIntent = Intent(this, EmotionsActivity::class.java)
+                    emotionsIntent.putExtra("USER_ID", userId)
+                    startActivity(emotionsIntent)
                     finish()
                 }
                 .addOnFailureListener { e ->

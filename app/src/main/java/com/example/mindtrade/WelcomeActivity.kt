@@ -15,11 +15,11 @@ class WelcomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        //enableEdgeToEdge()
         setContentView(R.layout.activity_welcome)
 
-        window.statusBarColor = ContextCompat.getColor(this, R.color.black)
-        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = false
+        //window.statusBarColor = ContextCompat.getColor(this, R.color.black)
+        //WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = false
 
         val userId = intent.getStringExtra("USER_ID")
 
@@ -38,11 +38,11 @@ class WelcomeActivity : AppCompatActivity() {
             finish()
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+        //ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            //val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            //v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            //insets
+        //}
     }
 }
 

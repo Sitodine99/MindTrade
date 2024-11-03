@@ -99,7 +99,7 @@
         android:id="@+id/textViewRegister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="48dp"
         android:contentDescription="@string/textViewRegister"
         android:fontFamily="serif"
         android:text="@string/textViewRegister"
@@ -122,39 +122,29 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewRegister" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/buttonGoogleRegister"
         android:layout_width="165dp"
         android:layout_height="46dp"
         android:layout_marginTop="24dp"
-        android:backgroundTint="@color/google_red"
+        android:background="@drawable/google_button_background"
+        android:backgroundTint="@null"
         android:drawableLeft="@drawable/ic_google"
-        android:drawablePadding="8dp"
+        android:paddingStart="30dp"
+        android:drawablePadding="15dp"
         android:gravity="start|center_vertical"
-        android:text="  Google"
-        android:textColor="@android:color/white"
+        android:text="Google"
+        android:textColor="@android:color/black"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textViewOr" />
 
-    <Button
-        android:id="@+id/buttonFacebookRegister"
-        android:layout_width="165dp"
-        android:layout_height="47dp"
-        android:layout_marginTop="20dp"
-        android:backgroundTint="@color/facebook_blue"
-        android:drawableLeft="@drawable/ic_facebook"
-        android:drawablePadding="8dp"
-        android:gravity="start|center_vertical"
-        android:text=" Facebook"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/buttonGoogleRegister" />
+
+
+
+
 
     <ImageView
         android:id="@+id/Edificios"
@@ -164,7 +154,7 @@
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintVertical_bias="1.0"
         app:srcCompat="@drawable/edificios"
         tools:layout_editor_absoluteX="0dp" />
 

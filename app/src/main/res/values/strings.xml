@@ -47,11 +47,17 @@
     !-- Descripción para la tarjeta de daytrading -->
     <string name="swingtrading_TexView" translatable="false">Sigue tendencias en periodos de días o semanas.</string>
 
+    <!-- Descripción para el título del activity psico -->
+    <string name="titlePsico" translatable="false">¿Cómo te sientes respecto a tu trading en este momento?</string>
+    <!-- Descripción para el título de psico+ -->
+    <string name="psicoPositiveTitle" translatable="false">Psico +</string>
+    <!-- Descripción para la tarjeta de psico+ -->
+    <string name="psicoPositiveTexview" translatable="false">"Me siento positivo y en control. Estoy manejando bien mis emociones y mi relación con el mercado."</string>
+    <!-- Descripción para el título de psico- -->
+    <string name="psicoNegativeTitle" translatable="false">Psico -</string>
+    <!-- Descripción para la tarjeta de psico- -->
+    <string name="psicoNegativeTexview" translatable="false">"Me siento negativo o fuera de control. Las emociones están afectando mis decisiones."</string>
 
-    <!-- Opciones para el Spinner de preferencias de trading -->
-    <string-array name="trading_preferences">
-        <item>Daytrading</item>
-        <item>Scalping</item>
-        <item>Swing trading</item>
-    </string-array>
+
+
 </resources>
