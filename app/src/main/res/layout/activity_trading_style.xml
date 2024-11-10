@@ -41,6 +41,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/cardScalping"
         style="@style/CustomCardStyle"
+        android:layout_marginTop="60dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/titleStyle">
@@ -100,10 +101,10 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/cardDayTrading"
         style="@style/CustomCardStyle"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardScalping"
-        android:layout_marginTop="16dp">
+        app:layout_constraintTop_toBottomOf="@id/cardScalping">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -116,13 +117,13 @@
                 android:id="@+id/daytrader"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:padding="4dp"
                 android:layout_marginEnd="16dp"
+                android:padding="4dp"
                 android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/CircularImage"
                 app:srcCompat="@drawable/daytrader"
                 app:strokeColor="@android:color/white"
-                app:strokeWidth="4dp"
-                app:shapeAppearanceOverlay="@style/CircularImage" />
+                app:strokeWidth="4dp" />
 
             <!-- Contenedor vertical para el título y la descripción -->
             <LinearLayout
@@ -160,10 +161,10 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/cardSwingTrading"
         style="@style/CustomCardStyle"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardDayTrading"
-        android:layout_marginTop="16dp">
+        app:layout_constraintTop_toBottomOf="@id/cardDayTrading">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -176,13 +177,13 @@
                 android:id="@+id/swingtrader"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:padding="4dp"
                 android:layout_marginEnd="16dp"
+                android:padding="4dp"
                 android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/CircularImage"
                 app:srcCompat="@drawable/swingtarder"
                 app:strokeColor="@android:color/white"
-                app:strokeWidth="4dp"
-                app:shapeAppearanceOverlay="@style/CircularImage" />
+                app:strokeWidth="4dp" />
 
             <!-- Contenedor vertical para el título y la descripción -->
             <LinearLayout

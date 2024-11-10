@@ -39,6 +39,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/cardPositive"
         style="@style/CustomCardStyle"
+        android:layout_marginTop="100dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/titlePsico">
@@ -98,6 +99,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/cardNegative"
         style="@style/CustomCardStyle"
+        android:layout_marginTop="60dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardPositive">

@@ -53,11 +53,15 @@
     <string name="psicoPositiveTitle" translatable="false">Psico +</string>
     <!-- Descripción para la tarjeta de psico+ -->
     <string name="psicoPositiveTexview" translatable="false">"Me siento positivo y en control. Estoy manejando bien mis emociones y mi relación con el mercado."</string>
+
     <!-- Descripción para el título de psico- -->
     <string name="psicoNegativeTitle" translatable="false">Psico -</string>
     <!-- Descripción para la tarjeta de psico- -->
     <string name="psicoNegativeTexview" translatable="false">"Me siento negativo o fuera de control. Las emociones están afectando mis decisiones."</string>
+    <string name="title_activity_psico_negative">PsicoNegativeActivity</string>
 
+    <!-- Descripción para el título de activityPsicoNegative -->
+    <string name="titleNegativeEmotions" translatable="false">¿Qué has sentido últimamente hacia el mercado?</string>
 
 
 </resources>
