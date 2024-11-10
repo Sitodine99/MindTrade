@@ -96,8 +96,9 @@
     <string name="avatar" translatable="false">Imagen de avatar</string>
     <string name="enter_your_alias" translatable="false">Escribe tu alias</string>
     <string name="what_is_your_birthday" translatable="false">¿Cuándo naciste?</string>
-    <!-- Descripción para el texto email -->
+    <!-- Descripción para el texto alias -->
     <string name="enter_alias_hint" translatable="false">Alias</string>
+    <string name="continueButton" translatable="false">Continuar</string>
 
 
 </resources>

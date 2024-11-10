@@ -5,13 +5,10 @@
 
         <!-- Color de la barra de estado (superior) a negro -->
         <item name="android:statusBarColor">@color/black</item>
-
         <!-- Iconos claros en la barra de estado (para que los iconos sean blancos) -->
         <item name="android:windowLightStatusBar">false</item>
-
         <!-- Color de la barra de navegación (inferior) a negro -->
         <item name="android:navigationBarColor">@color/black</item>
-
         <!-- Iconos claros en la barra de navegación (para que los iconos sean blancos) -->
         <item name="android:windowLightNavigationBar">false</item>
     </style>
