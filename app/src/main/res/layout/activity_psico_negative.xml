@@ -34,15 +34,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Primera fila de tarjetas -->
-
-    <!-- Segunda fila de tarjetas -->
-
     <LinearLayout
         android:id="@+id/first_row"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="8dp"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
         android:paddingStart="20dp"
@@ -298,7 +294,7 @@
         app:layout_constraintTop_toBottomOf="@+id/second_row">
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/vergüenza"
+            android:id="@+id/verguenza"
             style="@style/CustomCardStyle"
             android:layout_width="100dp"
             android:layout_height="140dp"
@@ -334,7 +330,7 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/confusión"
+            android:id="@+id/confusion"
             style="@style/CustomCardStyle"
             android:layout_width="100dp"
             android:layout_height="140dp"
@@ -417,9 +413,12 @@
         android:orientation="horizontal"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
+        app:layout_constraintBottom_toBottomOf="@+id/Edificios"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.511"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/third_row">
+        app:layout_constraintTop_toBottomOf="@+id/third_row"
+        app:layout_constraintVertical_bias="0.0">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/fatalismo"
@@ -458,7 +457,7 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/confusión"
+            android:id="@+id/frustracion"
             style="@style/CustomCardStyle"
             android:layout_width="100dp"
             android:layout_height="140dp"

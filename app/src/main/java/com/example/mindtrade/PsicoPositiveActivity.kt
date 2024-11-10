@@ -9,13 +9,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
-import com.example.mindtrade.databinding.ActivityPsicoNegativeBinding
+import com.example.mindtrade.databinding.ActivityPsicoPositiveBinding
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 
-class PsicoNegativeActivity : AppCompatActivity() {
+class PsicoPositiveActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityPsicoNegativeBinding
+    private lateinit var binding: ActivityPsicoPositiveBinding
     private var userId: String? = null
     private val db = FirebaseFirestore.getInstance()
 
@@ -25,7 +25,7 @@ class PsicoNegativeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityPsicoNegativeBinding.inflate(layoutInflater)
+        binding = ActivityPsicoPositiveBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         // Inicializar SoundPool
@@ -42,7 +42,8 @@ class PsicoNegativeActivity : AppCompatActivity() {
 
         // Obtener el ID del usuario de la intent
         userId = intent.getStringExtra("USER_ID")
-        Log.d("PsicoNegativeActivity", "User ID recibido: $userId")
+
+        Log.d("PsicoPositiveActivity", "User ID recibido: $userId")
 
         if (userId == null) {
             Toast.makeText(this, "Error: ID de usuario no encontrado", Toast.LENGTH_LONG).show()
@@ -50,25 +51,25 @@ class PsicoNegativeActivity : AppCompatActivity() {
             return
         }
 
-        // Configurar la selección de sentimientos
-        binding.ansiedad.setOnClickListener { selectEmotion(binding.ansiedad, "Ansiedad") }
-        binding.impaciencia.setOnClickListener { selectEmotion(binding.impaciencia, "Impaciencia") }
-        binding.descontrol.setOnClickListener { selectEmotion(binding.descontrol, "Descontrol") }
-        binding.avaricia.setOnClickListener { selectEmotion(binding.avaricia, "Avaricia") }
-        binding.insatisfaccion.setOnClickListener { selectEmotion(binding.insatisfaccion, "Insatisfacción") }
-        binding.rabia.setOnClickListener { selectEmotion(binding.rabia, "Rabia") }
-        binding.verguenza.setOnClickListener { selectEmotion(binding.verguenza, "Vergüenza") }
-        binding.confusion.setOnClickListener { selectEmotion(binding.confusion, "Confusión") }
-        binding.miedo.setOnClickListener { selectEmotion(binding.miedo, "Miedo") }
-        binding.fatalismo.setOnClickListener { selectEmotion(binding.fatalismo, "Fatalismo") }
-        binding.frustracion.setOnClickListener { selectEmotion(binding.frustracion, "Frustración") }
-        binding.ineficacia.setOnClickListener { selectEmotion(binding.ineficacia, "Ineficacia") }
+        // Configurar la selección de emociones positivas
+        binding.autocontrol.setOnClickListener { selectEmotion(binding.autocontrol, "Autocontrol") }
+        binding.confianza.setOnClickListener { selectEmotion(binding.confianza, "Confianza") }
+        binding.eficiencia.setOnClickListener { selectEmotion(binding.eficiencia, "Eficiencia") }
+        binding.optimismo.setOnClickListener { selectEmotion(binding.optimismo, "Optimismo") }
+        binding.paciencia.setOnClickListener { selectEmotion(binding.paciencia, "Paciencia") }
+        binding.realizacion.setOnClickListener { selectEmotion(binding.realizacion, "Realización") }
+        binding.satisfaccion.setOnClickListener { selectEmotion(binding.satisfaccion, "Satisfacción") }
+        binding.seguridad.setOnClickListener { selectEmotion(binding.seguridad, "Seguridad") }
+        binding.sintonia.setOnClickListener { selectEmotion(binding.sintonia, "Sintonía") }
+        binding.tranquilidad.setOnClickListener { selectEmotion(binding.tranquilidad, "Tranquilidad") }
+        binding.aceptacion.setOnClickListener { selectEmotion(binding.aceptacion, "Aceptación") }
+        binding.afirmacion.setOnClickListener { selectEmotion(binding.afirmacion, "Afirmación") }
     }
 
     private fun selectEmotion(cardView: CardView, emotion: String) {
         // Cambiar el fondo de la tarjeta seleccionada
-        selectedCard?.setCardBackgroundColor(ContextCompat.getColor(this, R.color.black))
-        cardView.setCardBackgroundColor(ContextCompat.getColor(this, R.color.highlight_green))
+        selectedCard?.setCardBackgroundColor(ContextCompat.getColor(this, R.color.black)) // Color de las tarjetas no seleccionadas
+        cardView.setCardBackgroundColor(ContextCompat.getColor(this, R.color.highlight_green)) // Color de la tarjeta seleccionada
         selectedCard = cardView
 
         // Reproducir sonido de selección

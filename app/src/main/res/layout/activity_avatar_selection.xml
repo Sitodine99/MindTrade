@@ -48,7 +48,7 @@
         android:clickable="true"
         android:contentDescription="@string/avatar"
         android:onClick="openAvatarSelectionDialog"
-        android:src="@drawable/firstAvatar"
+        android:src="@drawable/firstavatar"
         android:scaleType="centerCrop"
         android:padding="5dp"
         app:layout_constraintEnd_toEndOf="parent"

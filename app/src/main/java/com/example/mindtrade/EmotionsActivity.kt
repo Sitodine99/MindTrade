@@ -64,15 +64,15 @@ class EmotionsActivity : AppCompatActivity() {
 
     private fun selectCard(cardView: CardView, psicoState: String) {
         // Cambiar el fondo de la tarjeta seleccionada
-        selectedCard?.setCardBackgroundColor(ContextCompat.getColor(this, R.color.black)) // Color de las tarjetas no seleccionadas
-        cardView.setCardBackgroundColor(ContextCompat.getColor(this, R.color.highlight_green)) // Color de la tarjeta seleccionada
+        selectedCard?.setCardBackgroundColor(ContextCompat.getColor(this, R.color.black))
+        cardView.setCardBackgroundColor(ContextCompat.getColor(this, R.color.highlight_green))
 
         selectedCard = cardView
 
         // Reproducir sonido de selección
         soundPool.play(soundId, 1f, 1f, 0, 0, 1f)
 
-        // Guardar el estado emocional
+        // Guardar el estado emocional y redirigir
         saveEmotionalState(psicoState)
     }
 
@@ -85,9 +85,15 @@ class EmotionsActivity : AppCompatActivity() {
                 .addOnSuccessListener {
                     Toast.makeText(this, "Estado emocional guardado", Toast.LENGTH_SHORT).show()
 
-                    // Redirigir a MainActivity
-                    val mainIntent = Intent(this, MainActivity::class.java)
-                    startActivity(mainIntent)
+                    // Redirigir a PsicoPositiveActivity o PsicoNegativeActivity según el estado
+                    val nextActivity = if (psicoState == "Psico +") {
+                        PsicoPositiveActivity::class.java
+                    } else {
+                        PsicoNegativeActivity::class.java
+                    }
+                    val intent = Intent(this, nextActivity)
+                    intent.putExtra("USER_ID", userId) // Añadir el userId aquí
+                    startActivity(intent)
                     finish()
                 }
                 .addOnFailureListener { e ->

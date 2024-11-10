@@ -77,7 +77,6 @@ class TradingStyleActivity : AppCompatActivity() {
                 .addOnSuccessListener {
                     Toast.makeText(this, "Estilo de trading guardado", Toast.LENGTH_SHORT).show()
 
-
                     val emotionsIntent = Intent(this, EmotionsActivity::class.java)
                     emotionsIntent.putExtra("USER_ID", userId)
                     startActivity(emotionsIntent)
