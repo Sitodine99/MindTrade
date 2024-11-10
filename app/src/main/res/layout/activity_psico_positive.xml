@@ -53,7 +53,7 @@
         app:layout_constraintTop_toBottomOf="@+id/titleNegativeEmotions">
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/ansiedad"
+            android:id="@+id/autocontrol"
             style="@style/CustomCardStyle"
             android:layout_width="100dp"
             android:layout_height="140dp"
@@ -73,7 +73,7 @@
                     android:padding="3dp"
                     android:scaleType="centerCrop"
                     app:shapeAppearanceOverlay="@style/CircularImage"
-                    app:srcCompat="@drawable/ansiedad"
+                    app:srcCompat="@drawable/autocontrol"
                     app:strokeColor="@android:color/white"
                     app:strokeWidth="3dp" />
 
@@ -81,15 +81,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/titleAnsiedad"
-                    android:textColor="@color/my_red"
+                    android:text="@string/titleAutocontrol"
+                    android:textColor="@color/highlight_green"
                     android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/impaciencia"
+            android:id="@+id/confianza"
             style="@style/CustomCardStyle"
             android:layout_width="100dp"
             android:layout_height="140dp"
@@ -109,7 +109,7 @@
                     android:padding="3dp"
                     android:scaleType="centerCrop"
                     app:shapeAppearanceOverlay="@style/CircularImage"
-                    app:srcCompat="@drawable/impaciencia"
+                    app:srcCompat="@drawable/confianza"
                     app:strokeColor="@android:color/white"
                     app:strokeWidth="3dp" />
 
@@ -117,15 +117,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/titleImpaciencia"
-                    android:textColor="@color/my_red"
+                    android:text="@string/titleConfianza"
+                    android:textColor="@color/highlight_green"
                     android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/descontrol"
+            android:id="@+id/eficiencia"
             style="@style/CustomCardStyle"
             android:layout_width="100dp"
             android:layout_height="140dp">
@@ -144,7 +144,7 @@
                     android:padding="3dp"
                     android:scaleType="centerCrop"
                     app:shapeAppearanceOverlay="@style/CircularImage"
-                    app:srcCompat="@drawable/descontrol"
+                    app:srcCompat="@drawable/eficiencia"
                     app:strokeColor="@android:color/white"
                     app:strokeWidth="3dp" />
 
@@ -152,8 +152,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/titleDescontrol"
-                    android:textColor="@color/my_red"
+                    android:text="@string/titleEficiencia"
+                    android:textColor="@color/highlight_green"
                     android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -175,7 +175,7 @@
         app:layout_constraintTop_toBottomOf="@+id/first_row">
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/avaricia"
+            android:id="@+id/optimismo"
             style="@style/CustomCardStyle"
             android:layout_width="100dp"
             android:layout_height="140dp"
@@ -195,7 +195,7 @@
                     android:padding="3dp"
                     android:scaleType="centerCrop"
                     app:shapeAppearanceOverlay="@style/CircularImage"
-                    app:srcCompat="@drawable/avaricia"
+                    app:srcCompat="@drawable/optimismo"
                     app:strokeColor="@android:color/white"
                     app:strokeWidth="3dp" />
 
@@ -203,15 +203,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/titleAvaricia"
-                    android:textColor="@color/my_red"
+                    android:text="@string/titleOptimismo"
+                    android:textColor="@color/highlight_green"
                     android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/insatisfaccion"
+            android:id="@+id/paciencia"
             style="@style/CustomCardStyle"
             android:layout_width="100dp"
             android:layout_height="140dp"
@@ -231,7 +231,7 @@
                     android:padding="3dp"
                     android:scaleType="centerCrop"
                     app:shapeAppearanceOverlay="@style/CircularImage"
-                    app:srcCompat="@drawable/insatisfaccion"
+                    app:srcCompat="@drawable/paciencia"
                     app:strokeColor="@android:color/white"
                     app:strokeWidth="3dp" />
 
@@ -239,15 +239,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/titleInsatisfaccion"
-                    android:textColor="@color/my_red"
+                    android:text="@string/titlePaciente"
+                    android:textColor="@color/highlight_green"
                     android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/rabia"
+            android:id="@+id/realizacion"
             style="@style/CustomCardStyle"
             android:layout_width="100dp"
             android:layout_height="140dp">
@@ -266,7 +266,7 @@
                     android:padding="3dp"
                     android:scaleType="centerCrop"
                     app:shapeAppearanceOverlay="@style/CircularImage"
-                    app:srcCompat="@drawable/rabia"
+                    app:srcCompat="@drawable/realizacion"
                     app:strokeColor="@android:color/white"
                     app:strokeWidth="3dp" />
 
@@ -274,8 +274,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/titleRabia"
-                    android:textColor="@color/my_red"
+                    android:text="@string/titleRealizacion"
+                    android:textColor="@color/highlight_green"
                     android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -298,7 +298,7 @@
         app:layout_constraintTop_toBottomOf="@+id/second_row">
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/vergüenza"
+            android:id="@+id/satisfaccion"
             style="@style/CustomCardStyle"
             android:layout_width="100dp"
             android:layout_height="140dp"
@@ -318,7 +318,7 @@
                     android:padding="3dp"
                     android:scaleType="centerCrop"
                     app:shapeAppearanceOverlay="@style/CircularImage"
-                    app:srcCompat="@drawable/verguenza"
+                    app:srcCompat="@drawable/satisfaccion"
                     app:strokeColor="@android:color/white"
                     app:strokeWidth="3dp" />
 
@@ -326,15 +326,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/titleVerguenza"
-                    android:textColor="@color/my_red"
+                    android:text="@string/titleSatisfaccion"
+                    android:textColor="@color/highlight_green"
                     android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/confusión"
+            android:id="@+id/seguridad"
             style="@style/CustomCardStyle"
             android:layout_width="100dp"
             android:layout_height="140dp"
@@ -354,7 +354,7 @@
                     android:padding="3dp"
                     android:scaleType="centerCrop"
                     app:shapeAppearanceOverlay="@style/CircularImage"
-                    app:srcCompat="@drawable/confusion"
+                    app:srcCompat="@drawable/seguridad"
                     app:strokeColor="@android:color/white"
                     app:strokeWidth="3dp" />
 
@@ -362,15 +362,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/titleConsfusion"
-                    android:textColor="@color/my_red"
+                    android:text="@string/titleSeguridad"
+                    android:textColor="@color/highlight_green"
                     android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/miedo"
+            android:id="@+id/sintonia"
             style="@style/CustomCardStyle"
             android:layout_width="100dp"
             android:layout_height="140dp">
@@ -389,7 +389,7 @@
                     android:padding="3dp"
                     android:scaleType="centerCrop"
                     app:shapeAppearanceOverlay="@style/CircularImage"
-                    app:srcCompat="@drawable/miedo"
+                    app:srcCompat="@drawable/sintonia"
                     app:strokeColor="@android:color/white"
                     app:strokeWidth="3dp" />
 
@@ -397,8 +397,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/titleMiedo"
-                    android:textColor="@color/my_red"
+                    android:text="@string/titleSintonia"
+                    android:textColor="@color/highlight_green"
                     android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -422,7 +422,7 @@
         app:layout_constraintTop_toBottomOf="@+id/third_row">
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/fatalismo"
+            android:id="@+id/tranquilidad"
             style="@style/CustomCardStyle"
             android:layout_width="100dp"
             android:layout_height="140dp"
@@ -442,7 +442,7 @@
                     android:padding="3dp"
                     android:scaleType="centerCrop"
                     app:shapeAppearanceOverlay="@style/CircularImage"
-                    app:srcCompat="@drawable/fatalismo"
+                    app:srcCompat="@drawable/tranquilidad"
                     app:strokeColor="@android:color/white"
                     app:strokeWidth="3dp" />
 
@@ -450,15 +450,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/titleFatalismo"
-                    android:textColor="@color/my_red"
+                    android:text="@string/titleTranquilidad"
+                    android:textColor="@color/highlight_green"
                     android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/confusión"
+            android:id="@+id/aceptacion"
             style="@style/CustomCardStyle"
             android:layout_width="100dp"
             android:layout_height="140dp"
@@ -478,7 +478,7 @@
                     android:padding="3dp"
                     android:scaleType="centerCrop"
                     app:shapeAppearanceOverlay="@style/CircularImage"
-                    app:srcCompat="@drawable/frustracion"
+                    app:srcCompat="@drawable/aceptacion"
                     app:strokeColor="@android:color/white"
                     app:strokeWidth="3dp" />
 
@@ -486,15 +486,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/titleFrustracion"
-                    android:textColor="@color/my_red"
+                    android:text="@string/titleAceptación"
+                    android:textColor="@color/highlight_green"
                     android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/ineficacia"
+            android:id="@+id/afirmacion"
             style="@style/CustomCardStyle"
             android:layout_width="100dp"
             android:layout_height="140dp">
@@ -513,7 +513,7 @@
                     android:padding="3dp"
                     android:scaleType="centerCrop"
                     app:shapeAppearanceOverlay="@style/CircularImage"
-                    app:srcCompat="@drawable/ineficacia"
+                    app:srcCompat="@drawable/afirmacion"
                     app:strokeColor="@android:color/white"
                     app:strokeWidth="3dp" />
 
@@ -521,17 +521,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/titleIneficacia"
-                    android:textColor="@color/my_red"
+                    android:text="@string/titleAfirmación"
+                    android:textColor="@color/highlight_green"
                     android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-

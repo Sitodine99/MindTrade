@@ -74,6 +74,23 @@
     <string name="titleConsfusion" translatable="false">Confusión</string>
     <string name="titleMiedo" translatable="false">Miedo</string>
     <string name="titleFrustracion" translatable="false">Frustración</string>
+    <string name="titleIneficacia" translatable="false">Ineficacia</string>
+    <string name="titleFatalismo" translatable="false">Fatalismo</string>
+
+    <!-- Descripción para el título de tarjetas de emociones positivas -->
+    <string name="titleAutocontrol" translatable="false">Autocontrol</string>
+    <string name="titleConfianza" translatable="false">Confianza</string>
+    <string name="titleEficiencia" translatable="false">Eficiencia</string>
+    <string name="titleOptimismo" translatable="false">Optimismo</string>
+    <string name="titlePaciente" translatable="false">Paciencia</string>
+    <string name="titleRealizacion" translatable="false">Realización</string>
+    <string name="titleSatisfaccion" translatable="false">Satisfacción</string>
+    <string name="titleSeguridad" translatable="false">Seguridad</string>
+    <string name="titleSintonia" translatable="false">Sintonía</string>
+    <string name="titleTranquilidad" translatable="false">Tranquilidad</string>
+    <string name="titleAceptación" translatable="false">Aceptación</string>
+    <string name="titleAfirmación" translatable="false">Afirmación</string>
+    <string name="titleControl" translatable="false">Control</string>
 
 
 </resources>
