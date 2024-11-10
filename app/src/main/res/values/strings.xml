@@ -63,5 +63,17 @@
     <!-- Descripción para el título de activityPsicoNegative -->
     <string name="titleNegativeEmotions" translatable="false">¿Qué has sentido últimamente hacia el mercado?</string>
 
+    <!-- Descripción para el título de tarjetas de emociones negativas -->
+    <string name="titleAnsiedad" translatable="false">Ansiedad</string>
+    <string name="titleImpaciencia" translatable="false">Impaciencia</string>
+    <string name="titleDescontrol" translatable="false">Descontrol</string>
+    <string name="titleAvaricia" translatable="false">Avaricia</string>
+    <string name="titleInsatisfaccion" translatable="false">Insatisfacción</string>
+    <string name="titleRabia" translatable="false">Rabia</string>
+    <string name="titleVerguenza" translatable="false">Vergüenza</string>
+    <string name="titleConsfusion" translatable="false">Confusión</string>
+    <string name="titleMiedo" translatable="false">Miedo</string>
+    <string name="titleFrustracion" translatable="false">Frustración</string>
+
 
 </resources>

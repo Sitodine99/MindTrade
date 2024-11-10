@@ -81,9 +81,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/psicoPositiveTitle"
-                    android:textColor="@android:color/holo_green_light"
-                    android:textSize="16sp"
+                    android:text="@string/titleAnsiedad"
+                    android:textColor="@color/my_red"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -117,15 +117,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/psicoPositiveTitle"
-                    android:textColor="@android:color/holo_green_light"
-                    android:textSize="16sp"
+                    android:text="@string/titleImpaciencia"
+                    android:textColor="@color/my_red"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/avaricia"
+            android:id="@+id/descontrol"
             style="@style/CustomCardStyle"
             android:layout_width="100dp"
             android:layout_height="140dp">
@@ -152,9 +152,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/psicoPositiveTitle"
-                    android:textColor="@android:color/holo_green_light"
-                    android:textSize="16sp"
+                    android:text="@string/titleDescontrol"
+                    android:textColor="@color/my_red"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -203,9 +203,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/psicoPositiveTitle"
-                    android:textColor="@android:color/holo_green_light"
-                    android:textSize="16sp"
+                    android:text="@string/titleAvaricia"
+                    android:textColor="@color/my_red"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -239,9 +239,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/psicoPositiveTitle"
-                    android:textColor="@android:color/holo_green_light"
-                    android:textSize="16sp"
+                    android:text="@string/titleInsatisfaccion"
+                    android:textColor="@color/my_red"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -274,9 +274,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/psicoPositiveTitle"
-                    android:textColor="@android:color/holo_green_light"
-                    android:textSize="16sp"
+                    android:text="@string/titleRabia"
+                    android:textColor="@color/my_red"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -326,9 +326,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/psicoPositiveTitle"
-                    android:textColor="@android:color/holo_green_light"
-                    android:textSize="16sp"
+                    android:text="@string/titleVerguenza"
+                    android:textColor="@color/my_red"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -362,9 +362,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/psicoPositiveTitle"
-                    android:textColor="@android:color/holo_green_light"
-                    android:textSize="16sp"
+                    android:text="@string/titleConsfusion"
+                    android:textColor="@color/my_red"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -397,9 +397,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/psicoPositiveTitle"
-                    android:textColor="@android:color/holo_green_light"
-                    android:textSize="16sp"
+                    android:text="@string/titleMiedo"
+                    android:textColor="@color/my_red"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -449,9 +449,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
-                    android:text="@string/psicoPositiveTitle"
-                    android:textColor="@android:color/holo_green_light"
-                    android:textSize="16sp"
+                    android:text="@string/titleFrustracion"
+                    android:textColor="@color/my_red"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
