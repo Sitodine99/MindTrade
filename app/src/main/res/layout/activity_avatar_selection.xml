@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AvatarSelectionActivity">
+
+    <ImageView
+        android:id="@+id/Edificios"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/buildings_image_description"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:srcCompat="@drawable/edificios" />
+
+
+    <!-- Avatar Image (Circular) -->
+    <TextView
+        android:id="@+id/avatarText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:fontFamily="serif"
+        android:text="@string/select_your_avatar"
+        android:textAlignment="center"
+        android:textColor="#070707"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!-- Text above Alias Input -->
+
+    <!-- Alias Input Field -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/avatarImage"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="40dp"
+        android:clickable="true"
+        android:contentDescription="@string/avatar"
+        android:onClick="openAvatarSelectionDialog"
+        android:src="@drawable/firstAvatar"
+        android:scaleType="centerCrop"
+        android:padding="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/avatarText"
+        app:shapeAppearanceOverlay="@style/CircularImage"
+        app:strokeColor="@android:color/black"
+        app:strokeWidth="7.5dp"/>
+
+    <TextView
+        android:id="@+id/aliasText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:fontFamily="serif"
+        android:text="@string/enter_your_alias"
+        android:textAlignment="center"
+        android:textColor="#070707"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/avatarImage" />
+
+    <EditText
+        android:id="@+id/aliasInput"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="@string/enter_alias_hint"
+        android:inputType="textPersonName"
+        android:padding="12dp"
+        android:drawableStart="@drawable/ic_avatar"
+        android:drawablePadding="15dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintTop_toBottomOf="@id/aliasText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintWidth_percent="0.8"/>
+
+    <!-- Text above Date of Birth Selector -->
+    <TextView
+        android:id="@+id/dobText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/what_is_your_birthday"
+        android:fontFamily="serif"
+        android:textAlignment="center"
+        android:textColor="#070707"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintTop_toBottomOf="@id/aliasInput"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp"/>
+
+    <!-- Date of Birth Selector -->
+    <DatePicker
+        android:id="@+id/dobPicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:calendarViewShown="false"
+        android:datePickerMode="spinner"
+        app:layout_constraintTop_toBottomOf="@id/dobText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

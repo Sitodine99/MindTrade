@@ -92,5 +92,12 @@
     <string name="titleAfirmación" translatable="false">Afirmación</string>
     <string name="titleControl" translatable="false">Control</string>
 
+    <string name="select_your_avatar" translatable="false">Selecciona un avatar</string>
+    <string name="avatar" translatable="false">Imagen de avatar</string>
+    <string name="enter_your_alias" translatable="false">Escribe tu alias</string>
+    <string name="what_is_your_birthday" translatable="false">¿Cuándo naciste?</string>
+    <!-- Descripción para el texto email -->
+    <string name="enter_alias_hint" translatable="false">Alias</string>
+
 
 </resources>
