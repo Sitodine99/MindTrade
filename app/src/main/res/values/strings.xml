@@ -18,7 +18,10 @@
     <!-- Descripción para el botón de inicio de sesión -->
     <string name="sessionButton" translatable="false">Iniciar sesión</string>
     <!-- Descripción para el botón de inicio de sesión -->
-    <string name="textViewRegister" translatable="false">¿No tienes una cuenta? Regístrate</string>
+    <string name="textViewQuestion" translatable="false">¿No tienes una cuenta?</string>
+    <string name="textViewRegister" translatable="false">Regístrate</string>
+    <string name="textViewContinue" translatable="false">O continúa con:</string>
+    <string name="textViewGoogle" translatable="false">Google</string>
     <!-- Descripción para la imagen de edificios de pantalla de inicio -->
     <string name="buildings_image_description" translatable="false">Imagen de edificios similares a WallStreet</string>
 

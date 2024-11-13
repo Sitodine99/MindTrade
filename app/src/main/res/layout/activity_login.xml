@@ -10,6 +10,19 @@
     tools:context=".LoginActivity">
 
     <!-- Logo de la aplicación -->
+
+    <ImageView
+        android:id="@+id/Edificios"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:contentDescription="@string/buildings_image_description"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/edificios"
+        tools:layout_editor_absoluteX="0dp" />
+
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="200dp"
@@ -19,7 +32,8 @@
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/mindtrade" />
+        app:srcCompat="@drawable/mindtrade"
+        android:contentDescription="@string/logo_image"/>
 
     <!-- Texto de bienvenida -->
     <TextView
@@ -96,31 +110,46 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
+        android:id="@+id/textViewQuestion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="76dp"
+        android:contentDescription="@string/textViewQuestion"
+        android:fontFamily="serif"
+        android:text="@string/textViewQuestion"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.662" />
+
+    <TextView
         android:id="@+id/textViewRegister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
         android:contentDescription="@string/textViewRegister"
         android:fontFamily="serif"
         android:text="@string/textViewRegister"
         android:textColor="@color/black"
         android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonLogin" />
+        app:layout_constraintHorizontal_bias="0.183"
+        app:layout_constraintStart_toEndOf="@+id/textViewQuestion"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.662" />
 
     <TextView
         android:id="@+id/textViewOr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
         android:fontFamily="serif"
-        android:text="O continúa con:"
+        android:text="@string/textViewContinue"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewRegister" />
+        tools:layout_editor_absoluteY="582dp" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/buttonGoogleRegister"
@@ -129,30 +158,20 @@
         android:layout_marginTop="24dp"
         android:background="@drawable/google_button_background"
         android:backgroundTint="@null"
-        android:drawableLeft="@drawable/ic_google"
-        android:paddingStart="30dp"
+        android:drawableStart="@drawable/ic_google"
         android:drawablePadding="15dp"
         android:gravity="start|center_vertical"
-        android:text="Google"
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp"
+        android:text="@string/textViewGoogle"
         android:textColor="@android:color/black"
         android:textSize="16sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textViewOr" />
-
-
-    <ImageView
-        android:id="@+id/Edificios"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:contentDescription="@string/buildings_image_description"
-        android:scaleType="centerCrop"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@drawable/edificios"
-        tools:layout_editor_absoluteX="0dp" />
+        app:layout_constraintTop_toBottomOf="@id/textViewOr"
+        app:layout_constraintVertical_bias="0.0" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
