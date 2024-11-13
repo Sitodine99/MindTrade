@@ -7,12 +7,12 @@ import android.util.Log
 import android.widget.Button
 import android.widget.DatePicker
 import android.widget.EditText
+import android.widget.GridView
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import java.util.Calendar
 
 class AvatarSelectionActivity : AppCompatActivity() {
 
@@ -22,7 +22,8 @@ class AvatarSelectionActivity : AppCompatActivity() {
     private lateinit var aliasInput: EditText
     private lateinit var dobPicker: DatePicker
     private lateinit var continueButton: Button
-    private var selectedAvatar: String = "default_avatar" // Almacena el avatar seleccionado
+    private var selectedAvatarImage: Int = R.drawable.interrogacion
+    private var selectedAvatarName: String = "default_avatar" // Nombre del avatar seleccionado
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,24 +60,74 @@ class AvatarSelectionActivity : AppCompatActivity() {
             } else if (dateOfBirth.isEmpty()) {
                 Toast.makeText(this, "Por favor, selecciona tu fecha de nacimiento", Toast.LENGTH_SHORT).show()
             } else {
-                saveUserData(selectedAvatar, alias, dateOfBirth)
+                saveUserData(selectedAvatarName, alias, dateOfBirth)
             }
         }
     }
 
     private fun openAvatarSelectionDialog() {
-        val avatars = arrayOf("Avatar 1", "Avatar 2", "Avatar 3") // Nombres de avatares
-        val avatarImages = intArrayOf(R.drawable.avatarbebe, R.drawable.avatarhombre, R.drawable.avatarmujer) // Recursos de imágenes
+        val dialogView = layoutInflater.inflate(R.layout.dialog_avatar_selection, null)
+        val avatarGridView = dialogView.findViewById<GridView>(R.id.avatarGridView)
 
-        // Crear y mostrar un cuadro de diálogo
-        AlertDialog.Builder(this)
-            .setTitle("Selecciona tu Avatar")
-            .setItems(avatars) { dialog, which ->
-                selectedAvatar = avatars[which]  // Actualizar el avatar seleccionado
-                avatarImage.setImageResource(avatarImages[which])  // Mostrar el avatar seleccionado
-            }
+        // Lista de imágenes de avatares
+        val avatarImages = intArrayOf(
+            R.drawable.avatarbebe,
+            R.drawable.avatarhombre,
+            R.drawable.avatarmujer,
+            R.drawable.avataralien,
+            R.drawable.avatarfrankenstein,
+            R.drawable.avatarlobo,
+            R.drawable.avatarvampira,
+            R.drawable.avatarpayaso,
+            R.drawable.avatarninja,
+            R.drawable.avatarluchadora,
+            R.drawable.avatarmago,
+            R.drawable.avatarhalloween,
+            R.drawable.avatarpapanoel,
+            R.drawable.avatarrubio,
+            R.drawable.avatarmoreno,
+
+
+        )
+
+        // Lista de nombres de avatares correspondientes
+        val avatarNames = arrayOf(
+            "avatar_bebe",
+            "avatar_hombre",
+            "avatar_mujer",
+            "avatar_alien",
+            "avatar_frankenstein",
+            "avatar_lobo",
+            "avatar_vampira",
+            "avatar_payaso",
+            "avatar_ninja",
+            "avatar_luchadora",
+            "avatar_mago",
+            "avatar_halloween",
+            "avatar_papanoel",
+            "avatar_rubio",
+            "avatar_moreno",
+        )
+
+        // Usa el adaptador personalizado para mostrar las imágenes
+        val adapter = AvatarAdapter(this, avatarImages)
+        avatarGridView.adapter = adapter
+
+        // Crear y mostrar el cuadro de diálogo
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
             .setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
-            .show()
+            .create()
+
+        // Manejar la selección de avatar
+        avatarGridView.setOnItemClickListener { _, _, position, _ ->
+            selectedAvatarImage = avatarImages[position] // Guardar el recurso de imagen seleccionado
+            selectedAvatarName = avatarNames[position]  // Guardar el nombre del avatar seleccionado
+            avatarImage.setImageResource(selectedAvatarImage) // Establece la imagen seleccionada
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun getDateOfBirth(): String {
@@ -89,7 +140,8 @@ class AvatarSelectionActivity : AppCompatActivity() {
     private fun saveUserData(avatar: String, alias: String, dateOfBirth: String) {
         if (userId != null) {
             val userData = mapOf(
-                "avatar" to avatar,
+                "avatarImage" to selectedAvatarImage, // Guardar el recurso de imagen seleccionado
+                "avatarName" to avatar, // Guardar el nombre del avatar seleccionado
                 "alias" to alias,
                 "dateOfBirth" to dateOfBirth
             )
