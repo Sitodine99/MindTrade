@@ -86,7 +86,7 @@ class EmotionsActivity : AppCompatActivity() {
                     }
                     val intent = Intent(this, nextActivity)
                     startActivity(intent)
-                    finish()
+                    // Eliminamos `finish()` para permitir retroceder a esta actividad
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(this, "Error al guardar el estado emocional: ${e.message}", Toast.LENGTH_SHORT).show()

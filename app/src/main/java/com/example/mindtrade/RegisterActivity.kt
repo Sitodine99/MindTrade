@@ -4,24 +4,16 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mindtrade.databinding.ActivityRegisterBinding
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
-    private lateinit var googleSignInClient: GoogleSignInClient
     private val db = FirebaseFirestore.getInstance()
     private lateinit var binding: ActivityRegisterBinding
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +24,6 @@ class RegisterActivity : AppCompatActivity() {
         binding.buttonRegister.setOnClickListener {
             registerUser()
         }
-
     }
 
     private fun registerUser() {
@@ -64,8 +55,15 @@ class RegisterActivity : AppCompatActivity() {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val userId = auth.currentUser?.uid ?: ""
-                    val userData = hashMapOf("email" to email)
+                    val userData = hashMapOf(
+                        "email" to email,
+                        "registrationComplete" to false  // Campo de control inicializado en false
+                    )
 
+                    // Guarda el userId en SharedPreferences
+                    saveUserIdToPreferences(userId)
+
+                    // Guarda el documento en Firestore
                     db.collection("users").document(userId).set(userData)
                         .addOnSuccessListener {
                             Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
@@ -82,6 +80,7 @@ class RegisterActivity : AppCompatActivity() {
                 }
             }
     }
+
     private fun saveUserIdToPreferences(userId: String) {
         val sharedPreferences = getSharedPreferences("MindTradePrefs", MODE_PRIVATE)
         with(sharedPreferences.edit()) {
@@ -89,5 +88,4 @@ class RegisterActivity : AppCompatActivity() {
             apply()
         }
     }
-
 }

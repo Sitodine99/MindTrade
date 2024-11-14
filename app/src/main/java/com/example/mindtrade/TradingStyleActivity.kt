@@ -86,7 +86,6 @@ class TradingStyleActivity : AppCompatActivity() {
                     Toast.makeText(this, "Estilo de trading guardado", Toast.LENGTH_SHORT).show()
                     val emotionsIntent = Intent(this, EmotionsActivity::class.java)
                     startActivity(emotionsIntent)
-                    finish()
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(this, "Error al guardar el estilo: ${e.message}", Toast.LENGTH_SHORT).show()

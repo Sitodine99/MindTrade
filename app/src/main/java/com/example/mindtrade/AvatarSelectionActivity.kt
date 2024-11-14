@@ -120,14 +120,13 @@ class AvatarSelectionActivity : AppCompatActivity() {
                 "registrationComplete" to true // Indicar que el registro está completo
             )
 
-            // Guardar avatar, alias, fecha de nacimiento y progreso en Firebase
             db.collection("users").document(userId!!).set(userData, SetOptions.merge())
                 .addOnSuccessListener {
                     Toast.makeText(this, "Datos guardados correctamente", Toast.LENGTH_SHORT).show()
 
-                    // Redirigir a MainActivity
+                    // Redirigir a MainActivity y limpiar el stack
                     val intent = Intent(this, MainActivity::class.java)
-                    intent.putExtra("USER_ID", userId)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
                     finish()
                 }
@@ -138,5 +137,4 @@ class AvatarSelectionActivity : AppCompatActivity() {
             Toast.makeText(this, "Error: ID de usuario no encontrado", Toast.LENGTH_SHORT).show()
         }
     }
-
 }

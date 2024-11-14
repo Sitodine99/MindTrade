@@ -89,7 +89,7 @@ class PsicoNegativeActivity : AppCompatActivity() {
                     Toast.makeText(this, "Sentimiento guardado", Toast.LENGTH_SHORT).show()
                     val intent = Intent(this, AvatarSelectionActivity::class.java)
                     startActivity(intent)
-                    finish()
+                    // Eliminamos `finish()` para permitir retroceder a esta actividad
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(this, "Error al guardar el sentimiento: ${e.message}", Toast.LENGTH_SHORT).show()
