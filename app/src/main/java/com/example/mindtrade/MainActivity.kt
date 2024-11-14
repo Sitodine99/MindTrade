@@ -45,4 +45,11 @@ class MainActivity : AppCompatActivity() {
             finish() // Finalizar MainActivity para que no esté en el historial
         }
     }
+    private fun clearUserIdFromPreferences() {
+        val sharedPreferences = getSharedPreferences("MindTradePrefs", MODE_PRIVATE)
+        with(sharedPreferences.edit()) {
+            remove("USER_ID")
+            apply()
+        }
+    }
 }

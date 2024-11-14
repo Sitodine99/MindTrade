@@ -24,11 +24,16 @@ class TradingStyleActivity : AppCompatActivity() {
     private lateinit var soundPool: SoundPool
     private var soundId: Int = 0
 
+    private fun getUserIdFromPreferences(): String? {
+        val sharedPreferences = getSharedPreferences("MindTradePrefs", MODE_PRIVATE)
+        return sharedPreferences.getString("USER_ID", null)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_trading_style)
 
-        userId = intent.getStringExtra("USER_ID")
+        userId = getUserIdFromPreferences()
         if (userId == null) {
             Toast.makeText(this, "Error: ID de usuario no encontrado", Toast.LENGTH_LONG).show()
             finish()
@@ -72,13 +77,14 @@ class TradingStyleActivity : AppCompatActivity() {
 
     private fun saveTradingStyleAndProceed() {
         if (userId != null) {
-            val userData = mapOf("trading_style" to selectedTradingStyle)
+            val userData = mapOf(
+                "trading_style" to selectedTradingStyle,
+                "registration_progress" to "trading_style"
+            )
             db.collection("users").document(userId!!).set(userData, SetOptions.merge())
                 .addOnSuccessListener {
                     Toast.makeText(this, "Estilo de trading guardado", Toast.LENGTH_SHORT).show()
-
                     val emotionsIntent = Intent(this, EmotionsActivity::class.java)
-                    emotionsIntent.putExtra("USER_ID", userId)
                     startActivity(emotionsIntent)
                     finish()
                 }

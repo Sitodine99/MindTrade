@@ -23,14 +23,18 @@ class AvatarSelectionActivity : AppCompatActivity() {
     private lateinit var dobPicker: DatePicker
     private lateinit var continueButton: Button
     private var selectedAvatarImage: Int = R.drawable.interrogacion
-    private var selectedAvatarName: String = "default_avatar" // Nombre del avatar seleccionado
+    private var selectedAvatarName: String = "default_avatar"
+
+    private fun getUserIdFromPreferences(): String? {
+        val sharedPreferences = getSharedPreferences("MindTradePrefs", MODE_PRIVATE)
+        return sharedPreferences.getString("USER_ID", null)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_avatar_selection)
 
-        // Recuperar el ID de usuario desde la Intent
-        userId = intent.getStringExtra("USER_ID")
+        userId = getUserIdFromPreferences()
         Log.d("AvatarSelectionActivity", "User ID recibido: $userId")
 
         if (userId == null) {
@@ -39,18 +43,15 @@ class AvatarSelectionActivity : AppCompatActivity() {
             return
         }
 
-        // Referencias a los elementos de la UI
         avatarImage = findViewById(R.id.avatarImage)
         aliasInput = findViewById(R.id.aliasInput)
         dobPicker = findViewById(R.id.dobPicker)
         continueButton = findViewById(R.id.buttonLogin)
 
-        // Configurar el evento de clic en el avatar para abrir el cuadro de selección
         avatarImage.setOnClickListener {
             openAvatarSelectionDialog()
         }
 
-        // Configurar el evento de clic en el botón Continuar
         continueButton.setOnClickListener {
             val alias = aliasInput.text.toString()
             val dateOfBirth = getDateOfBirth()
@@ -69,61 +70,32 @@ class AvatarSelectionActivity : AppCompatActivity() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_avatar_selection, null)
         val avatarGridView = dialogView.findViewById<GridView>(R.id.avatarGridView)
 
-        // Lista de imágenes de avatares
         val avatarImages = intArrayOf(
-            R.drawable.avatarbebe,
-            R.drawable.avatarhombre,
-            R.drawable.avatarmujer,
-            R.drawable.avataralien,
-            R.drawable.avatarfrankenstein,
-            R.drawable.avatarlobo,
-            R.drawable.avatarvampira,
-            R.drawable.avatarpayaso,
-            R.drawable.avatarninja,
-            R.drawable.avatarluchadora,
-            R.drawable.avatarmago,
-            R.drawable.avatarhalloween,
-            R.drawable.avatarpapanoel,
-            R.drawable.avatarrubio,
-            R.drawable.avatarmoreno,
-
-
+            R.drawable.avatarbebe, R.drawable.avatarhombre, R.drawable.avatarmujer,
+            R.drawable.avataralien, R.drawable.avatarfrankenstein, R.drawable.avatarlobo,
+            R.drawable.avatarvampira, R.drawable.avatarpayaso, R.drawable.avatarninja,
+            R.drawable.avatarluchadora, R.drawable.avatarmago, R.drawable.avatarhalloween,
+            R.drawable.avatarpapanoel, R.drawable.avatarrubio, R.drawable.avatarmoreno
         )
 
-        // Lista de nombres de avatares correspondientes
         val avatarNames = arrayOf(
-            "avatar_bebe",
-            "avatar_hombre",
-            "avatar_mujer",
-            "avatar_alien",
-            "avatar_frankenstein",
-            "avatar_lobo",
-            "avatar_vampira",
-            "avatar_payaso",
-            "avatar_ninja",
-            "avatar_luchadora",
-            "avatar_mago",
-            "avatar_halloween",
-            "avatar_papanoel",
-            "avatar_rubio",
-            "avatar_moreno",
+            "avatar_bebe", "avatar_hombre", "avatar_mujer", "avatar_alien", "avatar_frankenstein",
+            "avatar_lobo", "avatar_vampira", "avatar_payaso", "avatar_ninja", "avatar_luchadora",
+            "avatar_mago", "avatar_halloween", "avatar_papanoel", "avatar_rubio", "avatar_moreno"
         )
 
-        // Usa el adaptador personalizado para mostrar las imágenes
         val adapter = AvatarAdapter(this, avatarImages)
         avatarGridView.adapter = adapter
 
-        // Crear y mostrar el cuadro de diálogo
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
             .setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
             .create()
 
-        // Manejar la selección de avatar
         avatarGridView.setOnItemClickListener { _, _, position, _ ->
-            selectedAvatarImage = avatarImages[position] // Guardar el recurso de imagen seleccionado
-            selectedAvatarName = avatarNames[position]  // Guardar el nombre del avatar seleccionado
-            avatarImage.setImageResource(selectedAvatarImage) // Establece la imagen seleccionada
+            selectedAvatarImage = avatarImages[position]
+            selectedAvatarName = avatarNames[position]
+            avatarImage.setImageResource(selectedAvatarImage)
             dialog.dismiss()
         }
 
@@ -132,7 +104,7 @@ class AvatarSelectionActivity : AppCompatActivity() {
 
     private fun getDateOfBirth(): String {
         val day = dobPicker.dayOfMonth
-        val month = dobPicker.month + 1 // Los meses en DatePicker empiezan desde 0
+        val month = dobPicker.month + 1
         val year = dobPicker.year
         return "$day/$month/$year"
     }
@@ -140,13 +112,15 @@ class AvatarSelectionActivity : AppCompatActivity() {
     private fun saveUserData(avatar: String, alias: String, dateOfBirth: String) {
         if (userId != null) {
             val userData = mapOf(
-                "avatarImage" to selectedAvatarImage, // Guardar el recurso de imagen seleccionado
-                "avatarName" to avatar, // Guardar el nombre del avatar seleccionado
+                "avatarImage" to selectedAvatarImage,
+                "avatarName" to avatar,
                 "alias" to alias,
-                "dateOfBirth" to dateOfBirth
+                "dateOfBirth" to dateOfBirth,
+                "registration_progress" to "avatar_selection",
+                "registrationComplete" to true // Indicar que el registro está completo
             )
 
-            // Guardar avatar, alias y fecha de nacimiento en Firebase
+            // Guardar avatar, alias, fecha de nacimiento y progreso en Firebase
             db.collection("users").document(userId!!).set(userData, SetOptions.merge())
                 .addOnSuccessListener {
                     Toast.makeText(this, "Datos guardados correctamente", Toast.LENGTH_SHORT).show()
@@ -164,4 +138,5 @@ class AvatarSelectionActivity : AppCompatActivity() {
             Toast.makeText(this, "Error: ID de usuario no encontrado", Toast.LENGTH_SHORT).show()
         }
     }
+
 }

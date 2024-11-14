@@ -3,6 +3,7 @@ package com.example.mindtrade
 import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mindtrade.databinding.ActivityLoginBinding
@@ -23,6 +24,7 @@ class LoginActivity : AppCompatActivity() {
 
     companion object {
         private const val RC_SIGN_IN = 9001
+        private const val TAG = "LoginActivity"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,48 +33,44 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
         auth = FirebaseAuth.getInstance()
 
-        // Verificar si hay una sesión activa
         val currentUser = auth.currentUser
         if (currentUser != null) {
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
+            saveUserIdToPreferences(currentUser.uid)
+            checkRegistrationStatus(currentUser.uid)
             return
         }
 
-        // Configurar Google Sign-In
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
-        // Configuración del botón de inicio de sesión con Google
         binding.buttonGoogleRegister.setOnClickListener {
             signInWithGoogle()
         }
 
-        // Configuración del botón de inicio de sesión con correo y contraseña
         binding.buttonLogin.setOnClickListener {
             val email = binding.editTextEmail.text.toString().trim()
             val password = binding.editTextPassword.text.toString().trim()
-
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Por favor ingrese el correo y la contraseña", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        startActivity(Intent(this, MainActivity::class.java))
-                        finish()
+                        val user = auth.currentUser
+                        user?.let {
+                            saveUserIdToPreferences(it.uid)
+                            checkRegistrationStatus(it.uid)
+                        }
                     } else {
                         Toast.makeText(this, "Usuario o contraseña incorrectos: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
         }
 
-        // Configuración del texto para ir al registro
         binding.textViewRegister.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             val options = ActivityOptions.makeCustomAnimation(this, R.anim.fade_in, R.anim.fade_out)
@@ -104,17 +102,13 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     val userId = auth.currentUser?.uid ?: ""
+                    saveUserIdToPreferences(userId)
                     val userDocRef = db.collection("users").document(userId)
-
-                    // Verifica si el usuario ya tiene un documento en Firestore
                     userDocRef.get().addOnSuccessListener { document ->
                         if (document.exists()) {
-                            // Usuario ya existe, redirigir directamente a MainActivity
-                            startActivity(Intent(this, MainActivity::class.java))
-                            finish()
+                            checkRegistrationStatus(userId)
                         } else {
-                            // Usuario nuevo, crear documento y redirigir al registro completo
-                            val userData = hashMapOf("email" to account?.email)
+                            val userData = hashMapOf("email" to account?.email, "registrationComplete" to false)
                             userDocRef.set(userData).addOnSuccessListener {
                                 val welcomeIntent = Intent(this, WelcomeActivity::class.java)
                                 welcomeIntent.putExtra("USER_ID", userId)
@@ -129,5 +123,60 @@ class LoginActivity : AppCompatActivity() {
                     Toast.makeText(this, "Error en la autenticación con Google", Toast.LENGTH_SHORT).show()
                 }
             }
+    }
+
+    private fun checkRegistrationStatus(userId: String) {
+        val userDocRef = db.collection("users").document(userId)
+        userDocRef.get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                // Verificar si el usuario ha completado el registro
+                if (document.getBoolean("registrationComplete") == true) {
+                    // Redirigir directamente a MainActivity si el registro está completo
+                    startActivity(Intent(this, MainActivity::class.java))
+                } else {
+                    // Continuar el proceso de registro donde se quedó
+                    when {
+                        document.getString("trading_style") == null -> {
+                            startActivity(Intent(this, TradingStyleActivity::class.java))
+                        }
+                        document.getString("psico") == null -> {
+                            startActivity(Intent(this, EmotionsActivity::class.java))
+                        }
+                        document.getString("emotion") == null -> {
+                            val nextActivity = if (document.getString("psico") == "Psico +") {
+                                PsicoPositiveActivity::class.java
+                            } else {
+                                PsicoNegativeActivity::class.java
+                            }
+                            startActivity(Intent(this, nextActivity))
+                        }
+                        document.getString("alias") == null ||
+                                document.get("avatarImage") == null ||
+                                document.getString("dateOfBirth") == null -> {
+                            startActivity(Intent(this, AvatarSelectionActivity::class.java))
+                        }
+                        else -> {
+                            startActivity(Intent(this, WelcomeActivity::class.java))
+                        }
+                    }
+                }
+                finish()
+            } else {
+                Log.d(TAG, "No se encontró el documento del usuario.")
+                startActivity(Intent(this, WelcomeActivity::class.java))
+                finish()
+            }
+        }.addOnFailureListener {
+            Log.e(TAG, "Error al acceder al documento en Firestore", it)
+            Toast.makeText(this, "Error al verificar el estado de registro", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun saveUserIdToPreferences(userId: String) {
+        val sharedPreferences = getSharedPreferences("MindTradePrefs", MODE_PRIVATE)
+        with(sharedPreferences.edit()) {
+            putString("USER_ID", userId)
+            apply()
+        }
     }
 }

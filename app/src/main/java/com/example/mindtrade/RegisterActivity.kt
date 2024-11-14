@@ -82,4 +82,12 @@ class RegisterActivity : AppCompatActivity() {
                 }
             }
     }
+    private fun saveUserIdToPreferences(userId: String) {
+        val sharedPreferences = getSharedPreferences("MindTradePrefs", MODE_PRIVATE)
+        with(sharedPreferences.edit()) {
+            putString("USER_ID", userId)
+            apply()
+        }
+    }
+
 }

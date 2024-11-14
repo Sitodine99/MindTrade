@@ -22,14 +22,16 @@ class EmotionsActivity : AppCompatActivity() {
     private var soundId: Int = 0
     private var selectedCard: CardView? = null
 
+    private fun getUserIdFromPreferences(): String? {
+        val sharedPreferences = getSharedPreferences("MindTradePrefs", MODE_PRIVATE)
+        return sharedPreferences.getString("USER_ID", null)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Usar ViewBinding
         binding = ActivityEmotionsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Inicializar SoundPool
         soundPool = SoundPool.Builder()
             .setMaxStreams(1)
             .setAudioAttributes(
@@ -39,60 +41,50 @@ class EmotionsActivity : AppCompatActivity() {
                     .build()
             )
             .build()
-
-        // Cargar el sonido
         soundId = soundPool.load(this, R.raw.select_sound, 1)
 
-        // Obtener el ID del usuario de la intent
-        userId = intent.getStringExtra("USER_ID")
-
+        userId = getUserIdFromPreferences()
         if (userId == null) {
             Toast.makeText(this, "Error: ID de usuario no encontrado", Toast.LENGTH_LONG).show()
             finish()
             return
         }
 
-        // Configurar la selección de estado emocional usando ViewBinding
         binding.cardPositive.setOnClickListener {
             selectCard(binding.cardPositive, "Psico +")
         }
-
         binding.cardNegative.setOnClickListener {
             selectCard(binding.cardNegative, "Psico -")
         }
     }
 
     private fun selectCard(cardView: CardView, psicoState: String) {
-        // Cambiar el fondo de la tarjeta seleccionada
         selectedCard?.setCardBackgroundColor(ContextCompat.getColor(this, R.color.black))
         cardView.setCardBackgroundColor(ContextCompat.getColor(this, R.color.highlight_green))
-
         selectedCard = cardView
-
-        // Reproducir sonido de selección
-        soundPool.play(soundId, 1f, 1f, 0, 0, 1f)
-
-        // Guardar el estado emocional y redirigir
+        playSelectionSound()
         saveEmotionalState(psicoState)
+    }
+
+    private fun playSelectionSound() {
+        soundPool.play(soundId, 1f, 1f, 0, 0, 1f)
     }
 
     private fun saveEmotionalState(psicoState: String) {
         if (userId != null) {
-            val userData = mapOf("psico" to psicoState)
-
-            // Guardar el estado emocional en Firebase
+            val userData = mapOf(
+                "psico" to psicoState,
+                "registration_progress" to "emotions"
+            )
             db.collection("users").document(userId!!).set(userData, SetOptions.merge())
                 .addOnSuccessListener {
                     Toast.makeText(this, "Estado emocional guardado", Toast.LENGTH_SHORT).show()
-
-                    // Redirigir a PsicoPositiveActivity o PsicoNegativeActivity según el estado
                     val nextActivity = if (psicoState == "Psico +") {
                         PsicoPositiveActivity::class.java
                     } else {
                         PsicoNegativeActivity::class.java
                     }
                     val intent = Intent(this, nextActivity)
-                    intent.putExtra("USER_ID", userId) // Añadir el userId aquí
                     startActivity(intent)
                     finish()
                 }

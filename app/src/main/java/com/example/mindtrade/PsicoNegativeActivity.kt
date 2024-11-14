@@ -23,12 +23,16 @@ class PsicoNegativeActivity : AppCompatActivity() {
     private var soundId: Int = 0
     private var selectedCard: CardView? = null
 
+    private fun getUserIdFromPreferences(): String? {
+        val sharedPreferences = getSharedPreferences("MindTradePrefs", MODE_PRIVATE)
+        return sharedPreferences.getString("USER_ID", null)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPsicoNegativeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Inicializar SoundPool
         soundPool = SoundPool.Builder()
             .setMaxStreams(1)
             .setAudioAttributes(
@@ -40,17 +44,13 @@ class PsicoNegativeActivity : AppCompatActivity() {
             .build()
         soundId = soundPool.load(this, R.raw.select_sound, 1)
 
-        // Obtener el ID del usuario de la intent
-        userId = intent.getStringExtra("USER_ID")
-        Log.d("PsicoNegativeActivity", "User ID recibido: $userId")
-
+        userId = getUserIdFromPreferences()
         if (userId == null) {
             Toast.makeText(this, "Error: ID de usuario no encontrado", Toast.LENGTH_LONG).show()
             finish()
             return
         }
 
-        // Configurar la selección de sentimientos
         binding.ansiedad.setOnClickListener { selectEmotion(binding.ansiedad, "Ansiedad") }
         binding.impaciencia.setOnClickListener { selectEmotion(binding.impaciencia, "Impaciencia") }
         binding.descontrol.setOnClickListener { selectEmotion(binding.descontrol, "Descontrol") }
@@ -66,30 +66,28 @@ class PsicoNegativeActivity : AppCompatActivity() {
     }
 
     private fun selectEmotion(cardView: CardView, emotion: String) {
-        // Cambiar el fondo de la tarjeta seleccionada
         selectedCard?.setCardBackgroundColor(ContextCompat.getColor(this, R.color.black))
         cardView.setCardBackgroundColor(ContextCompat.getColor(this, R.color.highlight_green))
         selectedCard = cardView
-
-        // Reproducir sonido de selección
-        soundPool.play(soundId, 1f, 1f, 0, 0, 1f)
-
-        // Guardar el sentimiento en Firebase y redirigir
+        playSelectionSound()
         saveEmotion(emotion)
+    }
+
+    private fun playSelectionSound() {
+        soundPool.play(soundId, 1f, 1f, 0, 0, 1f)
     }
 
     private fun saveEmotion(emotion: String) {
         if (userId != null) {
-            val emotionData = mapOf("emotion" to emotion)
+            val emotionData = mapOf(
+                "emotion" to emotion,
+                "registration_progress" to "psico_negative"
+            )
 
-            // Guardar el sentimiento en Firebase
             db.collection("users").document(userId!!).set(emotionData, SetOptions.merge())
                 .addOnSuccessListener {
                     Toast.makeText(this, "Sentimiento guardado", Toast.LENGTH_SHORT).show()
-
-                    // Redirigir a AvatarSelectionActivity
                     val intent = Intent(this, AvatarSelectionActivity::class.java)
-                    intent.putExtra("USER_ID", userId)
                     startActivity(intent)
                     finish()
                 }
