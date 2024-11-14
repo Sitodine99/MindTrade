@@ -5,6 +5,7 @@ import android.content.Intent
 import android.media.AudioAttributes
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
@@ -36,7 +37,7 @@ class TradingStyleActivity : AppCompatActivity() {
         userId = getUserIdFromPreferences()
         if (userId == null) {
             Toast.makeText(this, "Error: ID de usuario no encontrado", Toast.LENGTH_LONG).show()
-            finish()
+            finishWithFade()  // Termina con la animación si falta el ID de usuario
             return
         }
 
@@ -59,6 +60,13 @@ class TradingStyleActivity : AppCompatActivity() {
         cardScalping.setOnClickListener { selectCard(cardScalping, "Scalping") }
         cardDayTrading.setOnClickListener { selectCard(cardDayTrading, "Day Trading") }
         cardSwingTrading.setOnClickListener { selectCard(cardSwingTrading, "Swing Trading") }
+
+        // Configurar el comportamiento personalizado para el botón de atrás
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finishWithFade()  // Llama a la función de transición personalizada
+            }
+        })
     }
 
     private fun selectCard(cardView: CardView, style: String) {
@@ -85,7 +93,7 @@ class TradingStyleActivity : AppCompatActivity() {
                 .addOnSuccessListener {
                     Toast.makeText(this, "Estilo de trading guardado", Toast.LENGTH_SHORT).show()
                     val emotionsIntent = Intent(this, EmotionsActivity::class.java)
-                    startActivity(emotionsIntent)
+                    startActivityWithFade(emotionsIntent)
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(this, "Error al guardar el estilo: ${e.message}", Toast.LENGTH_SHORT).show()

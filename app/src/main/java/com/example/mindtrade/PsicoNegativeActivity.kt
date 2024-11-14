@@ -4,8 +4,8 @@ import android.content.Intent
 import android.media.AudioAttributes
 import android.media.SoundPool
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
@@ -47,7 +47,7 @@ class PsicoNegativeActivity : AppCompatActivity() {
         userId = getUserIdFromPreferences()
         if (userId == null) {
             Toast.makeText(this, "Error: ID de usuario no encontrado", Toast.LENGTH_LONG).show()
-            finish()
+            finishWithFade()
             return
         }
 
@@ -63,6 +63,13 @@ class PsicoNegativeActivity : AppCompatActivity() {
         binding.fatalismo.setOnClickListener { selectEmotion(binding.fatalismo, "Fatalismo") }
         binding.frustracion.setOnClickListener { selectEmotion(binding.frustracion, "Frustración") }
         binding.ineficacia.setOnClickListener { selectEmotion(binding.ineficacia, "Ineficacia") }
+
+        // Configurar el comportamiento personalizado para el botón de atrás
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finishWithFade()  // Termina con la animación de fade cuando se presiona el botón de atrás
+            }
+        })
     }
 
     private fun selectEmotion(cardView: CardView, emotion: String) {
@@ -88,7 +95,7 @@ class PsicoNegativeActivity : AppCompatActivity() {
                 .addOnSuccessListener {
                     Toast.makeText(this, "Sentimiento guardado", Toast.LENGTH_SHORT).show()
                     val intent = Intent(this, AvatarSelectionActivity::class.java)
-                    startActivity(intent)
+                    startActivityWithFade(intent)
                     // Eliminamos `finish()` para permitir retroceder a esta actividad
                 }
                 .addOnFailureListener { e ->

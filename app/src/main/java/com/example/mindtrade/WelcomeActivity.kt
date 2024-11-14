@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 
 class WelcomeActivity : AppCompatActivity() {
@@ -17,10 +18,17 @@ class WelcomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_welcome)
 
+        // Maneja el botón de retroceso usando OnBackPressedDispatcher
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finishWithFade()  // Aplica la animación de salida al presionar atrás
+            }
+        })
+
         val userId = getUserIdFromPreferences()
         if (userId == null) {
             Toast.makeText(this, "Error: ID de usuario no encontrado", Toast.LENGTH_LONG).show()
-            startActivity(Intent(this, LoginActivity::class.java))
+            startActivityWithFade(Intent(this, LoginActivity::class.java))
             finish()
             return
         }
@@ -28,10 +36,8 @@ class WelcomeActivity : AppCompatActivity() {
         findViewById<Button>(R.id.startbutton).setOnClickListener {
             val tradingStyleIntent = Intent(this, TradingStyleActivity::class.java)
             tradingStyleIntent.putExtra("USER_ID", userId)
-            startActivity(tradingStyleIntent)
+            startActivityWithFade(tradingStyleIntent)
             finish()
         }
     }
 }
-
-

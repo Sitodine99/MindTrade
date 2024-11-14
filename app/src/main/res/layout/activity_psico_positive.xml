@@ -21,9 +21,11 @@
 
     <TextView
         android:id="@+id/titleNegativeEmotions"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_width="343dp"
+        android:layout_height="94dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="8dp"
         android:fontFamily="serif"
         android:text="@string/titleNegativeEmotions"
         android:textAlignment="center"
@@ -42,7 +44,7 @@
         android:id="@+id/first_row"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="20dp"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
         android:paddingStart="20dp"
@@ -55,9 +57,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/autocontrol"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp"
-            android:layout_marginEnd="4dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -91,9 +94,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/confianza"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp"
-            android:layout_marginEnd="4dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -127,8 +131,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/eficiencia"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -177,9 +183,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/optimismo"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp"
-            android:layout_marginEnd="4dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -213,9 +220,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/paciencia"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp"
-            android:layout_marginEnd="4dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -249,8 +257,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/realizacion"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -300,9 +310,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/satisfaccion"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp"
-            android:layout_marginEnd="4dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -336,9 +347,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/seguridad"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp"
-            android:layout_marginEnd="4dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -372,8 +384,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/sintonia"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -427,10 +441,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/tranquilidad"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp"
-            android:layout_marginEnd="4dp">
-
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -463,9 +477,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/aceptacion"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp"
-            android:layout_marginEnd="4dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -499,8 +514,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/afirmacion"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1">
 
             <LinearLayout
                 android:layout_width="match_parent"

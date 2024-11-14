@@ -15,6 +15,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 
+
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
@@ -73,8 +74,7 @@ class LoginActivity : AppCompatActivity() {
 
         binding.textViewRegister.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
-            val options = ActivityOptions.makeCustomAnimation(this, R.anim.fade_in, R.anim.fade_out)
-            startActivity(intent, options.toBundle())
+            startActivityWithFade(intent)
         }
     }
 

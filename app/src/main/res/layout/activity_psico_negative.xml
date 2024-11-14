@@ -21,9 +21,11 @@
 
     <TextView
         android:id="@+id/titleNegativeEmotions"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_width="343dp"
+        android:layout_height="94dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="8dp"
         android:fontFamily="serif"
         android:text="@string/titleNegativeEmotions"
         android:textAlignment="center"
@@ -38,7 +40,7 @@
         android:id="@+id/first_row"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="20dp"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
         android:paddingStart="20dp"
@@ -51,9 +53,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/ansiedad"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp"
-            android:layout_marginEnd="4dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -87,9 +90,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/impaciencia"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp"
-            android:layout_marginEnd="4dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -123,8 +127,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/descontrol"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -173,9 +179,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/avaricia"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp"
-            android:layout_marginEnd="4dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -209,9 +216,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/insatisfaccion"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp"
-            android:layout_marginEnd="4dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -245,8 +253,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/rabia"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -296,9 +306,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/verguenza"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp"
-            android:layout_marginEnd="4dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -332,9 +343,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/confusion"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp"
-            android:layout_marginEnd="4dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -368,8 +380,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/miedo"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -403,7 +417,6 @@
     </LinearLayout>
 
 
-    <!-- Quinta fila con una sola tarjeta centrada -->
     <LinearLayout
         android:id="@+id/fifth_row"
         android:layout_width="wrap_content"
@@ -423,9 +436,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/fatalismo"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp"
-            android:layout_marginEnd="4dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -459,9 +473,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/frustracion"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp"
-            android:layout_marginEnd="4dp">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -495,9 +510,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/ineficacia"
             style="@style/CustomCardStyle"
-            android:layout_width="100dp"
-            android:layout_height="140dp">
-
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -530,7 +546,4 @@
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
 

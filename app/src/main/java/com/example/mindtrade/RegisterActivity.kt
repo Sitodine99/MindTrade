@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mindtrade.databinding.ActivityRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -20,6 +21,13 @@ class RegisterActivity : AppCompatActivity() {
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
         auth = FirebaseAuth.getInstance()
+
+        // Manejar el botón de retroceso usando OnBackPressedDispatcher
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finishWithFade()  // Aplica la animación de salida al presionar atrás
+            }
+        })
 
         binding.buttonRegister.setOnClickListener {
             registerUser()
@@ -60,16 +68,14 @@ class RegisterActivity : AppCompatActivity() {
                         "registrationComplete" to false  // Campo de control inicializado en false
                     )
 
-                    // Guarda el userId en SharedPreferences
                     saveUserIdToPreferences(userId)
 
-                    // Guarda el documento en Firestore
                     db.collection("users").document(userId).set(userData)
                         .addOnSuccessListener {
                             Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
                             val welcomeIntent = Intent(this, WelcomeActivity::class.java)
                             welcomeIntent.putExtra("USER_ID", userId)
-                            startActivity(welcomeIntent)
+                            startActivityWithFade(welcomeIntent)
                             finish()
                         }
                         .addOnFailureListener { e ->

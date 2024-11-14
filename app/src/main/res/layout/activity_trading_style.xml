@@ -41,7 +41,11 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/cardScalping"
         style="@style/CustomCardStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="60dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/titleStyle">
@@ -52,11 +56,10 @@
             android:orientation="horizontal"
             android:padding="16dp">
 
-            <!-- Imagen de Scalping con padding para evitar recorte -->
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imageScalper"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:layout_marginEnd="16dp"
                 android:padding="4dp"
                 android:scaleType="centerCrop"
@@ -65,14 +68,12 @@
                 app:strokeColor="@android:color/white"
                 app:strokeWidth="4dp" />
 
-            <!-- Contenedor vertical para el título y la descripción -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <!-- Título para Scalping -->
                 <TextView
                     android:id="@+id/scalpingTitle"
                     android:layout_width="wrap_content"
@@ -80,10 +81,9 @@
                     android:fontFamily="serif"
                     android:text="@string/titleScalping"
                     android:textColor="@android:color/white"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
 
-                <!-- Descripción para Scalping -->
                 <TextView
                     android:id="@+id/scalpingDescription"
                     android:layout_width="wrap_content"
@@ -92,7 +92,7 @@
                     android:fontFamily="serif"
                     android:text="@string/scalping_TexView"
                     android:textColor="@android:color/white"
-                    android:textSize="14sp" />
+                    android:textSize="16sp" />
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -101,7 +101,11 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/cardDayTrading"
         style="@style/CustomCardStyle"
-        android:layout_marginTop="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cardScalping">
@@ -112,11 +116,10 @@
             android:orientation="horizontal"
             android:padding="16dp">
 
-            <!-- Imagen de Day Trading con padding para evitar recorte -->
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/daytrader"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:layout_marginEnd="16dp"
                 android:padding="4dp"
                 android:scaleType="centerCrop"
@@ -125,14 +128,12 @@
                 app:strokeColor="@android:color/white"
                 app:strokeWidth="4dp" />
 
-            <!-- Contenedor vertical para el título y la descripción -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <!-- Título para Day Trading -->
                 <TextView
                     android:id="@+id/daytradingTitle"
                     android:layout_width="wrap_content"
@@ -140,10 +141,9 @@
                     android:fontFamily="serif"
                     android:text="@string/titleDaytrading"
                     android:textColor="@android:color/white"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
 
-                <!-- Descripción para Day Trading -->
                 <TextView
                     android:id="@+id/dayTradingDescription"
                     android:layout_width="wrap_content"
@@ -152,16 +152,20 @@
                     android:fontFamily="serif"
                     android:text="@string/daytrading_TexView"
                     android:textColor="@android:color/white"
-                    android:textSize="14sp" />
+                    android:textSize="16sp" />
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Tarjeta para Day Trading -->
+    <!-- Tarjeta para Swing Trading -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardSwingTrading"
         style="@style/CustomCardStyle"
-        android:layout_marginTop="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cardDayTrading">
@@ -172,11 +176,10 @@
             android:orientation="horizontal"
             android:padding="16dp">
 
-            <!-- Imagen de Day Trading con padding para evitar recorte -->
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/swingtrader"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:layout_marginEnd="16dp"
                 android:padding="4dp"
                 android:scaleType="centerCrop"
@@ -185,14 +188,12 @@
                 app:strokeColor="@android:color/white"
                 app:strokeWidth="4dp" />
 
-            <!-- Contenedor vertical para el título y la descripción -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <!-- Título para Day Trading -->
                 <TextView
                     android:id="@+id/swingtraderTitle"
                     android:layout_width="wrap_content"
@@ -200,10 +201,9 @@
                     android:fontFamily="serif"
                     android:text="@string/titleSwingtrading"
                     android:textColor="@android:color/white"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
 
-                <!-- Descripción para Day Trading -->
                 <TextView
                     android:id="@+id/swingTradingDescription"
                     android:layout_width="wrap_content"
@@ -212,9 +212,10 @@
                     android:fontFamily="serif"
                     android:text="@string/swingtrading_TexView"
                     android:textColor="@android:color/white"
-                    android:textSize="14sp" />
+                    android:textSize="16sp" />
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

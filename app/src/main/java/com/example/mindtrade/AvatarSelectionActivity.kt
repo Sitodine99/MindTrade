@@ -10,6 +10,7 @@ import android.widget.EditText
 import android.widget.GridView
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -39,7 +40,7 @@ class AvatarSelectionActivity : AppCompatActivity() {
 
         if (userId == null) {
             Toast.makeText(this, "Error: ID de usuario no encontrado", Toast.LENGTH_LONG).show()
-            finish()
+            finishWithFade()
             return
         }
 
@@ -64,6 +65,13 @@ class AvatarSelectionActivity : AppCompatActivity() {
                 saveUserData(selectedAvatarName, alias, dateOfBirth)
             }
         }
+
+        // Configuración de la animación para el botón de "Atrás"
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finishWithFade()  // Termina con animación de fade-out al presionar "Atrás"
+            }
+        })
     }
 
     private fun openAvatarSelectionDialog() {
@@ -127,8 +135,7 @@ class AvatarSelectionActivity : AppCompatActivity() {
                     // Redirigir a MainActivity y limpiar el stack
                     val intent = Intent(this, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-                    finish()
+                    startActivityWithFade(intent)
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(this, "Error al guardar: ${e.message}", Toast.LENGTH_SHORT).show()

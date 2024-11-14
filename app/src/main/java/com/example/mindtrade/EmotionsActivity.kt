@@ -5,12 +5,13 @@ import android.media.AudioAttributes
 import android.media.SoundPool
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.cardview.widget.CardView
 import com.example.mindtrade.databinding.ActivityEmotionsBinding
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import androidx.core.content.ContextCompat
-import androidx.cardview.widget.CardView
 
 class EmotionsActivity : AppCompatActivity() {
 
@@ -46,7 +47,7 @@ class EmotionsActivity : AppCompatActivity() {
         userId = getUserIdFromPreferences()
         if (userId == null) {
             Toast.makeText(this, "Error: ID de usuario no encontrado", Toast.LENGTH_LONG).show()
-            finish()
+            finishWithFade()
             return
         }
 
@@ -56,6 +57,13 @@ class EmotionsActivity : AppCompatActivity() {
         binding.cardNegative.setOnClickListener {
             selectCard(binding.cardNegative, "Psico -")
         }
+
+        // Configurar el comportamiento personalizado para el botón de atrás
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finishWithFade()  // Termina con la animación de fade cuando se presiona el botón de atrás
+            }
+        })
     }
 
     private fun selectCard(cardView: CardView, psicoState: String) {
@@ -85,8 +93,8 @@ class EmotionsActivity : AppCompatActivity() {
                         PsicoNegativeActivity::class.java
                     }
                     val intent = Intent(this, nextActivity)
-                    startActivity(intent)
-                    // Eliminamos `finish()` para permitir retroceder a esta actividad
+                    startActivityWithFade(intent)
+                    // `finish()` no se llama aquí para que el usuario pueda volver a esta actividad si lo desea
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(this, "Error al guardar el estado emocional: ${e.message}", Toast.LENGTH_SHORT).show()
