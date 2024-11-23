@@ -8,7 +8,7 @@
     tools:context=".MainActivity">
 
     <ImageView
-        android:id="@+id/Edificios"
+        android:id="@+id/torosyosos"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:contentDescription="@string/toros_y_osos"
