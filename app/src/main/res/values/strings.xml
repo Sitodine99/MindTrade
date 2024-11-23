@@ -55,7 +55,7 @@
     <!-- Descripción para el título de psico+ -->
     <string name="psicoPositiveTitle" translatable="false">Psico +</string>
     <!-- Descripción para la tarjeta de psico+ -->
-    <string name="psicoPositiveTexview" translatable="false">"Me siento positivo y en control. Estoy manejando bien mis emociones y mi relación con el mercado."</string>
+    <string name="psicoPositiveTexview" translatable="false">"Me siento positivo y en control. Estoy manejando bien mi relación con el mercado."</string>
 
     <!-- Descripción para el título de psico- -->
     <string name="psicoNegativeTitle" translatable="false">Psico -</string>
@@ -102,6 +102,13 @@
     <!-- Descripción para el texto alias -->
     <string name="enter_alias_hint" translatable="false">Alias</string>
     <string name="continueButton" translatable="false">Continuar</string>
+
+    <string name="navigation_drawer_open">Abrir menú</string>
+    <string name="navigation_drawer_close">Cerrar menú</string>
+
+    <string name="toros_y_osos">Fondo de toros contra osos</string>
+
+
 
 
 </resources>

@@ -81,15 +81,12 @@ class AvatarSelectionActivity : AppCompatActivity() {
         val avatarImages = intArrayOf(
             R.drawable.avatarbebe, R.drawable.avatarhombre, R.drawable.avatarmujer,
             R.drawable.avataralien, R.drawable.avatarfrankenstein, R.drawable.avatarlobo,
-            R.drawable.avatarvampira, R.drawable.avatarpayaso, R.drawable.avatarninja,
-            R.drawable.avatarluchadora, R.drawable.avatarmago, R.drawable.avatarhalloween,
-            R.drawable.avatarpapanoel, R.drawable.avatarrubio, R.drawable.avatarmoreno
+            R.drawable.avatarvampira
         )
 
         val avatarNames = arrayOf(
             "avatar_bebe", "avatar_hombre", "avatar_mujer", "avatar_alien", "avatar_frankenstein",
-            "avatar_lobo", "avatar_vampira", "avatar_payaso", "avatar_ninja", "avatar_luchadora",
-            "avatar_mago", "avatar_halloween", "avatar_papanoel", "avatar_rubio", "avatar_moreno"
+            "avatar_lobo", "avatar_vampira"
         )
 
         val adapter = AvatarAdapter(this, avatarImages)

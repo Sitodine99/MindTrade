@@ -3,53 +3,55 @@ package com.example.mindtrade
 import YourAdapter
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
-import android.widget.Button
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+
+    private lateinit var drawerLayout: DrawerLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Comentamos enableEdgeToEdge()
-        // enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-        // Lista de cuentas de ejemplo
-        val accountsList = listOf("Cuenta 1", "Cuenta 2", "Cuenta 3", "Cuenta 4", "Cuenta 5")
+        // Configurar Toolbar
+        val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
-        // Configurar el RecyclerView para desplazamiento horizontal
+        // Configurar DrawerLayout y NavigationView
+        drawerLayout = findViewById(R.id.drawer_layout)
+        val navigationView: NavigationView = findViewById(R.id.navigationView)
+        val toggle = ActionBarDrawerToggle(
+            this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
+        )
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+        navigationView.setNavigationItemSelectedListener(this)
+
+        // Configurar RecyclerView para las cuentas
+        val accountsList = listOf("Cuenta 1", "Cuenta 2", "Cuenta 3", "Cuenta 4", "Cuenta 5")
         val accountsRecyclerView = findViewById<RecyclerView>(R.id.accountsRecyclerView)
         accountsRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         accountsRecyclerView.adapter = YourAdapter(accountsList)
-
-        // Comentamos la configuración de insets para manejar el padding
-        /*
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-        */
-
-        // Configuración del botón de cierre de sesión
-        val signOutButton = findViewById<Button>(R.id.button)
-        signOutButton.setOnClickListener {
-            // Cerrar sesión de Firebase
-            FirebaseAuth.getInstance().signOut()
-
-            // Redirigir a LoginActivity después de cerrar sesión
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
-            finish() // Finalizar MainActivity para que no esté en el historial
-        }
     }
-    private fun clearUserIdFromPreferences() {
-        val sharedPreferences = getSharedPreferences("MindTradePrefs", MODE_PRIVATE)
-        with(sharedPreferences.edit()) {
-            remove("USER_ID")
-            apply()
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.nav_logout -> {
+                FirebaseAuth.getInstance().signOut()
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
         }
+        drawerLayout.closeDrawer(GravityCompat.START)
+        return true
     }
 }

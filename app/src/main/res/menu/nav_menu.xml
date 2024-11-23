@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Opción: Perfil -->
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/interrogacion"
+        android:title="Mi Perfil" />
+
+    <!-- Opción: Estrategias -->
+    <item
+        android:id="@+id/nav_strategies"
+        android:icon="@drawable/ic_strategies"
+        android:title="Estrategias" />
+
+    <!-- Opción: Mis Cuentas -->
+    <item
+        android:id="@+id/nav_accounts"
+        android:icon="@drawable/ic_accounts"
+        android:title="Mis Cuentas" />
+
+    <!-- Opción: Configuración -->
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="Configuración" />
+
+    <!-- Opción: Cerrar Sesión -->
+    <item
+        android:id="@+id/nav_logout"
+        android:icon="@drawable/ic_logout"
+        android:title="Cerrar Sesión" />
+
+</menu>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="?attr/colorPrimary"
+    android:padding="16dp"
+    android:gravity="bottom">
+
+    <!-- Avatar del Usuario -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/navUserAvatar"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/interrogacion"
+        android:contentDescription="Avatar del usuario"
+        app:shapeAppearanceOverlay="@style/CircularImage"
+        android:layout_gravity="center_horizontal" />
+
+    <!-- Nombre del Usuario -->
+    <TextView
+        android:id="@+id/navUserName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Alias del Usuario"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp" />
+
+    <!-- Detalles adicionales -->
+    <TextView
+        android:id="@+id/navUserDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Scalper, Psico +, En Control"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="4dp" />
+</LinearLayout>
