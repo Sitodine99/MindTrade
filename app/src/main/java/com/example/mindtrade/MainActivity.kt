@@ -28,6 +28,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val db = FirebaseFirestore.getInstance()
     private var userId: String? = null
 
+    // Variables para almacenar datos dinámicos del usuario
+    private var userAlias: String? = null // Alias del usuario
+    private var userAvatarName: String? = null
+    private var userTradingStyle: String? = null
+    private var userPsico: String? = null
+    private var userEmotion: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -72,6 +79,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Configurar RecyclerView para las estrategias
         setupStrategiesRecyclerView()
 
+        // Configurar clic en imágenes para abrir detalles
+        setupImageClickListeners()
+
         // Recuperar datos del usuario
         loadUserData()
     }
@@ -88,21 +98,88 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         strategiesRecyclerView.adapter = YourAdapter(strategiesList)
     }
 
+    private fun setupImageClickListeners() {
+        avatarImage.setOnClickListener {
+            val alias = userAlias ?: "Sin alias" // Mostrar el alias del usuario
+            val avatarImageResource = getAvatarImageResource(userAvatarName)
+            openImageDetail(avatarImageResource, alias)
+        }
+
+        tradingStyleImage.setOnClickListener {
+            val tradingStyle = userTradingStyle ?: "Sin nombre"
+            val tradingStyleImageResource = getTradingStyleImageResource(tradingStyle)
+            val tradingStyleText = when (tradingStyle) {
+                "Day Trading" -> "Daytrader"
+                "Scalping" -> "Scalper"
+                "Swing Trading" -> "Swingtrader"
+                else -> tradingStyle // Si no coincide, muestra el texto recibido
+            }
+            openImageDetail(tradingStyleImageResource, tradingStyleText)
+        }
+
+        psicoImage.setOnClickListener {
+            val psico = userPsico ?: "Sin nombre"
+            val psicoImageResource = getPsicoImageResource(psico)
+            openImageDetail(psicoImageResource, psico)
+        }
+
+        emotionImage.setOnClickListener {
+            val emotion = userEmotion ?: "Sin nombre"
+            val emotionImageResource = getEmotionImageResource(emotion)
+            val emotionText = when (emotion) {
+                "Ansiedad" -> "Trader ansioso"
+                "Impaciencia" -> "Trader impaciente"
+                "Descontrol" -> "Trader descontrolado"
+                "Avaricia" -> "Trader avaricioso"
+                "Insatisfacción" -> "Trader insatisfecho"
+                "Rabia" -> "Trader rabioso"
+                "Vergüenza" -> "Trader avergonzado"
+                "Confusion" -> "Trader confundido"
+                "Miedo" -> "Trader atemorizado"
+                "Fatalismo" -> "Trader fatalista"
+                "Frustración" -> "Trader frustrado"
+                "Ineficacia" -> "Trader ineficiente"
+                "Autocontrol" -> "Trader autocontrolado"
+                "Confianza" -> "Trader confiado"
+                "Eficiencia" -> "Trader eficiente"
+                "Optimismo" -> "Trader optimista"
+                "Paciencia" -> "Trader paciente"
+                "Realización" -> "Trader realizado"
+                "Satisfacción" -> "Trader satisfecho"
+                "Seguridad" -> "Trader seguro"
+                "Sintonía" -> "Trader en sintonía"
+                "Tranquilidad" -> "Trader tranquilo"
+                "Aceptación" -> "Trader aceptado"
+                "Afirmación" -> "Trader afirmativo"
+                else -> emotion
+            }
+            openImageDetail(emotionImageResource, emotionText)
+        }
+    }
+
+    private fun openImageDetail(imageResId: Int?, imageName: String) {
+        val intent = Intent(this, ImageDetailActivity::class.java)
+        intent.putExtra("imageResId", imageResId ?: 0) // Pasa 0 si la imagen es null
+        intent.putExtra("imageName", imageName)
+        startActivityWithFade(intent)
+    }
+
     private fun loadUserData() {
         userId?.let { id ->
             db.collection("users").document(id).get()
                 .addOnSuccessListener { document ->
                     if (document.exists()) {
-                        val avatarName = document.getString("avatarName")
-                        val tradingStyle = document.getString("trading_style")
-                        val psico = document.getString("psico")
-                        val emotion = document.getString("emotion")
+                        userAlias = document.getString("alias") // Recuperar el alias del usuario
+                        userAvatarName = document.getString("avatarName")
+                        userTradingStyle = document.getString("trading_style")
+                        userPsico = document.getString("psico")
+                        userEmotion = document.getString("emotion")
 
                         // Actualizar las imágenes dinámicamente
-                        setAvatarImage(avatarName)
-                        setTradingStyleImage(tradingStyle)
-                        setPsicoImage(psico)
-                        setEmotionImage(emotion)
+                        setAvatarImage(userAvatarName)
+                        setTradingStyleImage(userTradingStyle)
+                        setPsicoImage(userPsico)
+                        setEmotionImage(userEmotion)
                     } else {
                         println("El documento del usuario no existe.")
                     }
@@ -114,7 +191,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun setAvatarImage(avatarName: String?) {
-        val avatarResource = when (avatarName) {
+        val avatarResource = getAvatarImageResource(avatarName)
+        avatarResource?.let { avatarImage.setImageResource(it) }
+    }
+
+    private fun setTradingStyleImage(tradingStyle: String?) {
+        val tradingResource = getTradingStyleImageResource(tradingStyle)
+        tradingResource?.let { tradingStyleImage.setImageResource(it) }
+    }
+
+    private fun setPsicoImage(psico: String?) {
+        val psicoResource = getPsicoImageResource(psico)
+        psicoResource?.let { psicoImage.setImageResource(it) }
+    }
+
+    private fun setEmotionImage(emotion: String?) {
+        val emotionResource = getEmotionImageResource(emotion)
+        emotionResource?.let { emotionImage.setImageResource(it) }
+    }
+
+    private fun getAvatarImageResource(avatarName: String?): Int? {
+        return when (avatarName) {
             "avatar_alien" -> R.drawable.avataralien
             "avatar_bebe" -> R.drawable.avatarbebe
             "avatar_hombre" -> R.drawable.avatarhombre
@@ -124,30 +221,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             "avatar_vampira" -> R.drawable.avatarvampira
             else -> null
         }
-        avatarResource?.let { avatarImage.setImageResource(it) }
     }
 
-    private fun setTradingStyleImage(tradingStyle: String?) {
-        val tradingResource = when (tradingStyle) {
+    private fun getTradingStyleImageResource(tradingStyle: String?): Int? {
+        return when (tradingStyle) {
             "Day Trading" -> R.drawable.daytrader
             "Scalping" -> R.drawable.scalper
             "Swing Trading" -> R.drawable.swingtarder
             else -> null
         }
-        tradingResource?.let { tradingStyleImage.setImageResource(it) }
     }
 
-    private fun setPsicoImage(psico: String?) {
-        val psicoResource = when (psico) {
+    private fun getPsicoImageResource(psico: String?): Int? {
+        return when (psico) {
             "Psico +" -> R.drawable.positive
             "Psico -" -> R.drawable.negative
             else -> null
         }
-        psicoResource?.let { psicoImage.setImageResource(it) }
     }
 
-    private fun setEmotionImage(emotion: String?) {
-        val emotionResource = when (emotion) {
+    private fun getEmotionImageResource(emotion: String?): Int? {
+        return when (emotion) {
             "Ansiedad" -> R.drawable.ansiedad
             "Impaciencia" -> R.drawable.impaciencia
             "Descontrol" -> R.drawable.descontrol
@@ -174,7 +268,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             "Afirmación" -> R.drawable.afirmacion
             else -> null
         }
-        emotionResource?.let { emotionImage.setImageResource(it) }
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
