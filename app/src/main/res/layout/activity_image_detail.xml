@@ -1,18 +1,24 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/black">
 
-    <!-- Imagen en grande -->
-    <ImageView
+    <!-- Imagen en grande con estilo circular -->
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/photoImageView"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_width="350dp"
+        android:layout_height="350dp"
         android:contentDescription="@string/detalle_imagen"
-        android:scaleType="fitCenter" />
+        app:shapeAppearanceOverlay="@style/CircularImage"
+        app:strokeColor="@android:color/white"
+        app:strokeWidth="4dp"
+        android:padding="2dp"
+        android:scaleType="fitCenter"/>
 
     <!-- Texto con el nombre -->
     <TextView
@@ -20,8 +26,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
-        android:textColor="@android:color/black"
-        android:layout_marginTop="16dp"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="50dp"
         android:textStyle="bold"
         android:text="@string/nombre_de_la_imagen" />
 </LinearLayout>

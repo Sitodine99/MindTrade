@@ -80,7 +80,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
                     android:text="@string/titleScalping"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/orange"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
@@ -140,7 +140,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
                     android:text="@string/titleDaytrading"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/blue_normal"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
@@ -200,7 +200,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
                     android:text="@string/titleSwingtrading"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/forest_green"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
