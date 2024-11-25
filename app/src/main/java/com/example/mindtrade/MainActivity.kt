@@ -14,6 +14,8 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mindtrade.adapter.StrategyAdapter
+import com.example.mindtrade.model.Strategy
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -99,10 +101,53 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun setupStrategiesRecyclerView() {
-        val strategiesList = listOf("Estrategia 1", "Estrategia 2", "Estrategia 3")
-        strategiesRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        strategiesRecyclerView.adapter = YourAdapter(strategiesList)
+        strategiesRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+
+        // Consulta Firestore para obtener estrategias y datos de sus creadores
+        db.collection("strategies")
+            .get()
+            .addOnSuccessListener { result ->
+                val strategies = result.map { document ->
+                    val strategyId = document.id
+                    val title = document.getString("title") ?: "Sin título"
+                    val description = document.getString("description") ?: "Sin descripción"
+                    val rating = document.getDouble("rating") ?: 0.0
+                    val createdBy = document.getString("createdBy") ?: ""
+
+                    // Obtener alias y avatar directamente de los campos de Firestore
+                    val authorAlias = document.getString("authorAlias") ?: "Anónimo"
+                    val avatarName = document.getString("avatarName") ?: "default_avatar"
+
+                    // Crear y devolver la estrategia completa
+                    Strategy(
+                        id = strategyId,
+                        title = title,
+                        description = description,
+                        rating = rating,
+                        createdBy = createdBy,
+                        author = authorAlias,
+                        avatarName = avatarName
+                    )
+                }
+
+                // Configurar el adaptador con la lista de estrategias
+                val adapter = StrategyAdapter(strategies) { strategy ->
+                    // Navegar al detalle de la estrategia
+                    val intent = Intent(this, StrategyDetailActivity::class.java)
+                    intent.putExtra("strategyId", strategy.id)
+                    startActivity(intent)
+                }
+                strategiesRecyclerView.adapter = adapter
+            }
+            .addOnFailureListener { exception ->
+                Toast.makeText(this, "Error al cargar estrategias: ${exception.message}", Toast.LENGTH_SHORT).show()
+            }
     }
+
+
+
+
+
 
     private fun setupImageClickListeners() {
         avatarImage.setOnClickListener {

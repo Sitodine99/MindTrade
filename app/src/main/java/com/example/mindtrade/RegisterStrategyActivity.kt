@@ -34,7 +34,8 @@ class RegisterStrategyActivity : AppCompatActivity() {
         descriptionEditText = findViewById(R.id.strategyDescription)
         categorySpinner = findViewById(R.id.strategyCategory)
         chipGroup = findViewById(R.id.indicatorChipGroup)
-        predefinedIndicatorsChipGroup = findViewById(R.id.predefinedIndicatorChipGroup) // Nuevo grupo para chips predefinidos
+        predefinedIndicatorsChipGroup =
+            findViewById(R.id.predefinedIndicatorChipGroup) // Nuevo grupo para chips predefinidos
         addIndicatorEditText = findViewById(R.id.addIndicatorEditText)
         addIndicatorButton = findViewById(R.id.addIndicatorButton)
         algorithmEditText = findViewById(R.id.tradingAlgorithmCode)
@@ -81,7 +82,11 @@ class RegisterStrategyActivity : AppCompatActivity() {
                         }
                         chipGroup.addView(selectedChip)
                     } else {
-                        Toast.makeText(this@RegisterStrategyActivity, "El indicador ya existe", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@RegisterStrategyActivity,
+                            "El indicador ya existe",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
@@ -156,25 +161,64 @@ class RegisterStrategyActivity : AppCompatActivity() {
         val timeFrames = timeFramesCheckBoxes.filter { it.isChecked }.map { it.text.toString() }
         val algorithmCode = algorithmEditText.text.toString().trim()
 
-        val strategy = hashMapOf(
-            "title" to title,
-            "description" to description,
-            "tradingStyle" to category,
-            "indicators" to indicators,
-            "timeframes" to timeFrames,
-            "algorithmCode" to algorithmCode,
-            "createdBy" to currentUser?.uid,
-            "timestamp" to System.currentTimeMillis()
-        )
+        // Consulta para obtener alias y avatar
+        val userId = currentUser?.uid
+        if (userId == null) {
+            Toast.makeText(this, "Error: Usuario no autenticado", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-        db.collection("strategies")
-            .add(strategy)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Estrategia guardada exitosamente", Toast.LENGTH_SHORT).show()
-                finish()
+        // Obtén los datos del usuario actual
+        db.collection("users").document(userId)
+            .get()
+            .addOnSuccessListener { userDoc ->
+                if (userDoc.exists()) {
+                    val alias = userDoc.getString("alias") ?: "Anónimo"
+                    val avatarName = userDoc.getString("avatarName") ?: "default_avatar"
+
+                    // Estructura del documento de estrategia
+                    val strategy = hashMapOf(
+                        "title" to title,
+                        "description" to description,
+                        "tradingStyle" to category,
+                        "indicators" to indicators,
+                        "timeframes" to timeFrames,
+                        "algorithmCode" to algorithmCode,
+                        "createdBy" to userId, // ID del creador
+                        "authorAlias" to alias, // Alias del creador
+                        "avatarName" to avatarName, // Avatar del creador
+                        "timestamp" to System.currentTimeMillis()
+                    )
+
+                    // Guarda la estrategia en Firestore
+                    db.collection("strategies")
+                        .add(strategy)
+                        .addOnSuccessListener {
+                            Toast.makeText(
+                                this,
+                                "Estrategia guardada exitosamente",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            finish()
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(
+                                this,
+                                "Error al guardar: ${e.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                } else {
+                    Toast.makeText(this, "No se encontraron datos del usuario", Toast.LENGTH_SHORT)
+                        .show()
+                }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Error al guardar: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Error al cargar datos del usuario: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 }
