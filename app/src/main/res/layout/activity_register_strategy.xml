@@ -58,41 +58,47 @@
             android:layout_height="wrap_content"
             android:entries="@array/strategy_categories" />
 
-        <!-- Campo de indicadores -->
+        <!-- Indicadores -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Indicadores (opcional)"
+            android:text="Indicadores"
             android:textSize="16sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp" />
 
-        <LinearLayout
+        <!-- Grupo para los chips dinámicos -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/indicatorChipGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            app:singleLine="false"
+            app:chipSpacing="8dp" />
 
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/indicatorChipGroup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:singleLine="false"
-                app:chipSpacing="8dp" />
 
-            <EditText
-                android:id="@+id/addIndicatorEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Añadir nuevo indicador" />
 
-            <Button
-                android:id="@+id/addIndicatorButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Añadir indicador"
-                android:layout_marginTop="8dp" />
-        </LinearLayout>
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/predefinedIndicatorChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:chipSpacing="8dp"
+            app:singleLine="false" />
+
+        <!-- Añadir nuevo indicador -->
+        <EditText
+            android:id="@+id/addIndicatorEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nuevo indicador"
+            android:layout_marginTop="8dp" />
+
+        <Button
+            android:id="@+id/addIndicatorButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Añadir indicador"
+            android:layout_marginTop="8dp" />
 
         <!-- Temporalidades -->
         <TextView
@@ -185,10 +191,20 @@
         <EditText
             android:id="@+id/tradingAlgorithmCode"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="200dp"
             android:hint="Pega el código en MQL5 aquí"
-            android:minLines="4"
-            android:gravity="top|start" />
+            android:gravity="top|start"
+            android:background="@drawable/code_editor_background"
+            android:padding="8dp"
+            android:scrollbars="vertical|horizontal"
+            android:overScrollMode="always"
+            android:inputType="textMultiLine|textNoSuggestions"
+            android:fontFamily="monospace"
+            android:lineSpacingExtra="4dp"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:layout_marginBottom="16dp" />
+
 
         <!-- Imagen -->
         <LinearLayout
@@ -198,31 +214,26 @@
             android:gravity="center_vertical"
             android:layout_marginTop="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Imagen ilustrativa (opcional)"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+            <!-- Botón de subir imagen -->
+            <ImageButton
+                android:id="@+id/uploadImageButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:contentDescription="Subir Imagen"
+                android:src="@drawable/ic_upload"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_marginEnd="16dp" />
 
             <!-- Vista previa de la imagen -->
             <ImageView
                 android:id="@+id/strategyImageView"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:layout_marginStart="16dp"
                 android:contentDescription="Vista previa de la imagen"
                 android:src="@drawable/ic_placeholder"
-                android:scaleType="centerCrop" />
-
-            <!-- Botón de subir imagen -->
-            <ImageButton
-                android:id="@+id/uploadImageButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="16dp"
-                android:contentDescription="Subir Imagen"
-                android:src="@drawable/ic_upload" />
+                android:scaleType="centerCrop"
+                android:background="@drawable/code_editor_background"
+                android:layout_marginStart="16dp" />
         </LinearLayout>
 
 
