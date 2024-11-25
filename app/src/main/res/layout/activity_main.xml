@@ -165,7 +165,19 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tradingStrategiesSummary" />
+
+            <!-- Botón "Añadir Estrategia" -->
+            <Button
+                android:id="@+id/addStrategyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Añadir Estrategia"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/strategiesRecyclerView"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <!-- Menú Lateral -->

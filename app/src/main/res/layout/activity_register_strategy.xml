@@ -1,0 +1,251 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Campo de título -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Título"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/strategyTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Introduce el título de la estrategia" />
+
+        <!-- Campo de descripción -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Descripción"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/strategyDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Describe tu estrategia"
+            android:minLines="4"
+            android:gravity="top|start" />
+
+        <!-- Estilo de trading -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estilo de trading"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/strategyCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/strategy_categories" />
+
+        <!-- Campo de indicadores -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Indicadores (opcional)"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/indicatorChipGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:singleLine="false"
+                app:chipSpacing="8dp" />
+
+            <EditText
+                android:id="@+id/addIndicatorEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Añadir nuevo indicador" />
+
+            <Button
+                android:id="@+id/addIndicatorButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Añadir indicador"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+
+        <!-- Temporalidades -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Temporalidades (opcional)"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="5"
+            android:rowCount="2"
+            android:layout_marginBottom="16dp">
+
+            <CheckBox
+                android:id="@+id/timeM1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="M1" />
+
+            <CheckBox
+                android:id="@+id/timeM3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="M3" />
+
+            <CheckBox
+                android:id="@+id/timeM5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="M5" />
+
+            <CheckBox
+                android:id="@+id/timeM15"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="M15" />
+
+            <CheckBox
+                android:id="@+id/timeM30"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="M30" />
+
+            <CheckBox
+                android:id="@+id/timeH1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="H1" />
+
+            <CheckBox
+                android:id="@+id/timeH4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="H4" />
+
+            <CheckBox
+                android:id="@+id/timeD1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="D1" />
+
+            <CheckBox
+                android:id="@+id/timeW1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="W1" />
+
+            <CheckBox
+                android:id="@+id/timeMN"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="MN" />
+        </GridLayout>
+
+        <!-- Trading Algorítmico -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Trading Algorítmico (opcional)"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/tradingAlgorithmCode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Pega el código en MQL5 aquí"
+            android:minLines="4"
+            android:gravity="top|start" />
+
+        <!-- Imagen -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Imagen ilustrativa (opcional)"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <!-- Vista previa de la imagen -->
+            <ImageView
+                android:id="@+id/strategyImageView"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginStart="16dp"
+                android:contentDescription="Vista previa de la imagen"
+                android:src="@drawable/ic_placeholder"
+                android:scaleType="centerCrop" />
+
+            <!-- Botón de subir imagen -->
+            <ImageButton
+                android:id="@+id/uploadImageButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                android:contentDescription="Subir Imagen"
+                android:src="@drawable/ic_upload" />
+        </LinearLayout>
+
+
+        <!-- Botones para guardar y cancelar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:layout_marginTop="24dp">
+
+            <Button
+                android:id="@+id/cancelButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancelar"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/saveButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Guardar" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

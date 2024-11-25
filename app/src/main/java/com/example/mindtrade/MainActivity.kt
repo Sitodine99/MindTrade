@@ -4,6 +4,7 @@ import YourAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -27,6 +28,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var emotionImage: ShapeableImageView
     private lateinit var accountsRecyclerView: RecyclerView
     private lateinit var strategiesRecyclerView: RecyclerView
+    private lateinit var addStrategyButton: Button // Nuevo botón para añadir estrategia
     private lateinit var navAvatarImage: ImageView
     private lateinit var navUserNameText: TextView
     private lateinit var navTradingStyleText: TextView
@@ -35,7 +37,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val db = FirebaseFirestore.getInstance()
     private var userId: String? = null
 
-    // Variables para almacenar datos dinámicos del usuario
     private var userAlias: String? = null
     private var userAvatarName: String? = null
     private var userTradingStyle: String? = null
@@ -46,11 +47,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Configurar Toolbar
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        // Configurar DrawerLayout y NavigationView
         drawerLayout = findViewById(R.id.drawer_layout)
         val navigationView: NavigationView = findViewById(R.id.navigationView)
         val toggle = ActionBarDrawerToggle(
@@ -60,15 +59,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toggle.syncState()
         navigationView.setNavigationItemSelectedListener(this)
 
-        // Configurar referencias de UI
         avatarImage = findViewById(R.id.userAvatar)
         tradingStyleImage = findViewById(R.id.tradingStyleImage)
         psicoImage = findViewById(R.id.psicoImage)
         emotionImage = findViewById(R.id.emotionImage)
         accountsRecyclerView = findViewById(R.id.accountsRecyclerView)
         strategiesRecyclerView = findViewById(R.id.strategiesRecyclerView)
+        addStrategyButton = findViewById(R.id.addStrategyButton) // Inicializar botón
 
-        // Configurar referencias del header del NavigationView
         val headerView = navigationView.getHeaderView(0)
         navAvatarImage = headerView.findViewById(R.id.navAvatarImage)
         navUserNameText = headerView.findViewById(R.id.navUserNameText)
@@ -76,7 +74,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navPsicoStateText = headerView.findViewById(R.id.navPsicoState)
         navEmotionText = headerView.findViewById(R.id.navEmotion)
 
-        // Obtener ID del usuario autenticado
         val currentUser = FirebaseAuth.getInstance().currentUser
         userId = currentUser?.uid
 
@@ -88,16 +85,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             return
         }
 
-        // Configurar RecyclerView para las cuentas
         setupAccountsRecyclerView()
-
-        // Configurar RecyclerView para las estrategias
         setupStrategiesRecyclerView()
-
-        // Configurar clic en imágenes para abrir detalles
         setupImageClickListeners()
-
-        // Recuperar datos del usuario
+        setupAddStrategyButton() // Configurar botón "Añadir Estrategia"
         loadUserData()
     }
 
@@ -109,7 +100,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun setupStrategiesRecyclerView() {
         val strategiesList = listOf("Estrategia 1", "Estrategia 2", "Estrategia 3")
-        strategiesRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        strategiesRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         strategiesRecyclerView.adapter = YourAdapter(strategiesList)
     }
 
@@ -172,6 +163,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    private fun setupAddStrategyButton() {
+        addStrategyButton.setOnClickListener {
+            val intent = Intent(this, RegisterStrategyActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
     private fun openImageDetail(imageResId: Int?, imageName: String) {
         val intent = Intent(this, ImageDetailActivity::class.java)
         intent.putExtra("imageResId", imageResId ?: 0)
@@ -206,7 +204,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    private fun updateNavigationView() {
+
+private fun updateNavigationView() {
         val avatarResource = getAvatarImageResource(userAvatarName)
         avatarResource?.let { navAvatarImage.setImageResource(it) }
 

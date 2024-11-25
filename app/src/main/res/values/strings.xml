@@ -111,6 +111,12 @@
     <string name="detalle_imagen">Descripción de la imagen</string>
     <string name="nombre_de_la_imagen">Nombre de la imagen</string>
 
+    <string-array name="strategy_categories">
+        <item>Day Trading</item>
+        <item>Swing Trading</item>
+        <item>Scalping</item>
+    </string-array>
+
 
 
 

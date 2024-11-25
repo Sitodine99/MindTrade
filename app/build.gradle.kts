@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.androidx.annotation)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.firebase.storage.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -68,6 +69,7 @@ dependencies {
     implementation("com.google.firebase:firebase-database-ktx:20.3.0")
     // Firebase Cloud Storage (para fotos o gráficos)
     implementation("com.google.firebase:firebase-storage-ktx:20.2.0")
+
     // Firebase Firestore
     implementation("com.google.firebase:firebase-firestore-ktx:24.5.0")
 
