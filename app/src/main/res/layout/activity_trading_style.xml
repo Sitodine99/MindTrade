@@ -140,7 +140,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
                     android:text="@string/titleDaytrading"
-                    android:textColor="@color/blue_normal"
+                    android:textColor="@color/turquoise_blue"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
@@ -184,7 +184,7 @@
                 android:padding="4dp"
                 android:scaleType="centerCrop"
                 app:shapeAppearanceOverlay="@style/CircularImage"
-                app:srcCompat="@drawable/swingtarder"
+                app:srcCompat="@drawable/swingtrader"
                 app:strokeColor="@android:color/white"
                 app:strokeWidth="4dp" />
 

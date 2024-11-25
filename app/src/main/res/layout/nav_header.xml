@@ -1,45 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:background="?attr/colorPrimary"
-    android:padding="16dp"
-    android:gravity="bottom">
+    android:orientation="horizontal"
+    android:background="@color/black"
+    android:padding="16dp">
 
-    <!-- Avatar del Usuario -->
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/navUserAvatar"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:src="@drawable/interrogacion"
-        android:contentDescription="Avatar del usuario"
-        app:shapeAppearanceOverlay="@style/CircularImage"
-        android:layout_gravity="center_horizontal" />
-
-    <!-- Nombre del Usuario -->
-    <TextView
-        android:id="@+id/navUserName"
+    <!-- Contenedor de la imagen y el alias -->
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Alias del Usuario"
-        android:textStyle="bold"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
-        android:gravity="center"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="8dp" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
 
-    <!-- Detalles adicionales -->
-    <TextView
-        android:id="@+id/navUserDetails"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Scalper, Psico +, En Control"
-        android:textColor="@android:color/white"
-        android:textSize="14sp"
-        android:gravity="center"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="4dp" />
+        <!-- Avatar del Usuario -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/navAvatarImage"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginBottom="8dp"
+            android:padding="3dp"
+            android:scaleType="centerCrop"
+            app:strokeColor="@android:color/white"
+            app:strokeWidth="3dp"
+            android:src="@drawable/interrogacion"
+            android:contentDescription="Avatar del usuario"
+            app:shapeAppearanceOverlay="@style/CircularImage"
+            android:layout_gravity="center_horizontal"
+            />
+
+        <!-- Alias del Usuario -->
+        <TextView
+            android:id="@+id/navUserNameText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Alias del Usuario"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+
+    <!-- Contenedor de los detalles (estilo de trading, estado psicológico y emoción) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingLeft="16dp">
+
+        <!-- Estilo de Trading -->
+        <TextView
+            android:id="@+id/navTradingStyleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Swing trader"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:layout_marginStart="20dp"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Estado Psicológico -->
+        <TextView
+            android:id="@+id/navPsicoState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Psico +"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:layout_marginStart="20dp"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Emoción -->
+        <TextView
+            android:id="@+id/navEmotion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Trader fatalista"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:layout_marginStart="20dp"/>
+    </LinearLayout>
 </LinearLayout>
+

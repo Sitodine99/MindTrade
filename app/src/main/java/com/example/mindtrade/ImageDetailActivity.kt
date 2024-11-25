@@ -2,9 +2,9 @@ package com.example.mindtrade
 
 import android.os.Bundle
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.example.mindtrade.R
 
 class ImageDetailActivity : AppCompatActivity() {
 
@@ -12,6 +12,7 @@ class ImageDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image_detail)
 
+        val rootView: LinearLayout = findViewById(R.id.rootLayout)
         val imageView: ImageView = findViewById(R.id.photoImageView)
         val textView: TextView = findViewById(R.id.photoTextView)
 
@@ -40,31 +41,19 @@ class ImageDetailActivity : AppCompatActivity() {
 
         // Cambiar el color del texto según el grupo al que pertenezca
         when (imageName) {
-            "Psico +" -> {
-                textView.setTextColor(resources.getColor(R.color.highlight_green, theme))
-            }
-            "Psico -" -> {
-                textView.setTextColor(resources.getColor(R.color.my_red, theme))
-            }
-            in negativeEmotionTexts -> {
-                textView.setTextColor(resources.getColor(R.color.my_red, theme))
-            }
-            in positiveEmotionTexts -> {
-                textView.setTextColor(resources.getColor(R.color.highlight_green, theme))
-            }
-            "Daytrader" -> {
-                textView.setTextColor(resources.getColor(R.color.orange, theme))
-            }
-            "Scalper" -> {
-                textView.setTextColor(resources.getColor(R.color.blue_normal, theme))
-            }
-            "Swingtrader" -> {
-                textView.setTextColor(resources.getColor(R.color.forest_green, theme))
-            }
-            else -> {
-                // Alias (u otros textos no categorizados) se muestran en blanco
-                textView.setTextColor(resources.getColor(android.R.color.white, theme))
-            }
+            "Psico +" -> textView.setTextColor(resources.getColor(R.color.highlight_green, theme))
+            "Psico -" -> textView.setTextColor(resources.getColor(R.color.my_red, theme))
+            in negativeEmotionTexts -> textView.setTextColor(resources.getColor(R.color.my_red, theme))
+            in positiveEmotionTexts -> textView.setTextColor(resources.getColor(R.color.highlight_green, theme))
+            "Day trader" -> textView.setTextColor(resources.getColor(R.color.blue_light, theme))
+            "Scalper" -> textView.setTextColor(resources.getColor(R.color.orange, theme))
+            "Swing trader" -> textView.setTextColor(resources.getColor(R.color.forest_green, theme))
+            else -> textView.setTextColor(resources.getColor(android.R.color.white, theme))
+        }
+
+        // Configurar OnClickListener para cerrar la actividad al tocar la pantalla
+        rootView.setOnClickListener {
+            finishWithFade()
         }
     }
 
@@ -74,5 +63,6 @@ class ImageDetailActivity : AppCompatActivity() {
         finishWithFade()
     }
 }
+
 
 

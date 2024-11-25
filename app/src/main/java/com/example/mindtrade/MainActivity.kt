@@ -4,6 +4,8 @@ import YourAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -25,11 +27,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var emotionImage: ShapeableImageView
     private lateinit var accountsRecyclerView: RecyclerView
     private lateinit var strategiesRecyclerView: RecyclerView
+    private lateinit var navAvatarImage: ImageView
+    private lateinit var navUserNameText: TextView
+    private lateinit var navTradingStyleText: TextView
+    private lateinit var navPsicoStateText: TextView
+    private lateinit var navEmotionText: TextView
     private val db = FirebaseFirestore.getInstance()
     private var userId: String? = null
 
     // Variables para almacenar datos dinámicos del usuario
-    private var userAlias: String? = null // Alias del usuario
+    private var userAlias: String? = null
     private var userAvatarName: String? = null
     private var userTradingStyle: String? = null
     private var userPsico: String? = null
@@ -60,6 +67,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         emotionImage = findViewById(R.id.emotionImage)
         accountsRecyclerView = findViewById(R.id.accountsRecyclerView)
         strategiesRecyclerView = findViewById(R.id.strategiesRecyclerView)
+
+        // Configurar referencias del header del NavigationView
+        val headerView = navigationView.getHeaderView(0)
+        navAvatarImage = headerView.findViewById(R.id.navAvatarImage)
+        navUserNameText = headerView.findViewById(R.id.navUserNameText)
+        navTradingStyleText = headerView.findViewById(R.id.navTradingStyleText)
+        navPsicoStateText = headerView.findViewById(R.id.navPsicoState)
+        navEmotionText = headerView.findViewById(R.id.navEmotion)
 
         // Obtener ID del usuario autenticado
         val currentUser = FirebaseAuth.getInstance().currentUser
@@ -100,7 +115,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun setupImageClickListeners() {
         avatarImage.setOnClickListener {
-            val alias = userAlias ?: "Sin alias" // Mostrar el alias del usuario
+            val alias = userAlias ?: "Sin alias"
             val avatarImageResource = getAvatarImageResource(userAvatarName)
             openImageDetail(avatarImageResource, alias)
         }
@@ -109,10 +124,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val tradingStyle = userTradingStyle ?: "Sin nombre"
             val tradingStyleImageResource = getTradingStyleImageResource(tradingStyle)
             val tradingStyleText = when (tradingStyle) {
-                "Day Trading" -> "Daytrader"
+                "Day Trading" -> "Day trader"
                 "Scalping" -> "Scalper"
-                "Swing Trading" -> "Swingtrader"
-                else -> tradingStyle // Si no coincide, muestra el texto recibido
+                "Swing Trading" -> "Swing trader"
+                else -> tradingStyle
             }
             openImageDetail(tradingStyleImageResource, tradingStyleText)
         }
@@ -159,7 +174,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun openImageDetail(imageResId: Int?, imageName: String) {
         val intent = Intent(this, ImageDetailActivity::class.java)
-        intent.putExtra("imageResId", imageResId ?: 0) // Pasa 0 si la imagen es null
+        intent.putExtra("imageResId", imageResId ?: 0)
         intent.putExtra("imageName", imageName)
         startActivityWithFade(intent)
     }
@@ -169,17 +184,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             db.collection("users").document(id).get()
                 .addOnSuccessListener { document ->
                     if (document.exists()) {
-                        userAlias = document.getString("alias") // Recuperar el alias del usuario
+                        userAlias = document.getString("alias")
                         userAvatarName = document.getString("avatarName")
                         userTradingStyle = document.getString("trading_style")
                         userPsico = document.getString("psico")
                         userEmotion = document.getString("emotion")
 
-                        // Actualizar las imágenes dinámicamente
                         setAvatarImage(userAvatarName)
                         setTradingStyleImage(userTradingStyle)
                         setPsicoImage(userPsico)
                         setEmotionImage(userEmotion)
+
+                        updateNavigationView()
                     } else {
                         println("El documento del usuario no existe.")
                     }
@@ -187,6 +203,105 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 .addOnFailureListener { e ->
                     Toast.makeText(this, "Error al cargar datos: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
+        }
+    }
+
+    private fun updateNavigationView() {
+        val avatarResource = getAvatarImageResource(userAvatarName)
+        avatarResource?.let { navAvatarImage.setImageResource(it) }
+
+        navUserNameText.text = userAlias ?: "Sin alias"
+
+        val tradingStyleText = when (userTradingStyle) {
+            "Day Trading" -> "Day trader"
+            "Scalping" -> "Scalper"
+            "Swing Trading" -> "Swing trader"
+            else -> "Sin estilo"
+        }
+        navTradingStyleText.text = tradingStyleText
+        when (tradingStyleText) {
+            "Day trader" -> navTradingStyleText.setTextColor(
+                resources.getColor(
+                    R.color.blue_light,
+                    theme
+                )
+            )
+
+            "Scalper" -> navTradingStyleText.setTextColor(
+                resources.getColor(
+                    R.color.orange,
+                    theme
+                )
+            )
+
+            "Swing trader" -> navTradingStyleText.setTextColor(
+                resources.getColor(
+                    R.color.forest_green,
+                    theme
+                )
+            )
+
+            else -> navTradingStyleText.setTextColor(
+                resources.getColor(
+                    android.R.color.white,
+                    theme
+                )
+            )
+        }
+
+        val psicoText = userPsico ?: "Sin estado"
+        navPsicoStateText.text = psicoText
+        when (psicoText) {
+            "Psico +" -> navPsicoStateText.setTextColor(resources.getColor(R.color.highlight_green, theme))
+            "Psico -" -> navPsicoStateText.setTextColor(resources.getColor(R.color.my_red, theme))
+            else -> navPsicoStateText.setTextColor(resources.getColor(android.R.color.white, theme))
+        }
+
+        val emotionText = when (userEmotion) {
+            "Ansiedad" -> "Trader ansioso"
+            "Impaciencia" -> "Trader impaciente"
+            "Descontrol" -> "Trader descontrolado"
+            "Avaricia" -> "Trader avaricioso"
+            "Insatisfacción" -> "Trader insatisfecho"
+            "Rabia" -> "Trader rabioso"
+            "Vergüenza" -> "Trader avergonzado"
+            "Confusion" -> "Trader confundido"
+            "Miedo" -> "Trader atemorizado"
+            "Fatalismo" -> "Trader fatalista"
+            "Frustración" -> "Trader frustrado"
+            "Ineficacia" -> "Trader ineficiente"
+            "Autocontrol" -> "Trader autocontrolado"
+            "Confianza" -> "Trader confiado"
+            "Eficiencia" -> "Trader eficiente"
+            "Optimismo" -> "Trader optimista"
+            "Paciencia" -> "Trader paciente"
+            "Realización" -> "Trader realizado"
+            "Satisfacción" -> "Trader satisfecho"
+            "Seguridad" -> "Trader seguro"
+            "Sintonía" -> "Trader en sintonía"
+            "Tranquilidad" -> "Trader tranquilo"
+            "Aceptación" -> "Trader aceptado"
+            "Afirmación" -> "Trader afirmativo"
+            else -> userEmotion ?: "Sin emoción"
+        }
+        navEmotionText.text = emotionText
+
+        val negativeEmotionTexts = listOf(
+            "Trader ansioso", "Trader impaciente", "Trader descontrolado",
+            "Trader avaricioso", "Trader insatisfecho", "Trader rabioso",
+            "Trader avergonzado", "Trader confundido", "Trader atemorizado",
+            "Trader fatalista", "Trader frustrado", "Trader ineficiente"
+        )
+        val positiveEmotionTexts = listOf(
+            "Trader autocontrolado", "Trader confiado", "Trader eficiente",
+            "Trader optimista", "Trader paciente", "Trader realizado",
+            "Trader satisfecho", "Trader seguro", "Trader en sintonía",
+            "Trader tranquilo", "Trader aceptado", "Trader afirmativo"
+        )
+        when (emotionText) {
+            in negativeEmotionTexts -> navEmotionText.setTextColor(resources.getColor(R.color.my_red, theme))
+            in positiveEmotionTexts -> navEmotionText.setTextColor(resources.getColor(R.color.highlight_green, theme))
+            else -> navEmotionText.setTextColor(resources.getColor(android.R.color.white, theme))
         }
     }
 
@@ -227,7 +342,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return when (tradingStyle) {
             "Day Trading" -> R.drawable.daytrader
             "Scalping" -> R.drawable.scalper
-            "Swing Trading" -> R.drawable.swingtarder
+            "Swing Trading" -> R.drawable.swingtrader
             else -> null
         }
     }
