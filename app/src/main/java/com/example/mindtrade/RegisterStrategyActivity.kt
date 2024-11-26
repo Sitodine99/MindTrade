@@ -203,6 +203,7 @@ class RegisterStrategyActivity : AppCompatActivity() {
                     )
 
                     // Guarda la estrategia en Firestore
+                    // Guarda la estrategia en Firestore
                     db.collection("strategies")
                         .add(strategy)
                         .addOnSuccessListener {
@@ -211,6 +212,9 @@ class RegisterStrategyActivity : AppCompatActivity() {
                                 "Estrategia guardada exitosamente",
                                 Toast.LENGTH_SHORT
                             ).show()
+
+                            // Devolver un resultado exitoso
+                            setResult(RESULT_OK)
                             finish()
                         }
                         .addOnFailureListener { e ->
@@ -220,6 +224,7 @@ class RegisterStrategyActivity : AppCompatActivity() {
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
+
                 } else {
                     Toast.makeText(this, "No se encontraron datos del usuario", Toast.LENGTH_SHORT)
                         .show()

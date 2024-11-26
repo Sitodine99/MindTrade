@@ -8,6 +8,8 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -44,6 +46,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var userTradingStyle: String? = null
     private var userPsico: String? = null
     private var userEmotion: String? = null
+    private lateinit var registerStrategyLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,6 +88,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             startActivity(intent)
             finish()
             return
+        }
+
+        registerStrategyLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                // Cuando regresas de RegisterStrategyActivity, recarga las estrategias
+                setupStrategiesRecyclerView()
+            }
         }
 
         setupAccountsRecyclerView()
@@ -259,9 +269,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun setupAddStrategyButton() {
         addStrategyButton.setOnClickListener {
             val intent = Intent(this, RegisterStrategyActivity::class.java)
-            startActivity(intent)
+            registerStrategyLauncher.launch(intent)
         }
     }
+
 
     private fun openImageDetail(imageResId: Int?, imageName: String) {
         val intent = Intent(this, ImageDetailActivity::class.java)
