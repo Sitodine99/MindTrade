@@ -10,7 +10,8 @@ data class Strategy(
     val rating: Double = 0.0,
     val createdBy: String = "",
     val indicators: List<String> = emptyList(),
-    val timeframes: List<String> = emptyList()
+    val timeframes: List<String> = emptyList(),
+    val tradingStyles: List<String> = emptyList()
 )
 
 

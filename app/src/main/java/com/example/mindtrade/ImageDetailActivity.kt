@@ -45,7 +45,7 @@ class ImageDetailActivity : AppCompatActivity() {
             "Psico -" -> textView.setTextColor(resources.getColor(R.color.my_red, theme))
             in negativeEmotionTexts -> textView.setTextColor(resources.getColor(R.color.my_red, theme))
             in positiveEmotionTexts -> textView.setTextColor(resources.getColor(R.color.highlight_green, theme))
-            "Day trader" -> textView.setTextColor(resources.getColor(R.color.blue_light, theme))
+            "Day trader" -> textView.setTextColor(resources.getColor(R.color.turquoise_blue, theme))
             "Scalper" -> textView.setTextColor(resources.getColor(R.color.orange, theme))
             "Swing trader" -> textView.setTextColor(resources.getColor(R.color.forest_green, theme))
             else -> textView.setTextColor(resources.getColor(android.R.color.white, theme))

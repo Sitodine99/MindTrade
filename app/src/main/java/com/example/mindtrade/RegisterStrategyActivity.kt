@@ -12,7 +12,9 @@ class RegisterStrategyActivity : AppCompatActivity() {
 
     private lateinit var titleEditText: EditText
     private lateinit var descriptionEditText: EditText
-    private lateinit var categorySpinner: Spinner
+    private lateinit var dayTradingCheckBox: CheckBox
+    private lateinit var scalpingCheckBox: CheckBox
+    private lateinit var swingTradingCheckBox: CheckBox
     private lateinit var chipGroup: ChipGroup
     private lateinit var addIndicatorEditText: EditText
     private lateinit var addIndicatorButton: Button
@@ -32,10 +34,11 @@ class RegisterStrategyActivity : AppCompatActivity() {
         // Referenciar elementos del diseño
         titleEditText = findViewById(R.id.strategyTitle)
         descriptionEditText = findViewById(R.id.strategyDescription)
-        categorySpinner = findViewById(R.id.strategyCategory)
+        dayTradingCheckBox = findViewById(R.id.tradingStyleDayTrading)
+        scalpingCheckBox = findViewById(R.id.tradingStyleScalping)
+        swingTradingCheckBox = findViewById(R.id.tradingStyleSwingTrading)
         chipGroup = findViewById(R.id.indicatorChipGroup)
-        predefinedIndicatorsChipGroup =
-            findViewById(R.id.predefinedIndicatorChipGroup) // Nuevo grupo para chips predefinidos
+        predefinedIndicatorsChipGroup = findViewById(R.id.predefinedIndicatorChipGroup) // Nuevo grupo para chips predefinidos
         addIndicatorEditText = findViewById(R.id.addIndicatorEditText)
         addIndicatorButton = findViewById(R.id.addIndicatorButton)
         algorithmEditText = findViewById(R.id.tradingAlgorithmCode)
@@ -145,9 +148,18 @@ class RegisterStrategyActivity : AppCompatActivity() {
     private fun saveStrategyToFirestore() {
         val title = titleEditText.text.toString().trim()
         val description = descriptionEditText.text.toString().trim()
-        val category = categorySpinner.selectedItem.toString()
+        val tradingStyles = mutableListOf<String>()
+        if (dayTradingCheckBox.isChecked) tradingStyles.add("Day Trading")
+        if (scalpingCheckBox.isChecked) tradingStyles.add("Scalping")
+        if (swingTradingCheckBox.isChecked) tradingStyles.add("Swing Trading")
 
-        if (title.isBlank() || description.isBlank() || category.isBlank()) {
+        // Verificar si no se seleccionó ningún estilo
+        if (tradingStyles.isEmpty()) {
+            Toast.makeText(this, "Selecciona al menos un estilo de trading", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (title.isBlank() || description.isBlank()) {
             Toast.makeText(this, "Completa los campos obligatorios", Toast.LENGTH_SHORT).show()
             return
         }
@@ -180,7 +192,7 @@ class RegisterStrategyActivity : AppCompatActivity() {
                     val strategy = hashMapOf(
                         "title" to title,
                         "description" to description,
-                        "tradingStyle" to category,
+                        "tradingStyles" to tradingStyles,
                         "indicators" to indicators,
                         "timeframes" to timeFrames,
                         "algorithmCode" to algorithmCode,

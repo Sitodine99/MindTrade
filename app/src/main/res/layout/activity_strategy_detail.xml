@@ -39,20 +39,20 @@
             android:textSize="16sp"
             android:layout_marginBottom="16dp" />
 
-        <!-- Descripción -->
+        <!-- Estilo de Trading -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Descripción"
+            android:text="Estilo de Trading"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginBottom="4dp" />
 
         <TextView
-            android:id="@+id/strategyDescriptionTextView"
+            android:id="@+id/tradingStyleTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Descripción de la estrategia"
+            android:text="Estilos seleccionados"
             android:textSize="16sp"
             android:layout_marginBottom="16dp" />
 
@@ -87,6 +87,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Temporalidades utilizadas"
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Descripción -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Descripción"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/strategyDescriptionTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Descripción de la estrategia"
             android:textSize="16sp"
             android:layout_marginBottom="16dp" />
 

@@ -17,6 +17,8 @@ class StrategyDetailActivity : AppCompatActivity() {
     private lateinit var strategyIndicatorsTextView: TextView
     private lateinit var strategyTimeframesTextView: TextView
     private lateinit var strategyRatingBar: RatingBar
+    private lateinit var tradingStyleTextView: TextView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,15 +32,17 @@ class StrategyDetailActivity : AppCompatActivity() {
         strategyIndicatorsTextView = findViewById(R.id.strategyIndicatorsTextView)
         strategyTimeframesTextView = findViewById(R.id.strategyTimeframesTextView)
         strategyRatingBar = findViewById(R.id.strategyRatingBar)
+        tradingStyleTextView = findViewById(R.id.tradingStyleTextView)
 
         // Obtener datos del Intent
         val strategyTitle = intent.getStringExtra("strategyTitle") ?: "Sin título"
         val strategyDescription = intent.getStringExtra("strategyDescription") ?: "Sin descripción"
         val strategyAuthor = intent.getStringExtra("strategyAuthor") ?: "Anónimo"
         val strategyAvatarName = intent.getStringExtra("strategyAvatarName") ?: "default_avatar"
-        val strategyIndicators = intent.getStringArrayExtra("strategyIndicators") ?: arrayOf()
-        val strategyTimeframes = intent.getStringArrayExtra("strategyTimeframes") ?: arrayOf()
+        val strategyIndicators = intent.getStringArrayExtra("strategyIndicators") ?: arrayOf("Sin indicadores")
+        val strategyTimeframes = intent.getStringArrayExtra("strategyTimeframes") ?: arrayOf("Sin temporalidades")
         val strategyRating = intent.getDoubleExtra("strategyRating", 0.0)
+        val tradingStyles = intent.getStringArrayExtra("tradingStyles") ?: arrayOf("Sin estilos")
 
         // Mostrar los datos en la UI
         strategyTitleTextView.text = strategyTitle
@@ -47,6 +51,7 @@ class StrategyDetailActivity : AppCompatActivity() {
         strategyIndicatorsTextView.text = strategyIndicators.joinToString(", ")
         strategyTimeframesTextView.text = strategyTimeframes.joinToString(", ")
         strategyRatingBar.rating = strategyRating.toFloat()
+        tradingStyleTextView.text = tradingStyles.joinToString(", ")
 
         // Cargar el avatar
         val avatarResId = getAvatarResource(strategyAvatarName)
@@ -55,6 +60,7 @@ class StrategyDetailActivity : AppCompatActivity() {
             .circleCrop()
             .into(avatarImageView)
     }
+
 
     private fun getAvatarResource(avatarName: String): Int {
         return when (avatarName) {

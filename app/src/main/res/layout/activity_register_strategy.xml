@@ -46,17 +46,37 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Estilo de trading"
+            android:text="Estilo de trading (selecciona uno o varios)"
             android:textSize="16sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp" />
 
-        <Spinner
-            android:id="@+id/strategyCategory"
+        <LinearLayout
+            android:id="@+id/tradingStyleCheckBoxGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:entries="@array/strategy_categories" />
+            android:orientation="vertical">
+
+            <CheckBox
+                android:id="@+id/tradingStyleDayTrading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Day Trading" />
+
+            <CheckBox
+                android:id="@+id/tradingStyleScalping"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Scalping" />
+
+            <CheckBox
+                android:id="@+id/tradingStyleSwingTrading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Swing Trading" />
+        </LinearLayout>
+
 
         <!-- Indicadores -->
         <TextView
@@ -75,7 +95,6 @@
             android:layout_height="wrap_content"
             app:singleLine="false"
             app:chipSpacing="8dp" />
-
 
 
         <com.google.android.material.chip.ChipGroup

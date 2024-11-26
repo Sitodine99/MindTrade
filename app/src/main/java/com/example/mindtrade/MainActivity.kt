@@ -100,11 +100,58 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         accountsRecyclerView.adapter = YourAdapter(accountsList)
     }
 
-    private fun setupStrategiesRecyclerView() {
-        strategiesRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+    private fun startAutoScroll(itemCount: Int) {
+        val handler = android.os.Handler()
+        val inactivityHandler = android.os.Handler() // Handler para la inactividad
+        var currentIndex = 0
 
-        // Consulta Firestore para obtener estrategias y datos de sus creadores
+        val runnable = object : Runnable {
+            override fun run() {
+                if (currentIndex < itemCount) {
+                    strategiesRecyclerView.smoothScrollToPosition(currentIndex)
+                    currentIndex++
+                } else {
+                    currentIndex = 0 // Reiniciar al inicio cuando lleguemos al final
+                    strategiesRecyclerView.smoothScrollToPosition(currentIndex)
+                }
+                handler.postDelayed(this, 3000) // Cambiar cada 3 segundos
+            }
+        }
+
+        handler.postDelayed(runnable, 3000)
+
+        // Configurar el tiempo de inactividad antes de reanudar el scroll (5 segundos)
+        val INACTIVITY_DELAY = 5000L
+
+        // Opción para detener el scroll si el usuario interactúa
+        strategiesRecyclerView.setOnTouchListener { _, _ ->
+            handler.removeCallbacks(runnable) // Detener el scroll automático
+            inactivityHandler.removeCallbacksAndMessages(null) // Cancelar reinicios previos
+
+            // Configurar el reinicio automático después de la inactividad
+            inactivityHandler.postDelayed({
+                handler.postDelayed(runnable, 3000) // Reanudar el scroll automático
+            }, INACTIVITY_DELAY)
+
+            false // Permitir que el RecyclerView maneje el evento táctil
+        }
+
+
+
+// Sobrescribir el performClick en el RecyclerView
+        strategiesRecyclerView.setOnClickListener {
+            strategiesRecyclerView.performClick()
+        }
+}
+
+
+        private fun setupStrategiesRecyclerView() {
+        strategiesRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        // Consulta Firestore para obtener las últimas 10 estrategias subidas
         db.collection("strategies")
+            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .limit(10)
             .get()
             .addOnSuccessListener { result ->
                 val strategies = result.map { document ->
@@ -113,12 +160,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     val description = document.getString("description") ?: "Sin descripción"
                     val rating = document.getDouble("rating") ?: 0.0
                     val createdBy = document.getString("createdBy") ?: ""
-
-                    // Obtener alias y avatar directamente de los campos de Firestore
                     val authorAlias = document.getString("authorAlias") ?: "Anónimo"
                     val avatarName = document.getString("avatarName") ?: "default_avatar"
+                    val indicators = (document.get("indicators") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
+                    val timeframes = (document.get("timeframes") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
+                    val tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
 
-                    // Crear y devolver la estrategia completa
                     Strategy(
                         id = strategyId,
                         title = title,
@@ -126,27 +173,28 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         rating = rating,
                         createdBy = createdBy,
                         author = authorAlias,
-                        avatarName = avatarName
+                        avatarName = avatarName,
+                        indicators = indicators,
+                        timeframes = timeframes,
+                        tradingStyles = tradingStyles
                     )
                 }
 
-                // Configurar el adaptador con la lista de estrategias
+                // Configurar el adaptador
                 val adapter = StrategyAdapter(strategies) { strategy ->
-                    // Navegar al detalle de la estrategia
                     val intent = Intent(this, StrategyDetailActivity::class.java)
                     intent.putExtra("strategyId", strategy.id)
                     startActivity(intent)
                 }
                 strategiesRecyclerView.adapter = adapter
+
+                // Iniciar scroll automático
+                startAutoScroll(strategies.size)
             }
             .addOnFailureListener { exception ->
                 Toast.makeText(this, "Error al cargar estrategias: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
     }
-
-
-
-
 
 
     private fun setupImageClickListeners() {
@@ -185,7 +233,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 "Insatisfacción" -> "Trader insatisfecho"
                 "Rabia" -> "Trader rabioso"
                 "Vergüenza" -> "Trader avergonzado"
-                "Confusion" -> "Trader confundido"
+                "Confusión" -> "Trader confundido"
                 "Miedo" -> "Trader atemorizado"
                 "Fatalismo" -> "Trader fatalista"
                 "Frustración" -> "Trader frustrado"
@@ -266,7 +314,7 @@ private fun updateNavigationView() {
         when (tradingStyleText) {
             "Day trader" -> navTradingStyleText.setTextColor(
                 resources.getColor(
-                    R.color.blue_light,
+                    R.color.turquoise_blue,
                     theme
                 )
             )
@@ -309,7 +357,7 @@ private fun updateNavigationView() {
             "Insatisfacción" -> "Trader insatisfecho"
             "Rabia" -> "Trader rabioso"
             "Vergüenza" -> "Trader avergonzado"
-            "Confusion" -> "Trader confundido"
+            "Confusión" -> "Trader confundido"
             "Miedo" -> "Trader atemorizado"
             "Fatalismo" -> "Trader fatalista"
             "Frustración" -> "Trader frustrado"
@@ -408,7 +456,7 @@ private fun updateNavigationView() {
             "Insatisfacción" -> R.drawable.insatisfaccion
             "Rabia" -> R.drawable.rabia
             "Vergüenza" -> R.drawable.verguenza
-            "Confusion" -> R.drawable.confusion
+            "Confusión" -> R.drawable.confusion
             "Miedo" -> R.drawable.miedo
             "Fatalismo" -> R.drawable.fatalismo
             "Frustración" -> R.drawable.frustracion

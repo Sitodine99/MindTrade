@@ -48,7 +48,8 @@ class StrategyAdapter(
             intent.putExtra("strategyId", strategy.id)
             intent.putExtra("strategyTitle", strategy.title)
             intent.putExtra("strategyDescription", strategy.description)
-            intent.putExtra("strategyAuthor", strategy.author) // Pasar alias directamente
+            intent.putExtra("strategyAuthor", strategy.author)
+            intent.putExtra("tradingStyles", strategy.tradingStyles.toTypedArray())
             intent.putExtra(
                 "strategyAvatarName",
                 strategy.avatarName
