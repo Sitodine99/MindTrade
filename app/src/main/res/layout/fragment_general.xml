@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Estilo de Trading -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estilo de Trading"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/tradingStyleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Estilos seleccionados"
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Indicadores -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Indicadores"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/strategyIndicatorsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Indicadores seleccionados"
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Temporalidades -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Temporalidades"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/strategyTimeframesTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Temporalidades seleccionadas"
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Valoración -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valoración"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp" />
+
+        <RatingBar
+            android:id="@+id/strategyRatingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:stepSize="0.5"
+            android:isIndicator="true" />
+
+    </LinearLayout>
+</ScrollView>
