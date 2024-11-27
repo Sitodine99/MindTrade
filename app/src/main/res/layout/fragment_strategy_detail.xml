@@ -16,14 +16,19 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <!-- Imagen del avatar -->
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/avatarImageView"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:src="@drawable/ic_placeholder"
             android:scaleType="centerCrop"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="16dp"
+            android:padding="4dp"
+            app:shapeAppearanceOverlay="@style/CircularImage"
+            app:strokeColor="@android:color/black"
+            app:strokeWidth="2dp"
+            />
 
         <!-- Título de la estrategia -->
         <TextView

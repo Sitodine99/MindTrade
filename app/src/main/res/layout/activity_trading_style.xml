@@ -200,7 +200,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
                     android:text="@string/titleSwingtrading"
-                    android:textColor="@color/forest_green"
+                    android:textColor="@color/blue_light"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 

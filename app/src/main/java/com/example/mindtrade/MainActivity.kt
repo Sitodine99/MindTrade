@@ -97,10 +97,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         registerStrategyLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
-                // Cuando regresas de RegisterStrategyActivity, recarga las estrategias
-                setupStrategiesRecyclerView()
+                val newStrategyId = result.data?.getStringExtra("newStrategyId")
+                if (newStrategyId != null) {
+                    // Recargar las estrategias y resaltar la nueva
+                    setupStrategiesRecyclerView()
+                    Toast.makeText(this, "Nueva estrategia añadida", Toast.LENGTH_SHORT).show()
+                }
             }
         }
+
 
         setupAccountsRecyclerView()
         setupStrategiesRecyclerView()
@@ -226,6 +231,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     )
                 }
 
+                // Actualizar el adaptador
+                strategiesRecyclerView.adapter = StrategyAdapter(strategies) { strategy ->
+                    openStrategyDetailFragment(strategy)
+                }
+
                 // Configurar el adaptador
                 val adapter = StrategyAdapter(strategies) { strategy ->
                     openStrategyDetailFragment(strategy)
@@ -303,7 +313,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun setupAddStrategyButton() {
         addStrategyButton.setOnClickListener {
             val intent = Intent(this, RegisterStrategyActivity::class.java)
-            startActivityWithFade(intent)
+            registerStrategyLauncher.launch(intent)
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
     }
 

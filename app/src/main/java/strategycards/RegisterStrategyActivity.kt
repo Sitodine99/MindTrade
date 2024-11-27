@@ -1,5 +1,6 @@
 package strategycards
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -127,8 +128,11 @@ class RegisterStrategyActivity : AppCompatActivity() {
 
         // Botón de cancelar
         cancelButton.setOnClickListener {
-            finish() // Cierra la actividad
+            setResult(RESULT_CANCELED) // Indica que no se hizo ningún cambio
+            finish()
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
+
 
         // Botón de guardar
         saveButton.setOnClickListener {
@@ -155,14 +159,8 @@ class RegisterStrategyActivity : AppCompatActivity() {
         if (scalpingCheckBox.isChecked) tradingStyles.add("Scalping")
         if (swingTradingCheckBox.isChecked) tradingStyles.add("Swing Trading")
 
-        // Verificar si no se seleccionó ningún estilo
-        if (tradingStyles.isEmpty()) {
-            Toast.makeText(this, "Selecciona al menos un estilo de trading", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        if (title.isBlank() || description.isBlank()) {
-            Toast.makeText(this, "Completa los campos obligatorios", Toast.LENGTH_SHORT).show()
+        if (title.isBlank() || description.isBlank() || tradingStyles.isEmpty()) {
+            Toast.makeText(this, "Completa todos los campos obligatorios", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -175,77 +173,50 @@ class RegisterStrategyActivity : AppCompatActivity() {
         val timeFrames = timeFramesCheckBoxes.filter { it.isChecked }.map { it.text.toString() }
         val algorithmCode = algorithmEditText.text.toString().trim()
 
-        // Consulta para obtener alias y avatar
-        val userId = currentUser?.uid
-        if (userId == null) {
-            Toast.makeText(this, "Error: Usuario no autenticado", Toast.LENGTH_SHORT).show()
-            return
-        }
+        val userId = currentUser?.uid ?: return
+        db.collection("users").document(userId).get().addOnSuccessListener { userDoc ->
+            val alias = userDoc.getString("alias") ?: "Anónimo"
+            val avatarName = userDoc.getString("avatarName") ?: "default_avatar"
 
-        // Obtén los datos del usuario actual
-        db.collection("users").document(userId)
-            .get()
-            .addOnSuccessListener { userDoc ->
-                if (userDoc.exists()) {
-                    val alias = userDoc.getString("alias") ?: "Anónimo"
-                    val avatarName = userDoc.getString("avatarName") ?: "default_avatar"
+            val strategy = hashMapOf(
+                "title" to title,
+                "description" to description,
+                "tradingStyles" to tradingStyles,
+                "indicators" to indicators,
+                "timeframes" to timeFrames,
+                "algorithmCode" to algorithmCode,
+                "createdBy" to userId,
+                "authorAlias" to alias,
+                "avatarName" to avatarName,
+                "timestamp" to System.currentTimeMillis()
+            )
 
-                    // Estructura del documento de estrategia
-                    val strategy = hashMapOf(
-                        "title" to title,
-                        "description" to description,
-                        "tradingStyles" to tradingStyles,
-                        "indicators" to indicators,
-                        "timeframes" to timeFrames,
-                        "algorithmCode" to algorithmCode,
-                        "createdBy" to userId, // ID del creador
-                        "authorAlias" to alias, // Alias del creador
-                        "avatarName" to avatarName, // Avatar del creador
-                        "timestamp" to System.currentTimeMillis()
-                    )
+            db.collection("strategies").add(strategy).addOnSuccessListener { documentRef ->
+                Toast.makeText(this, "Estrategia guardada exitosamente", Toast.LENGTH_SHORT).show()
 
-                    // Guarda la estrategia en Firestore
-                    // Guarda la estrategia en Firestore
-                    db.collection("strategies")
-                        .add(strategy)
-                        .addOnSuccessListener {
-                            Toast.makeText(
-                                this,
-                                "Estrategia guardada exitosamente",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                // Devolver el ID de la estrategia al MainActivity
+                val resultIntent = Intent()
+                resultIntent.putExtra("newStrategyId", documentRef.id)
+                setResult(RESULT_OK, resultIntent)
 
-                            // Devolver un resultado exitoso
-                            setResult(RESULT_OK)
-                            finish()
-                        }
-                        .addOnFailureListener { e ->
-                            Toast.makeText(
-                                this,
-                                "Error al guardar: ${e.message}",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+                // Finalizar la actividad
+                finish()
+            }.addOnFailureListener {
+           Toast.makeText(this, "Error al guardar estrategia", Toast.LENGTH_SHORT).show()
+}
+}.addOnFailureListener {
+    Toast.makeText(this, "Error al obtener datos del usuario", Toast.LENGTH_SHORT).show()
+}
 
-                } else {
-                    Toast.makeText(this, "No se encontraron datos del usuario", Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(
-                    this,
-                    "Error al cargar datos del usuario: ${e.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-
-    }
-
-    override fun onBackPressed() {
-        finishWithFade() // Usa la función de extensión para aplicar la animación al cerrar
-    }
 
 }
 
+
+    override fun onBackPressed() {
+    setResult(RESULT_CANCELED)
+    finish()
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+}
+
+}
 
