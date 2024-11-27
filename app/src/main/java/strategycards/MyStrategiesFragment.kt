@@ -18,6 +18,7 @@ class MyStrategiesFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private val db = FirebaseFirestore.getInstance()
     private var userId: String? = null
+    private var userAlias: String = "Anónimo" // Alias por defecto
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,10 +35,32 @@ class MyStrategiesFragment : Fragment() {
             return view
         }
 
-        loadUserStrategies()
+        loadUserAliasAndStrategies()
         return view
     }
 
+    // 1. Cargar el alias del usuario y luego las estrategias
+    private fun loadUserAliasAndStrategies() {
+        // Obtener alias del usuario desde Firestore
+        db.collection("users").document(userId!!)
+            .get()
+            .addOnSuccessListener { userDocument ->
+                if (userDocument.exists()) {
+                    userAlias = userDocument.getString("alias") ?: "Anónimo"
+                }
+
+                // Cargar estrategias después de obtener el alias
+                loadUserStrategies()
+            }
+            .addOnFailureListener { exception ->
+                Toast.makeText(requireContext(), "Error al cargar alias: ${exception.message}", Toast.LENGTH_SHORT).show()
+
+                // Cargar estrategias incluso si no se pudo obtener el alias
+                loadUserStrategies()
+            }
+    }
+
+    // 2. Cargar estrategias usando el alias del usuario logueado
     private fun loadUserStrategies() {
         db.collection("strategies")
             .whereEqualTo("createdBy", userId)
@@ -48,7 +71,7 @@ class MyStrategiesFragment : Fragment() {
                         id = document.id,
                         title = document.getString("title") ?: "Sin título",
                         description = document.getString("description") ?: "Sin descripción",
-                        author = document.getString("author") ?: "Anónimo",
+                        author = userAlias, // Aquí usamos SIEMPRE el alias del usuario actual
                         avatarName = document.getString("avatarName"),
                         avatarUrl = document.getString("avatarUrl"),
                         rating = document.getDouble("rating") ?: 0.0,
@@ -59,10 +82,12 @@ class MyStrategiesFragment : Fragment() {
                     )
                 }
 
-                recyclerView.adapter = SimpleStrategyAdapter(strategies)
+                // Configurar el adaptador con las estrategias
+                recyclerView.adapter = SimpleStrategyAdapter(strategies, requireActivity())
             }
             .addOnFailureListener { exception ->
                 Toast.makeText(requireContext(), "Error al cargar estrategias: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
     }
 }
+

@@ -26,7 +26,7 @@ import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import strategycards.RegisterStrategyActivity
-import strategycards.StrategyDetailActivity
+import strategycards.StrategyDetailFragment
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -159,9 +159,42 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    private fun openStrategyDetailFragment(strategy: Strategy) {
+        // Ocultar vistas principales
+        findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.GONE
+        findViewById<TextView>(R.id.accountsSummary).visibility = View.GONE
+        findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.GONE
+        findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.GONE
+        findViewById<Button>(R.id.addStrategyButton).visibility = View.GONE
+
+        // Mostrar el contenedor de fragmentos
+        findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility = View.VISIBLE
+
+        // Crear y agregar el fragmento
+        val fragment = StrategyDetailFragment().apply {
+            arguments = Bundle().apply {
+                putString("strategyTitle", strategy.title)
+                putString("strategyDescription", strategy.description)
+                putString("strategyAuthor", strategy.author)
+                putString("strategyAvatarName", strategy.avatarName)
+                putStringArray("strategyIndicators", strategy.indicators.toTypedArray())
+                putStringArray("strategyTimeframes", strategy.timeframes.toTypedArray())
+                putStringArray("tradingStyles", strategy.tradingStyles.toTypedArray())
+                putDouble("strategyRating", strategy.rating)
+            }
+        }
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .addToBackStack(null) // Agrega el fragmento a la pila de retroceso
+            .commit()
+    }
+
+
 
     private fun setupStrategiesRecyclerView() {
-        strategiesRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        strategiesRecyclerView.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
         // Consulta Firestore para obtener las últimas 10 estrategias subidas
         db.collection("strategies")
@@ -170,36 +203,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             .get()
             .addOnSuccessListener { result ->
                 val strategies = result.map { document ->
-                    val strategyId = document.id
-                    val title = document.getString("title") ?: "Sin título"
-                    val description = document.getString("description") ?: "Sin descripción"
-                    val rating = document.getDouble("rating") ?: 0.0
-                    val createdBy = document.getString("createdBy") ?: ""
-                    val authorAlias = document.getString("authorAlias") ?: "Anónimo"
-                    val avatarName = document.getString("avatarName") ?: "default_avatar"
-                    val indicators = (document.get("indicators") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
-                    val timeframes = (document.get("timeframes") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
-                    val tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
-
                     Strategy(
-                        id = strategyId,
-                        title = title,
-                        description = description,
-                        rating = rating,
-                        createdBy = createdBy,
-                        author = authorAlias,
-                        avatarName = avatarName,
-                        indicators = indicators,
-                        timeframes = timeframes,
-                        tradingStyles = tradingStyles
+                        id = document.id,
+                        title = document.getString("title") ?: "Sin título",
+                        description = document.getString("description") ?: "Sin descripción",
+                        author = document.getString("authorAlias") ?: "Anónimo",
+                        avatarName = document.getString("avatarName"),
+                        avatarUrl = document.getString("avatarUrl"),
+                        rating = document.getDouble("rating") ?: 0.0,
+                        createdBy = document.getString("createdBy") ?: "",
+                        indicators = (document.get("indicators") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                        timeframes = (document.get("timeframes") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                        tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
                     )
                 }
 
                 // Configurar el adaptador
                 val adapter = StrategyAdapter(strategies) { strategy ->
-                    val intent = Intent(this, StrategyDetailActivity::class.java)
-                    intent.putExtra("strategyId", strategy.id)
-                    startActivity(intent)
+                    openStrategyDetailFragment(strategy)
                 }
                 strategiesRecyclerView.adapter = adapter
 
@@ -493,6 +514,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    private fun restoreMainView() {
+        // Mostrar las vistas principales del MainActivity
+        findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.VISIBLE
+        findViewById<TextView>(R.id.accountsSummary).visibility = View.VISIBLE
+        findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.VISIBLE
+        findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.VISIBLE
+        findViewById<Button>(R.id.addStrategyButton).visibility = View.VISIBLE
+
+        // Ocultar el contenedor de fragmentos
+        findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility = View.GONE
+    }
+
+
+
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.nav_strategies -> {
@@ -537,19 +572,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
     override fun onBackPressed() {
-        val fragmentContainer = findViewById<FragmentContainerView>(R.id.fragmentContainer)
-        if (fragmentContainer.visibility == View.VISIBLE) {
-            // Restaurar las vistas principales y ocultar el contenedor de fragmentos
-            fragmentContainer.visibility = View.GONE
-            findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.VISIBLE
-            findViewById<TextView>(R.id.accountsSummary).visibility = View.VISIBLE
-            findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.VISIBLE
-            findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.VISIBLE
-            findViewById<Button>(R.id.addStrategyButton).visibility = View.VISIBLE
+        val fragmentManager = supportFragmentManager
+
+        if (fragmentManager.backStackEntryCount > 0) {
+            // Retrocede al fragmento anterior en la pila
+            fragmentManager.popBackStack()
+
+            // Verificar si no queda ningún fragmento visible después de retroceder
+            fragmentManager.executePendingTransactions()
+            val currentFragment = fragmentManager.findFragmentById(R.id.fragmentContainer)
+            if (currentFragment == null) {
+                // Si no hay más fragmentos, restaurar la vista principal
+                restoreMainView()
+            }
         } else {
-            super.onBackPressed()
+            // Restaurar la vista principal si no hay más fragmentos en la pila
+            restoreMainView()
         }
     }
-
 
 }

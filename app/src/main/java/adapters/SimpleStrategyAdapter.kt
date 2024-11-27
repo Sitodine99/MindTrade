@@ -1,18 +1,21 @@
 package adapters
 
-import android.content.Intent
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mindtrade.R
 import com.example.mindtrade.model.Strategy
-import strategycards.StrategyDetailActivity
+import strategycards.StrategyDetailFragment
 
-class SimpleStrategyAdapter(private val strategies: List<Strategy>) :
-    RecyclerView.Adapter<SimpleStrategyAdapter.ViewHolder>() {
+class SimpleStrategyAdapter(
+    private val strategies: List<Strategy>,
+    private val fragmentActivity: FragmentActivity // Recibe una instancia de FragmentActivity
+) : RecyclerView.Adapter<SimpleStrategyAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val strategyTitle: TextView = view.findViewById(R.id.strategyTitleTextView)
@@ -32,20 +35,27 @@ class SimpleStrategyAdapter(private val strategies: List<Strategy>) :
         // Asignar datos
         holder.strategyTitle.text = strategy.title
 
-        // Evento de clic en todo el elemento para redirigir a StrategyDetailActivity
+        // Evento de clic en todo el elemento para redirigir a StrategyDetailFragment
         holder.itemView.setOnClickListener {
-            val context = holder.itemView.context
-            val intent = Intent(context, StrategyDetailActivity::class.java)
-            intent.putExtra("strategyTitle", strategy.title)
-            intent.putExtra("strategyDescription", strategy.description)
-            intent.putExtra("strategyAuthor", strategy.author)
-            intent.putExtra("strategyAvatarName", strategy.avatarName)
-            intent.putExtra("strategyAvatarUrl", strategy.avatarUrl)
-            intent.putExtra("strategyIndicators", strategy.indicators.toTypedArray())
-            intent.putExtra("strategyTimeframes", strategy.timeframes.toTypedArray())
-            intent.putExtra("tradingStyles", strategy.tradingStyles.toTypedArray())
-            intent.putExtra("strategyRating", strategy.rating)
-            context.startActivity(intent)
+            val fragment = StrategyDetailFragment().apply {
+                arguments = Bundle().apply {
+                    putString("strategyTitle", strategy.title)
+                    putString("strategyDescription", strategy.description)
+                    putString("strategyAuthor", strategy.author)
+                    putString("strategyAvatarName", strategy.avatarName)
+                    putString("strategyAvatarUrl", strategy.avatarUrl)
+                    putStringArray("strategyIndicators", strategy.indicators.toTypedArray())
+                    putStringArray("strategyTimeframes", strategy.timeframes.toTypedArray())
+                    putStringArray("tradingStyles", strategy.tradingStyles.toTypedArray())
+                    putDouble("strategyRating", strategy.rating)
+                }
+            }
+
+            // Reemplazar el fragmento
+            fragmentActivity.supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainer, fragment) // Reemplaza el contenedor definido en el layout principal
+                .addToBackStack(null) // Permite regresar al fragmento anterior
+                .commit()
         }
 
         // Configurar eventos de clic para íconos (opcional)
@@ -60,4 +70,3 @@ class SimpleStrategyAdapter(private val strategies: List<Strategy>) :
 
     override fun getItemCount(): Int = strategies.size
 }
-
