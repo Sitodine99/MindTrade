@@ -1,6 +1,6 @@
 package com.example.mindtrade
 
-import YourAdapter
+import adapters.AccountAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
@@ -16,12 +16,15 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mindtrade.adapter.StrategyAdapter
+import auth.LoginActivity
+import adapters.StrategyAdapter
 import com.example.mindtrade.model.Strategy
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import strategycards.RegisterStrategyActivity
+import strategycards.StrategyDetailActivity
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -107,7 +110,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun setupAccountsRecyclerView() {
         val accountsList = listOf("Cuenta 1", "Cuenta 2", "Cuenta 3", "Cuenta 4", "Cuenta 5")
         accountsRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        accountsRecyclerView.adapter = YourAdapter(accountsList)
+        accountsRecyclerView.adapter = AccountAdapter(accountsList)
     }
 
     private fun startAutoScroll(itemCount: Int) {
@@ -152,10 +155,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         strategiesRecyclerView.setOnClickListener {
             strategiesRecyclerView.performClick()
         }
-}
+    }
 
 
-        private fun setupStrategiesRecyclerView() {
+    private fun setupStrategiesRecyclerView() {
         strategiesRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
         // Consulta Firestore para obtener las últimas 10 estrategias subidas
@@ -309,7 +312,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
-private fun updateNavigationView() {
+    private fun updateNavigationView() {
         val avatarResource = getAvatarImageResource(userAvatarName)
         avatarResource?.let { navAvatarImage.setImageResource(it) }
 
@@ -490,6 +493,20 @@ private fun updateNavigationView() {
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.nav_strategies -> {
+                val intent = Intent(this, MyStrategiesActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.ic_favorite_strategies -> {
+                Toast.makeText(this, "Estrategias Favoritas seleccionadas", Toast.LENGTH_SHORT).show()
+                // Navegación para estrategias favoritas
+            }
+            R.id.nav_accounts -> {
+                Toast.makeText(this, "Mis Cuentas seleccionadas", Toast.LENGTH_SHORT).show()
+            }
+            R.id.nav_settings -> {
+                Toast.makeText(this, "Configuración seleccionada", Toast.LENGTH_SHORT).show()
+            }
             R.id.nav_logout -> {
                 FirebaseAuth.getInstance().signOut()
                 val intent = Intent(this, LoginActivity::class.java)
@@ -500,4 +517,5 @@ private fun updateNavigationView() {
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
+
 }

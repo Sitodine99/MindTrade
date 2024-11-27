@@ -1,4 +1,4 @@
-package com.example.mindtrade
+package adapters
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity

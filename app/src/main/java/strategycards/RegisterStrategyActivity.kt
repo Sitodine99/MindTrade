@@ -1,8 +1,9 @@
-package com.example.mindtrade
+package strategycards
 
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.example.mindtrade.R
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.firebase.auth.FirebaseAuth
@@ -239,3 +240,5 @@ class RegisterStrategyActivity : AppCompatActivity() {
             }
     }
 }
+
+

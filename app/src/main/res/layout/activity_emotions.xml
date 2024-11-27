@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".EmotionsActivity">
+    tools:context="welcome.EmotionsActivity">
 
     <ImageView
         android:id="@+id/Edificios"
@@ -85,7 +85,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="serif"
                     android:text="@string/psicoPositiveTitle"
-                    android:textColor="@android:color/holo_green_light"
+                    android:textColor="@color/highlight_green"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 

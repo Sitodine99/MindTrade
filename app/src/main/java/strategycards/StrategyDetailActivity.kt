@@ -1,11 +1,13 @@
-package com.example.mindtrade
+package strategycards
 
+import adapters.StrategyPagerAdapter
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
+import com.example.mindtrade.R
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -27,6 +29,7 @@ class StrategyDetailActivity : AppCompatActivity() {
         val strategyDescription = intent.getStringExtra("strategyDescription") ?: "Sin descripción"
         val strategyAuthor = intent.getStringExtra("strategyAuthor") ?: "Anónimo"
         val strategyAvatarName = intent.getStringExtra("strategyAvatarName") ?: "default_avatar"
+        val strategyAvatarUrl = intent.getStringExtra("strategyAvatarUrl")
         val strategyIndicators = intent.getStringArrayExtra("strategyIndicators") ?: arrayOf("Sin indicadores")
         val strategyTimeframes = intent.getStringArrayExtra("strategyTimeframes") ?: arrayOf("Sin temporalidades")
         val tradingStyles = intent.getStringArrayExtra("tradingStyles") ?: arrayOf("Sin estilos")
@@ -35,11 +38,9 @@ class StrategyDetailActivity : AppCompatActivity() {
         // Mostrar los datos de la cabecera
         strategyTitleTextView.text = strategyTitle
         strategyAuthorTextView.text = "Por: $strategyAuthor"
-        val avatarResId = getAvatarResource(strategyAvatarName)
-        Glide.with(this)
-            .load(avatarResId)
-            .circleCrop()
-            .into(avatarImageView)
+
+        // Cargar avatar
+        loadAvatar(strategyAvatarUrl, strategyAvatarName, avatarImageView)
 
         // Configurar el ViewPager con los fragments
         val adapter = StrategyPagerAdapter(this)
@@ -66,16 +67,30 @@ class StrategyDetailActivity : AppCompatActivity() {
         }.attach()
     }
 
-    private fun getAvatarResource(avatarName: String): Int {
-        return when (avatarName) {
-            "avatar_hombre" -> R.drawable.avatarhombre
-            "avatar_mujer" -> R.drawable.avatarmujer
-            "avatar_bebe" -> R.drawable.avatarbebe
-            "avatar_alien" -> R.drawable.avataralien
-            "avatar_frankenstein" -> R.drawable.avatarfrankenstein
-            "avatar_lobo" -> R.drawable.avatarlobo
-            "avatar_vampira" -> R.drawable.avatarvampira
-            else -> R.drawable.ic_placeholder
+    private fun loadAvatar(avatarUrl: String?, avatarName: String, imageView: ImageView) {
+        if (!avatarUrl.isNullOrEmpty()) {
+            // Cargar desde URL
+            Glide.with(this)
+                .load(avatarUrl)
+                .circleCrop()
+                .into(imageView)
+        } else {
+            // Cargar recurso local basado en avatarName
+            val avatarResId = when (avatarName) {
+                "avatar_hombre" -> R.drawable.avatarhombre
+                "avatar_mujer" -> R.drawable.avatarmujer
+                "avatar_bebe" -> R.drawable.avatarbebe
+                "avatar_alien" -> R.drawable.avataralien
+                "avatar_frankenstein" -> R.drawable.avatarfrankenstein
+                "avatar_lobo" -> R.drawable.avatarlobo
+                "avatar_vampira" -> R.drawable.avatarvampira
+                else -> R.drawable.ic_placeholder
+            }
+            Glide.with(this)
+                .load(avatarResId)
+                .circleCrop()
+                .into(imageView)
         }
     }
 }
+

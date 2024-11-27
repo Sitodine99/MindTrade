@@ -1,4 +1,4 @@
-package com.example.mindtrade
+package welcome
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,6 +6,10 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import auth.LoginActivity
+import com.example.mindtrade.R
+import com.example.mindtrade.finishWithFade
+import com.example.mindtrade.startActivityWithFade
 
 class WelcomeActivity : AppCompatActivity() {
 

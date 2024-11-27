@@ -1,4 +1,4 @@
-package com.example.mindtrade.adapter
+package adapters
 
 import android.content.Intent
 import android.view.LayoutInflater
@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.mindtrade.R
-import com.example.mindtrade.StrategyDetailActivity
+import strategycards.StrategyDetailActivity
 import com.example.mindtrade.model.Strategy
 
 class StrategyAdapter(

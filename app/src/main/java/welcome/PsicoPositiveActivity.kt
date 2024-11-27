@@ -1,4 +1,4 @@
-package com.example.mindtrade
+package welcome
 
 import android.content.Intent
 import android.media.AudioAttributes
@@ -9,7 +9,10 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import com.example.mindtrade.R
 import com.example.mindtrade.databinding.ActivityPsicoPositiveBinding
+import com.example.mindtrade.finishWithFade
+import com.example.mindtrade.startActivityWithFade
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 

@@ -1,4 +1,4 @@
-package com.example.mindtrade
+package welcome
 
 import android.app.AlertDialog
 import android.content.Intent
@@ -12,6 +12,11 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import adapters.AvatarAdapter
+import com.example.mindtrade.MainActivity
+import com.example.mindtrade.R
+import com.example.mindtrade.finishWithFade
+import com.example.mindtrade.startActivityWithFade
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 

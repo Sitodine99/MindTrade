@@ -1,3 +1,5 @@
+package adapters
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -5,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mindtrade.R
 
-class YourAdapter(private val items: List<String>) : RecyclerView.Adapter<YourAdapter.ViewHolder>() {
+class AccountAdapter(private val items: List<String>) : RecyclerView.Adapter<AccountAdapter.ViewHolder>() {
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val accountName: TextView = view.findViewById(R.id.accountName)

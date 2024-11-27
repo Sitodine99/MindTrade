@@ -13,35 +13,35 @@
         android:theme="@style/Theme.MindTrade"
         tools:targetApi="31">
         <activity
-            android:name=".GeneralFragment"
+            android:name="strategycards.GeneralFragment"
             android:exported="false" />
         <activity
-            android:name=".StrategyDetailActivity"
+            android:name="strategycards.StrategyDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".RegisterStrategyActivity"
+            android:name="strategycards.RegisterStrategyActivity"
             android:exported="false" />
         <activity
             android:name=".ImageDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".AvatarSelectionActivity"
+            android:name="welcome.AvatarSelectionActivity"
             android:exported="false"
             android:theme="@style/Theme.MindTrade" />
         <activity
-            android:name=".PsicoPositiveActivity"
+            android:name="welcome.PsicoPositiveActivity"
             android:exported="false"
             android:theme="@style/Theme.MindTrade" />
         <activity
-            android:name=".PsicoNegativeActivity"
+            android:name="welcome.PsicoNegativeActivity"
             android:exported="false"
             android:theme="@style/Theme.MindTrade" />
         <activity
-            android:name=".EmotionsActivity"
+            android:name="welcome.EmotionsActivity"
             android:exported="false"
             android:theme="@style/Theme.MindTrade" /> <!-- LoginActivity como punto de entrada inicial -->
         <activity
-            android:name=".LoginActivity"
+            android:name="auth.LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.MindTrade">
             <intent-filter>
@@ -51,21 +51,23 @@
             </intent-filter>
         </activity> <!-- RegisterActivity para registro de usuarios -->
         <activity
-            android:name=".RegisterActivity"
+            android:name="auth.RegisterActivity"
             android:exported="false"
             android:theme="@style/Theme.MindTrade" /> <!-- WelcomeActivity para dar la bienvenida tras el registro -->
         <activity
-            android:name=".WelcomeActivity"
+            android:name="welcome.WelcomeActivity"
             android:exported="false"
             android:theme="@style/Theme.MindTrade" /> <!-- TradingStyleActivity para seleccionar estilo de trading -->
         <activity
-            android:name=".TradingStyleActivity"
+            android:name="welcome.TradingStyleActivity"
             android:exported="false"
             android:theme="@style/Theme.MindTrade" /> <!-- MainActivity como pantalla principal para usuarios autenticados -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.MindTrade" />
+
+        <activity android:name=".MyStrategiesActivity" />
 
     </application>
 

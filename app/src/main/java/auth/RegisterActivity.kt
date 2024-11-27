@@ -1,4 +1,4 @@
-package com.example.mindtrade
+package auth
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,8 +7,11 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mindtrade.databinding.ActivityRegisterBinding
+import com.example.mindtrade.finishWithFade
+import com.example.mindtrade.startActivityWithFade
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import welcome.WelcomeActivity
 
 class RegisterActivity : AppCompatActivity() {
 
