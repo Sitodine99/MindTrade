@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mindtrade.R
+import com.example.mindtrade.finishWithFade
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.firebase.auth.FirebaseAuth
@@ -238,7 +239,13 @@ class RegisterStrategyActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+
     }
+
+    override fun onBackPressed() {
+        finishWithFade() // Usa la función de extensión para aplicar la animación al cerrar
+    }
+
 }
 
 

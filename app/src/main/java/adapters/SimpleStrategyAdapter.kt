@@ -51,12 +51,19 @@ class SimpleStrategyAdapter(
                 }
             }
 
-            // Reemplazar el fragmento
+            // Transacción con animaciones
             fragmentActivity.supportFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, fragment) // Reemplaza el contenedor definido en el layout principal
-                .addToBackStack(null) // Permite regresar al fragmento anterior
+                .setCustomAnimations(
+                    R.anim.fade_in, // Animación al entrar
+                    R.anim.fade_out, // Animación al salir
+                    R.anim.fade_in, // Animación al regresar
+                    R.anim.fade_out  // Animación al salir al regresar
+                )
+                .replace(R.id.fragmentContainer, fragment)
+                .addToBackStack(null)
                 .commit()
         }
+
 
         // Configurar eventos de clic para íconos (opcional)
         holder.editIcon.setOnClickListener {

@@ -184,11 +184,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
 
+        // Añade animaciones para la transacción del fragmento
         supportFragmentManager.beginTransaction()
+            .setCustomAnimations(
+                R.anim.fade_in, // Animación de entrada
+                R.anim.fade_out, // Animación de salida
+                R.anim.fade_in, // Animación al retroceder (popEnter)
+                R.anim.fade_out  // Animación al salir (popExit)
+            )
             .replace(R.id.fragmentContainer, fragment)
             .addToBackStack(null) // Agrega el fragmento a la pila de retroceso
             .commit()
     }
+
 
 
 
@@ -295,7 +303,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun setupAddStrategyButton() {
         addStrategyButton.setOnClickListener {
             val intent = Intent(this, RegisterStrategyActivity::class.java)
-            registerStrategyLauncher.launch(intent)
+            startActivityWithFade(intent)
         }
     }
 
