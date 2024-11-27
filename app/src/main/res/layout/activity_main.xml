@@ -16,7 +16,8 @@
         app:srcCompat="@drawable/torosyosos" />
 
     <!-- Contenido Principal -->
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/mainContentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -104,7 +105,6 @@
                             android:padding="2dp"
                             android:scaleType="fitCenter" />
 
-
                     </LinearLayout>
 
                     <!-- Botón de Notificación -->
@@ -120,66 +120,69 @@
             </androidx.appcompat.widget.Toolbar>
         </com.google.android.material.appbar.AppBarLayout>
 
-        <!-- Contenido Principal -->
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <!-- Contenedor de Fragmentos -->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragmentContainer"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="16dp"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/appbarLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-            <!-- Módulo "Mis Cuentas" -->
-            <TextView
-                android:id="@+id/accountsSummary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Mis Cuentas"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/appbarLayout" />
+        <!-- RecyclerView y Botón (solo en MainActivity, no en fragmentos) -->
+        <TextView
+            android:id="@+id/accountsSummary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mis Cuentas"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="16dp"
+            app:layout_constraintTop_toBottomOf="@id/appbarLayout" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/accountsRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/accountsSummary" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/accountsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/accountsSummary" />
 
-            <!-- Módulo "Estrategias de Trading" -->
-            <TextView
-                android:id="@+id/tradingStrategiesSummary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Últimas Estrategias"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/accountsRecyclerView" />
+        <TextView
+            android:id="@+id/tradingStrategiesSummary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="16dp"
+            android:text="Últimas Estrategias"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/accountsRecyclerView" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/strategiesRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollbars="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tradingStrategiesSummary" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/strategiesRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tradingStrategiesSummary" />
 
-            <!-- Botón "Añadir Estrategia" -->
-            <Button
-                android:id="@+id/addStrategyButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Añadir Estrategia"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/strategiesRecyclerView"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:id="@+id/addStrategyButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Añadir Estrategia"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/strategiesRecyclerView"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp" />
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Menú Lateral -->
     <com.google.android.material.navigation.NavigationView

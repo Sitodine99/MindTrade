@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import auth.LoginActivity
 import adapters.StrategyAdapter
+import android.view.View
+import androidx.fragment.app.FragmentContainerView
 import com.example.mindtrade.model.Strategy
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.navigation.NavigationView
@@ -494,19 +496,34 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.nav_strategies -> {
-                val intent = Intent(this, MyStrategiesActivity::class.java)
-                startActivity(intent)
+                // Ocultar vistas del MainActivity
+                findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.GONE
+                findViewById<TextView>(R.id.accountsSummary).visibility = View.GONE
+                findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.GONE
+                findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.GONE
+                findViewById<Button>(R.id.addStrategyButton).visibility = View.GONE
+
+                // Mostrar contenedor de fragmentos
+                findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility = View.VISIBLE
+
+                // Reemplazar el fragmento
+                val fragment = MyStrategiesFragment()
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainer, fragment)
+                    .addToBackStack(null) // Esto permite regresar al MainActivity
+                    .commit()
             }
-            R.id.ic_favorite_strategies -> {
-                Toast.makeText(this, "Estrategias Favoritas seleccionadas", Toast.LENGTH_SHORT).show()
-                // Navegación para estrategias favoritas
-            }
+
             R.id.nav_accounts -> {
-                Toast.makeText(this, "Mis Cuentas seleccionadas", Toast.LENGTH_SHORT).show()
+                // Restaurar vistas principales y ocultar el contenedor de fragmentos
+                findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.VISIBLE
+                findViewById<TextView>(R.id.accountsSummary).visibility = View.VISIBLE
+                findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.VISIBLE
+                findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.VISIBLE
+                findViewById<Button>(R.id.addStrategyButton).visibility = View.VISIBLE
+                findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility = View.GONE
             }
-            R.id.nav_settings -> {
-                Toast.makeText(this, "Configuración seleccionada", Toast.LENGTH_SHORT).show()
-            }
+
             R.id.nav_logout -> {
                 FirebaseAuth.getInstance().signOut()
                 val intent = Intent(this, LoginActivity::class.java)
@@ -517,5 +534,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
+
+
+    override fun onBackPressed() {
+        val fragmentContainer = findViewById<FragmentContainerView>(R.id.fragmentContainer)
+        if (fragmentContainer.visibility == View.VISIBLE) {
+            // Restaurar las vistas principales y ocultar el contenedor de fragmentos
+            fragmentContainer.visibility = View.GONE
+            findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.VISIBLE
+            findViewById<TextView>(R.id.accountsSummary).visibility = View.VISIBLE
+            findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.VISIBLE
+            findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.VISIBLE
+            findViewById<Button>(R.id.addStrategyButton).visibility = View.VISIBLE
+        } else {
+            super.onBackPressed()
+        }
+    }
+
 
 }
