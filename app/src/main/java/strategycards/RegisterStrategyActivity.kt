@@ -207,16 +207,19 @@ class RegisterStrategyActivity : AppCompatActivity() {
 
                 val strategy = hashMapOf(
                     "title" to title,
+                    "createdBy" to userId,
+                    "authorAlias" to alias,
+                    "avatarName" to avatarName,
                     "description" to description,
                     "tradingStyles" to tradingStyles,
                     "indicators" to indicators,
                     "timeframes" to timeFrames,
                     "algorithmCode" to algorithmCode,
-                    "createdBy" to userId,
-                    "authorAlias" to alias,
-                    "avatarName" to avatarName,
                     "favoritedBy" to emptyList<String>(),
-                    "timestamp" to System.currentTimeMillis()
+                    "timestamp" to System.currentTimeMillis(),
+                    "rating" to 0.0, // Valor inicial
+                    "totalVotes" to 0, // Valor inicial
+                    "votedBy" to emptyList<String>(),
                 )
 
                 db.collection("strategies").add(strategy).addOnSuccessListener { documentRef ->

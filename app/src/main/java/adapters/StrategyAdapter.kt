@@ -33,6 +33,9 @@ class StrategyAdapter(
         holder.strategyTitleTextView.text = strategy.title
         holder.strategyAuthorTextView.text = "Por: ${strategy.author}"
 
+        // Asignar el valor al RatingBar
+        holder.strategyRatingBar.rating = strategy.rating.toFloat()
+
         // Cargar imagen del avatar con Glide
         val avatarResId = getAvatarResource(strategy.avatarName ?: "default_avatar")
         Glide.with(holder.avatarImageView.context)

@@ -57,6 +57,7 @@ class StrategyDetailFragment : Fragment() {
         val adapter = StrategyPagerAdapter(requireActivity())
         adapter.addFragment(GeneralFragment().apply {
             arguments = Bundle().apply {
+                putString("strategyId", strategyId)
                 putStringArray("tradingStyles", tradingStyles)
                 putStringArray("indicators", strategyIndicators)
                 putStringArray("timeframes", strategyTimeframes)
@@ -71,6 +72,8 @@ class StrategyDetailFragment : Fragment() {
         }, "Descripción")
 
         viewPager.adapter = adapter
+        viewPager.offscreenPageLimit = adapter.itemCount
+
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = adapter.getPageTitle(position)

@@ -26,6 +26,7 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import strategycards.FavoriteStrategiesFragment
 import strategycards.RegisterStrategyActivity
 import strategycards.StrategyDetailFragment
@@ -45,6 +46,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var navTradingStyleText: TextView
     private lateinit var navPsicoStateText: TextView
     private lateinit var navEmotionText: TextView
+    private var listenerRegistration: ListenerRegistration? = null
     private val db = FirebaseFirestore.getInstance()
     private var userId: String? = null
 
@@ -58,6 +60,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        FirebaseFirestore.setLoggingEnabled(true)
+
 
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -210,46 +214,55 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         strategiesRecyclerView.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
-        // Consulta Firestore para obtener las últimas 10 estrategias subidas
+        // Lista local para almacenar estrategias
+        val strategies = mutableListOf<Strategy>()
+
+        // Configurar el adaptador
+        val adapter = StrategyAdapter(strategies) { strategy ->
+            openStrategyDetailFragment(strategy)
+        }
+        strategiesRecyclerView.adapter = adapter
+
+        // Escucha en tiempo real desde Firestore
         db.collection("strategies")
             .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
             .limit(10)
-            .get()
-            .addOnSuccessListener { result ->
-                val strategies = result.map { document ->
-                    Strategy(
-                        id = document.id,
-                        title = document.getString("title") ?: "Sin título",
-                        description = document.getString("description") ?: "Sin descripción",
-                        author = document.getString("authorAlias") ?: "Anónimo",
-                        avatarName = document.getString("avatarName"),
-                        avatarUrl = document.getString("avatarUrl"),
-                        rating = document.getDouble("rating") ?: 0.0,
-                        createdBy = document.getString("createdBy") ?: "",
-                        indicators = (document.get("indicators") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
-                        timeframes = (document.get("timeframes") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
-                        tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
-                    )
+            .addSnapshotListener { snapshots, error ->
+                if (error != null) {
+                    // Validar que el usuario sigue autenticado antes de mostrar el Toast
+                    if (FirebaseAuth.getInstance().currentUser != null) {
+                        Toast.makeText(this, "Error al escuchar estrategias: ${error.message}", Toast.LENGTH_SHORT).show()
+                    }
+                    return@addSnapshotListener
                 }
 
-                // Actualizar el adaptador
-                strategiesRecyclerView.adapter = StrategyAdapter(strategies) { strategy ->
-                    openStrategyDetailFragment(strategy)
-                }
+                if (snapshots != null) {
+                    strategies.clear() // Limpiar la lista para reflejar cambios
+                    for (document in snapshots) {
+                        strategies.add(
+                            Strategy(
+                                id = document.id,
+                                title = document.getString("title") ?: "Sin título",
+                                description = document.getString("description") ?: "Sin descripción",
+                                author = document.getString("authorAlias") ?: "Anónimo",
+                                avatarName = document.getString("avatarName"),
+                                avatarUrl = document.getString("avatarUrl"),
+                                rating = document.getDouble("rating") ?: 0.0,
+                                createdBy = document.getString("createdBy") ?: "",
+                                indicators = (document.get("indicators") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                                timeframes = (document.get("timeframes") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                                tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
+                            )
+                        )
+                    }
+                    adapter.notifyDataSetChanged() // Actualizar la UI con los nuevos datos
 
-                // Configurar el adaptador
-                val adapter = StrategyAdapter(strategies) { strategy ->
-                    openStrategyDetailFragment(strategy)
+                    // Iniciar scroll automático
+                    startAutoScroll(strategies.size)
                 }
-                strategiesRecyclerView.adapter = adapter
-
-                // Iniciar scroll automático
-                startAutoScroll(strategies.size)
-            }
-            .addOnFailureListener { exception ->
-                Toast.makeText(this, "Error al cargar estrategias: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
 
 
     private fun setupImageClickListeners() {
@@ -647,6 +660,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onResume()
         // Actualizar el RecyclerView de estrategias al volver al MainActivity
         setupStrategiesRecyclerView()
+    }
+
+    // Método para eliminar la escucha al cerrar sesión
+    private fun removeListener() {
+        listenerRegistration?.remove()
+        listenerRegistration = null
+    }
+
+    // Llama a removeListener en onDestroy y en logout
+    override fun onDestroy() {
+        super.onDestroy()
+        removeListener()
+    }
+
+    // En tu lógica de logout (por ejemplo, en el botón de logout):
+    private fun logout() {
+        removeListener()
+        FirebaseAuth.getInstance().signOut()
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
 }
