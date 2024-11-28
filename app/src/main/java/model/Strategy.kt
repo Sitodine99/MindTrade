@@ -11,7 +11,8 @@ data class Strategy(
     val createdBy: String = "",
     val indicators: List<String> = emptyList(),
     val timeframes: List<String> = emptyList(),
-    val tradingStyles: List<String> = emptyList()
+    val tradingStyles: List<String> = emptyList(),
+    val algorithmCode: String = ""
 )
 
 

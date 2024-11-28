@@ -48,6 +48,12 @@ class RegisterStrategyActivity : AppCompatActivity() {
         saveButton = findViewById(R.id.saveButton)
         cancelButton = findViewById(R.id.cancelButton)
 
+        // Cargar datos de estrategia si es modo edición
+        val strategyId = intent.getStringExtra("strategyId")
+        if (strategyId != null) {
+            loadStrategyData(strategyId)
+        }
+
         // Temporalidades
         timeFramesCheckBoxes = listOf(
             findViewById(R.id.timeM1),
@@ -173,42 +179,62 @@ class RegisterStrategyActivity : AppCompatActivity() {
         val timeFrames = timeFramesCheckBoxes.filter { it.isChecked }.map { it.text.toString() }
         val algorithmCode = algorithmEditText.text.toString().trim()
 
-        val userId = currentUser?.uid ?: return
-        db.collection("users").document(userId).get().addOnSuccessListener { userDoc ->
-            val alias = userDoc.getString("alias") ?: "Anónimo"
-            val avatarName = userDoc.getString("avatarName") ?: "default_avatar"
-
-            val strategy = hashMapOf(
-                "title" to title,
-                "description" to description,
-                "tradingStyles" to tradingStyles,
-                "indicators" to indicators,
-                "timeframes" to timeFrames,
-                "algorithmCode" to algorithmCode,
-                "createdBy" to userId,
-                "authorAlias" to alias,
-                "avatarName" to avatarName,
-                "timestamp" to System.currentTimeMillis()
-            )
-
-            db.collection("strategies").add(strategy).addOnSuccessListener { documentRef ->
-                Toast.makeText(this, "Estrategia guardada exitosamente", Toast.LENGTH_SHORT).show()
-
-                // Devolver el ID de la estrategia al MainActivity
-                val resultIntent = Intent()
-                resultIntent.putExtra("newStrategyId", documentRef.id)
-                setResult(RESULT_OK, resultIntent)
-
-                // Finalizar la actividad
+        val strategyId = intent.getStringExtra("strategyId")
+        if (strategyId != null) {
+            // Actualizar estrategia existente
+            db.collection("strategies").document(strategyId).update(
+                mapOf(
+                    "title" to title,
+                    "description" to description,
+                    "tradingStyles" to tradingStyles,
+                    "indicators" to indicators,
+                    "timeframes" to timeFrames,
+                    "algorithmCode" to algorithmCode,
+                    "timestamp" to System.currentTimeMillis()
+                )
+            ).addOnSuccessListener {
+                Toast.makeText(this, "Estrategia actualizada", Toast.LENGTH_SHORT).show()
                 finish()
             }.addOnFailureListener {
-           Toast.makeText(this, "Error al guardar estrategia", Toast.LENGTH_SHORT).show()
-}
-}.addOnFailureListener {
-    Toast.makeText(this, "Error al obtener datos del usuario", Toast.LENGTH_SHORT).show()
-}
+                Toast.makeText(this, "Error al actualizar estrategia", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            // Crear nueva estrategia
+            val userId = currentUser?.uid ?: return
+            db.collection("users").document(userId).get().addOnSuccessListener { userDoc ->
+                val alias = userDoc.getString("alias") ?: "Anónimo"
+                val avatarName = userDoc.getString("avatarName") ?: "default_avatar"
 
+                val strategy = hashMapOf(
+                    "title" to title,
+                    "description" to description,
+                    "tradingStyles" to tradingStyles,
+                    "indicators" to indicators,
+                    "timeframes" to timeFrames,
+                    "algorithmCode" to algorithmCode,
+                    "createdBy" to userId,
+                    "authorAlias" to alias,
+                    "avatarName" to avatarName,
+                    "timestamp" to System.currentTimeMillis()
+                )
 
+                db.collection("strategies").add(strategy).addOnSuccessListener { documentRef ->
+                    Toast.makeText(this, "Estrategia guardada exitosamente", Toast.LENGTH_SHORT).show()
+
+                    // Devolver el ID de la estrategia al MainActivity
+                    val resultIntent = Intent()
+                    resultIntent.putExtra("newStrategyId", documentRef.id)
+                    setResult(RESULT_OK, resultIntent)
+
+                    // Finalizar la actividad
+                    finish()
+                }.addOnFailureListener {
+                    Toast.makeText(this, "Error al guardar estrategia", Toast.LENGTH_SHORT).show()
+                }
+            }.addOnFailureListener {
+                Toast.makeText(this, "Error al obtener datos del usuario", Toast.LENGTH_SHORT).show()
+            }
+        }
 }
 
 
@@ -217,6 +243,40 @@ class RegisterStrategyActivity : AppCompatActivity() {
     finish()
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
 }
+    private fun loadStrategyData(strategyId: String) {
+        db.collection("strategies").document(strategyId).get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                // Prellenar los campos con los datos de Firestore
+                titleEditText.setText(document.getString("title"))
+                descriptionEditText.setText(document.getString("description"))
 
+                // Prellenar estilos de trading
+                val tradingStyles = document.get("tradingStyles") as? List<*>
+                dayTradingCheckBox.isChecked = tradingStyles?.contains("Day Trading") == true
+                scalpingCheckBox.isChecked = tradingStyles?.contains("Scalping") == true
+                swingTradingCheckBox.isChecked = tradingStyles?.contains("Swing Trading") == true
+
+                // Prellenar indicadores
+                val indicators = document.get("indicators") as? List<*>
+                indicators?.forEach { indicator ->
+                    val chip = Chip(this).apply {
+                        text = indicator.toString()
+                        isCloseIconVisible = true
+                        setOnCloseIconClickListener { chipGroup.removeView(this) }
+                    }
+                    chipGroup.addView(chip)
+                }
+
+                // Prellenar temporalidades
+                val timeFrames = document.get("timeframes") as? List<*>
+                timeFramesCheckBoxes.forEach { checkBox ->
+                    checkBox.isChecked = timeFrames?.contains(checkBox.text.toString()) == true
+                }
+
+                // Prellenar código de algoritmo
+                algorithmEditText.setText(document.getString("algorithmCode"))
+            }
+        }
+    }
 }
 

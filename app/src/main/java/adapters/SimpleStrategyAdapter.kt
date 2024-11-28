@@ -1,5 +1,6 @@
 package adapters
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,12 +11,14 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mindtrade.R
 import com.example.mindtrade.model.Strategy
+import strategycards.RegisterStrategyActivity
 import strategycards.StrategyDetailFragment
 
 class SimpleStrategyAdapter(
     private val strategies: List<Strategy>,
     private val fragmentActivity: FragmentActivity, // Recibe una instancia de FragmentActivity
-    private val onDeleteClick: (Strategy) -> Unit // Callback para manejar eliminación
+    private val onDeleteClick: (Strategy) -> Unit, // Callback para manejar eliminación
+    private val onEditClick: (Strategy) -> Unit // Callback para manejar la edición
 ) : RecyclerView.Adapter<SimpleStrategyAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -68,12 +71,26 @@ class SimpleStrategyAdapter(
 
         // Configurar eventos de clic para íconos (opcional)
         holder.editIcon.setOnClickListener {
+            val intent = Intent(fragmentActivity, RegisterStrategyActivity::class.java).apply {
+                putExtra("strategyId", strategy.id)
+                putExtra("strategyTitle", strategy.title)
+                putExtra("strategyDescription", strategy.description)
+                putExtra("strategyTradingStyles", strategy.tradingStyles.toTypedArray())
+                putExtra("strategyIndicators", strategy.indicators.toTypedArray())
+                putExtra("strategyTimeframes", strategy.timeframes.toTypedArray())
+                putExtra("strategyAlgorithmCode", strategy.algorithmCode)
+            }
+            fragmentActivity.startActivity(intent)
             // Implementar funcionalidad de edición si es necesario
         }
 
         //Eliminar estrategia:
         holder.deleteIcon.setOnClickListener {
             onDeleteClick(strategy)
+        }
+
+        holder.editIcon.setOnClickListener{
+            onEditClick(strategy)
         }
     }
 
