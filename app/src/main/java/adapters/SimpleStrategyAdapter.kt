@@ -14,7 +14,8 @@ import strategycards.StrategyDetailFragment
 
 class SimpleStrategyAdapter(
     private val strategies: List<Strategy>,
-    private val fragmentActivity: FragmentActivity // Recibe una instancia de FragmentActivity
+    private val fragmentActivity: FragmentActivity, // Recibe una instancia de FragmentActivity
+    private val onDeleteClick: (Strategy) -> Unit // Callback para manejar eliminación
 ) : RecyclerView.Adapter<SimpleStrategyAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -70,8 +71,9 @@ class SimpleStrategyAdapter(
             // Implementar funcionalidad de edición si es necesario
         }
 
+        //Eliminar estrategia:
         holder.deleteIcon.setOnClickListener {
-            // Implementar funcionalidad de eliminación si es necesario
+            onDeleteClick(strategy)
         }
     }
 

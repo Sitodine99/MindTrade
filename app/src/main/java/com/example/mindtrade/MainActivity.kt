@@ -1,5 +1,6 @@
 package com.example.mindtrade
 
+import MyStrategiesFragment
 import adapters.AccountAdapter
 import android.content.Intent
 import android.os.Bundle
