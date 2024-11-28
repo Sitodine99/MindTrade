@@ -215,6 +215,7 @@ class RegisterStrategyActivity : AppCompatActivity() {
                     "createdBy" to userId,
                     "authorAlias" to alias,
                     "avatarName" to avatarName,
+                    "favoritedBy" to emptyList<String>(),
                     "timestamp" to System.currentTimeMillis()
                 )
 

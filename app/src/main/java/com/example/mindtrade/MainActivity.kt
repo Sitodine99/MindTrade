@@ -26,6 +26,7 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import strategycards.FavoriteStrategiesFragment
 import strategycards.RegisterStrategyActivity
 import strategycards.StrategyDetailFragment
 
@@ -179,6 +180,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Crear y agregar el fragmento
         val fragment = StrategyDetailFragment().apply {
             arguments = Bundle().apply {
+                putString("strategyId", strategy.id) // Añadir el ID de la estrategia
                 putString("strategyTitle", strategy.title)
                 putString("strategyDescription", strategy.description)
                 putString("strategyAuthor", strategy.author)
@@ -202,8 +204,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             .addToBackStack(null) // Agrega el fragmento a la pila de retroceso
             .commit()
     }
-
-
 
 
     private fun setupStrategiesRecyclerView() {
@@ -576,6 +576,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     .addToBackStack(null) // Esto permite regresar al MainActivity
                     .commit()
             }
+
+            R.id.nav_favorite_strategies -> {
+                findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.GONE
+                findViewById<TextView>(R.id.accountsSummary).visibility = View.GONE
+                findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.GONE
+                findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.GONE
+                findViewById<Button>(R.id.addStrategyButton).visibility = View.GONE
+
+                // Mostrar contenedor de fragmentos
+                findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility = View.VISIBLE
+
+                // Reemplazar el fragmento
+                val fragment = FavoriteStrategiesFragment()
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainer, fragment)
+                    .addToBackStack(null)
+                    .commit()
+            }
+
 
             R.id.nav_accounts -> {
                 // Restaurar vistas principales y ocultar el contenedor de fragmentos

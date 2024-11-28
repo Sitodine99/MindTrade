@@ -12,8 +12,10 @@ data class Strategy(
     val indicators: List<String> = emptyList(),
     val timeframes: List<String> = emptyList(),
     val tradingStyles: List<String> = emptyList(),
-    val algorithmCode: String = ""
+    val algorithmCode: String = "",
+    val favoritedBy: List<String> = emptyList()
 )
+
 
 
 

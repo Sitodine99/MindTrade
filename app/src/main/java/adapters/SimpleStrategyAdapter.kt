@@ -43,6 +43,7 @@ class SimpleStrategyAdapter(
         holder.itemView.setOnClickListener {
             val fragment = StrategyDetailFragment().apply {
                 arguments = Bundle().apply {
+                    putString("strategyId", strategy.id)
                     putString("strategyTitle", strategy.title)
                     putString("strategyDescription", strategy.description)
                     putString("strategyAuthor", strategy.author)

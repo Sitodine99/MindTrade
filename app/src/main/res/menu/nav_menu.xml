@@ -21,8 +21,8 @@
 
     <!-- Opción: Estrategias Favoritas -->
     <item
-        android:id="@+id/ic_favorite_strategies"
-        android:icon="@drawable/ic_favorite_strategies"
+        android:id="@+id/nav_favorite_strategies"
+        android:icon="@drawable/ic_heart_filled"
         android:title="Estrategias favoritas" />
 
     <!-- Opción: Mis Cuentas -->
