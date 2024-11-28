@@ -29,7 +29,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import strategycards.RegisterStrategyActivity
 import strategycards.StrategyDetailFragment
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyStrategiesFragment.OnStrategyDeletedListener  {
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var avatarImage: ShapeableImageView
@@ -550,6 +550,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.nav_home -> {
+                // Regresar al estado principal de la MainActivity
+                supportFragmentManager.popBackStack(
+                    null,
+                    androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
+                )
+                restoreMainView() // Asegúrate de que las vistas principales se muestren
+            }
             R.id.nav_strategies -> {
                 // Ocultar vistas del MainActivity
                 findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.GONE
@@ -609,6 +617,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             // Restaurar la vista principal si no hay más fragmentos en la pila
             restoreMainView()
         }
+    }
+
+    override fun onStrategyDeleted() {
+        // Recargar el RecyclerView de estrategias
+        setupStrategiesRecyclerView()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Actualizar el RecyclerView de estrategias al volver al MainActivity
+        setupStrategiesRecyclerView()
     }
 
 }

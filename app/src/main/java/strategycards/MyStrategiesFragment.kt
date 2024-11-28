@@ -1,4 +1,5 @@
 import adapters.SimpleStrategyAdapter
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +23,7 @@ class MyStrategiesFragment : Fragment() {
     private var userId: String? = null
     private var userAlias: String = "Anónimo" // Alias por defecto
     private val strategies = mutableListOf<Strategy>() // Lista local sincronizada
+    private var listener: OnStrategyDeletedListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -114,11 +116,24 @@ class MyStrategiesFragment : Fragment() {
                 // Actualiza la lista local y el adaptador
                 strategies.remove(strategy) // Elimina de la lista local
                 adapter.notifyDataSetChanged() // Notifica al adaptador del cambio
+                listener?.onStrategyDeleted() // Notifica al MainActivity
             }
             .addOnFailureListener {
                 Toast.makeText(requireContext(), "Error al eliminar estrategia", Toast.LENGTH_SHORT).show()
             }
     }
+
+    interface OnStrategyDeletedListener {
+        fun onStrategyDeleted()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnStrategyDeletedListener) {
+            listener = context
+        }
+    }
+
 }
 
 
