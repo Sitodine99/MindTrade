@@ -15,9 +15,8 @@ data class Strategy(
     val tradingStyles: List<String> = emptyList(),
     val algorithmCode: String = "",
     val favoritedBy: List<String> = emptyList(),
-    val votedBy: List<String> = emptyList()
+    val userRatings: Map<String, Double> = emptyMap() // Nuevo campo para almacenar valoraciones por usuario
 )
-
 
 
 

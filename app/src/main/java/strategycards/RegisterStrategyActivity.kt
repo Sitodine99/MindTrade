@@ -216,10 +216,10 @@ class RegisterStrategyActivity : AppCompatActivity() {
                     "timeframes" to timeFrames,
                     "algorithmCode" to algorithmCode,
                     "favoritedBy" to emptyList<String>(),
-                    "timestamp" to System.currentTimeMillis(),
+                    "userRatings" to emptyMap<String, Double>(), // Inicializar mapa vacío
                     "rating" to 0.0, // Valor inicial
                     "totalVotes" to 0, // Valor inicial
-                    "votedBy" to emptyList<String>(),
+                    "timestamp" to System.currentTimeMillis()
                 )
 
                 db.collection("strategies").add(strategy).addOnSuccessListener { documentRef ->
@@ -239,7 +239,8 @@ class RegisterStrategyActivity : AppCompatActivity() {
                 Toast.makeText(this, "Error al obtener datos del usuario", Toast.LENGTH_SHORT).show()
             }
         }
-}
+    }
+
 
 
     override fun onBackPressed() {

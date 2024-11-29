@@ -46,34 +46,33 @@ class GeneralFragment : Fragment() {
         ratingBar.rating = rating
 
         // Configurar el estado inicial del RatingBar
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
         strategyId?.let { id ->
             db.collection("strategies").document(id).get().addOnSuccessListener { document ->
-                val votedBy = document.get("votedBy") as? List<*>
-                val userId = FirebaseAuth.getInstance().currentUser?.uid
+                val userRatings = document.get("userRatings") as? Map<String, Double> ?: emptyMap()
 
-                if (votedBy != null && userId in votedBy) {
-                    ratingBar.setIsIndicator(true) // Desactivar interacción si ya ha votado
-                } else {
-                    ratingBar.setIsIndicator(false) // Permitir interacción si no ha votado
+                if (userId != null && userRatings.containsKey(userId)) {
+                    // Mostrar la valoración actual del usuario
+                    val userRating = userRatings[userId]?.toFloat() ?: 0f
+                    ratingBar.rating = userRating
                 }
+
+                // Permitir interacción para usuarios autenticados
+                ratingBar.setIsIndicator(false)
             }.addOnFailureListener {
-                Toast.makeText(context, "Error al cargar los datos", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(context, "Error al cargar los datos", Toast.LENGTH_SHORT).show()
             }
         }
 
-        // Desactivar RatingBar para usuarios no autenticados
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        // Configurar listener para guardar valoración
         if (userId != null) {
-            ratingBar.setIsIndicator(false) // Permitir interacción
-            ratingBar.setOnRatingBarChangeListener { _, rating, _ ->
-                Log.d("RatingBar", "Usuario seleccionó un rating: $rating")
-                Toast.makeText(context, "Rating seleccionado: $rating", Toast.LENGTH_SHORT).show()
-                saveRating(rating)
+            ratingBar.setOnRatingBarChangeListener { _, newRating, _ ->
+                Log.d("RatingBar", "Usuario seleccionó un rating: $newRating")
+                Toast.makeText(context, "Rating seleccionado: $newRating", Toast.LENGTH_SHORT).show()
+                saveRating(newRating)
             }
-
         } else {
-            ratingBar.setIsIndicator(true) // Solo indicador
+            ratingBar.setIsIndicator(true) // Desactivar para usuarios no autenticados
         }
 
         return view
@@ -81,7 +80,6 @@ class GeneralFragment : Fragment() {
 
     private fun saveRating(userRating: Float) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        Log.d("GeneralFragment", "strategyId: $strategyId")
         strategyId?.let { id ->
             val docRef = db.collection("strategies").document(id)
 
@@ -89,40 +87,39 @@ class GeneralFragment : Fragment() {
                 val snapshot = transaction.get(docRef)
                 val currentRating = snapshot.getDouble("rating") ?: 0.0
                 val totalVotes = snapshot.getLong("totalVotes")?.toInt() ?: 0
-                val votedBy = snapshot.get("votedBy") as? List<*> ?: emptyList<Any>()
+                val userRatings = snapshot.get("userRatings") as? Map<String, Double> ?: emptyMap()
 
-                // Verificar si el usuario ya ha votado
-                if (votedBy.contains(userId)) {
-                    throw Exception("Ya has votado esta estrategia.")
+                // Obtener la valoración previa del usuario, si existe
+                val previousRating = userRatings[userId]
+
+                // Calcular nuevo promedio y total de votos
+                val (newRating, newTotalVotes) = if (previousRating != null) {
+                    // Actualizar promedio eliminando la valoración previa
+                    val adjustedTotal = currentRating * totalVotes - previousRating + userRating
+                    adjustedTotal / totalVotes to totalVotes
+                } else {
+                    // Nuevo voto del usuario
+                    val adjustedTotal = currentRating * totalVotes + userRating
+                    adjustedTotal / (totalVotes + 1) to (totalVotes + 1)
                 }
 
-                // Calcular nuevo promedio
-                val newTotalVotes = totalVotes + 1
-                val newRating = (currentRating * totalVotes + userRating) / newTotalVotes
-
-                // Actualizar datos
+                // Actualizar datos en Firestore
                 transaction.update(
                     docRef,
                     mapOf(
                         "rating" to newRating,
                         "totalVotes" to newTotalVotes,
-                        "votedBy" to votedBy + userId // Agregar usuario a la lista de votantes
+                        "userRatings" to userRatings + (userId to userRating.toDouble())
                     )
                 )
             }.addOnSuccessListener {
-                Toast.makeText(context, "¡Valoración guardada!", Toast.LENGTH_SHORT).show()
-                // Desactivar el RatingBar para evitar votos adicionales
-                ratingBar.setIsIndicator(true)
+                Toast.makeText(context, "¡Valoración actualizada!", Toast.LENGTH_SHORT).show()
             }.addOnFailureListener { e ->
-                if (e.message == "Ya has votado esta estrategia.") {
-                    Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(
-                        context,
-                        "Error al guardar valoración: ${e.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                Toast.makeText(
+                    context,
+                    "Error al actualizar valoración: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
