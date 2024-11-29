@@ -58,12 +58,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <CheckBox
-                android:id="@+id/tradingStyleDayTrading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Day Trading" />
-
+            <!-- Reordenados -->
             <CheckBox
                 android:id="@+id/tradingStyleScalping"
                 android:layout_width="wrap_content"
@@ -71,11 +66,18 @@
                 android:text="Scalping" />
 
             <CheckBox
+                android:id="@+id/tradingStyleDayTrading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Day Trader" />
+
+            <CheckBox
                 android:id="@+id/tradingStyleSwingTrading"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Swing Trading" />
+                android:text="Swing Trader" />
         </LinearLayout>
+
 
 
         <!-- Indicadores -->
@@ -117,6 +119,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Añadir indicador"
+            android:backgroundTint="@color/black"
+            android:textColor="#FFFFFF"
             android:layout_marginTop="8dp" />
 
         <!-- Temporalidades -->
@@ -191,10 +195,10 @@
                 android:text="W1" />
 
             <CheckBox
-                android:id="@+id/timeMN"
+                android:id="@+id/timeOtras"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="MN" />
+                android:text="Otras" />
         </GridLayout>
 
         <!-- Trading Algorítmico -->
@@ -268,6 +272,8 @@
                 android:id="@+id/cancelButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:backgroundTint="@color/black"
+                android:textColor="#FFFFFF"
                 android:text="Cancelar"
                 android:layout_marginEnd="8dp" />
 
@@ -275,6 +281,8 @@
                 android:id="@+id/saveButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:backgroundTint="@color/black"
+                android:textColor="#FFFFFF"
                 android:text="Guardar" />
         </LinearLayout>
     </LinearLayout>

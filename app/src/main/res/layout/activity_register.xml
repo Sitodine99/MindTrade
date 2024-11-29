@@ -115,12 +115,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- Separador para el registro social -->
 
-    <!-- Botón de registro con Google -->
-    <!-- Botón de registro con Google -->
-
-    <!-- Botón de registro con Facebook -->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

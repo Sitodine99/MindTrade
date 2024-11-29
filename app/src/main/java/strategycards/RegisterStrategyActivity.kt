@@ -65,7 +65,7 @@ class RegisterStrategyActivity : AppCompatActivity() {
             findViewById(R.id.timeH4),
             findViewById(R.id.timeD1),
             findViewById(R.id.timeW1),
-            findViewById(R.id.timeMN)
+            findViewById(R.id.timeOtras)
         )
 
         // Inicializar etiquetas predefinidas
@@ -77,8 +77,8 @@ class RegisterStrategyActivity : AppCompatActivity() {
 
     private fun setupPredefinedIndicators() {
         val predefinedIndicators = listOf(
-            "EMA", "SMA", "MACD", "RSI", "Bollinger Bands",
-            "ADX", "Ichimoku", "Volume", "Fibonacci Retracements", "Pivot Points"
+            "EMA21","EMA50", "EMA200", "SMA21", "SMA50", "SMA200", "MACD", "RSI", "Bollinger Bands",
+            "ADX", "Ichimoku", "Volume", "Fibonacci Retracements", "Pivot Points",
         )
 
         for (indicator in predefinedIndicators) {
@@ -165,18 +165,36 @@ class RegisterStrategyActivity : AppCompatActivity() {
         if (scalpingCheckBox.isChecked) tradingStyles.add("Scalping")
         if (swingTradingCheckBox.isChecked) tradingStyles.add("Swing Trading")
 
-        if (title.isBlank() || description.isBlank() || tradingStyles.isEmpty()) {
-            Toast.makeText(this, "Completa todos los campos obligatorios", Toast.LENGTH_SHORT).show()
+        // Validar campos obligatorios
+        if (title.isBlank()) {
+            Toast.makeText(this, "El título es obligatorio", Toast.LENGTH_SHORT).show()
             return
         }
 
+        if (description.isBlank()) {
+            Toast.makeText(this, "La descripción es obligatoria", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (tradingStyles.isEmpty()) {
+            Toast.makeText(this, "Selecciona al menos un estilo de trading", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Validar temporalidades
+        val timeFrames = timeFramesCheckBoxes.filter { it.isChecked }.map { it.text.toString() }
+        if (timeFrames.isEmpty()) {
+            Toast.makeText(this, "Selecciona al menos una temporalidad", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Recoger los indicadores seleccionados
         val indicators = mutableListOf<String>()
         for (i in 0 until chipGroup.childCount) {
             val chip = chipGroup.getChildAt(i) as Chip
             indicators.add(chip.text.toString())
         }
 
-        val timeFrames = timeFramesCheckBoxes.filter { it.isChecked }.map { it.text.toString() }
         val algorithmCode = algorithmEditText.text.toString().trim()
 
         val strategyId = intent.getStringExtra("strategyId")
@@ -216,21 +234,19 @@ class RegisterStrategyActivity : AppCompatActivity() {
                     "timeframes" to timeFrames,
                     "algorithmCode" to algorithmCode,
                     "favoritedBy" to emptyList<String>(),
-                    "userRatings" to emptyMap<String, Double>(), // Inicializar mapa vacío
-                    "rating" to 0.0, // Valor inicial
-                    "totalVotes" to 0, // Valor inicial
+                    "userRatings" to emptyMap<String, Double>(),
+                    "rating" to 0.0,
+                    "totalVotes" to 0,
                     "timestamp" to System.currentTimeMillis()
                 )
 
                 db.collection("strategies").add(strategy).addOnSuccessListener { documentRef ->
                     Toast.makeText(this, "Estrategia guardada exitosamente", Toast.LENGTH_SHORT).show()
 
-                    // Devolver el ID de la estrategia al MainActivity
                     val resultIntent = Intent()
                     resultIntent.putExtra("newStrategyId", documentRef.id)
                     setResult(RESULT_OK, resultIntent)
 
-                    // Finalizar la actividad
                     finish()
                 }.addOnFailureListener {
                     Toast.makeText(this, "Error al guardar estrategia", Toast.LENGTH_SHORT).show()
