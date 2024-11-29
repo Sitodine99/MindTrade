@@ -1,6 +1,6 @@
 //Este adaptador gestiona cómo se muestran los comentarios y respuestas
 
-package strategycards
+package adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -35,11 +35,11 @@ class CommentsAdapter : RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>(
     override fun getItemCount(): Int = comments.size
 
     class CommentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val userAliasTextView: TextView = view.findViewById(R.id.userAliasTextView)
-        private val contentTextView: TextView = view.findViewById(R.id.contentTextView)
-        private val timestampTextView: TextView = view.findViewById(R.id.timestampTextView)
+        private val userAliasTextView: TextView = view.findViewById(R.id.userAliasTextViewTest)
+        private val contentTextView: TextView = view.findViewById(R.id.contentTextViewTest)
+        private val timestampTextView: TextView = view.findViewById(R.id.timestampTextViewTest)
         private val avatarImageView: ImageView =
-            view.findViewById(R.id.AvatarForumImageView) // Asegúrate de usar el ID correcto
+            view.findViewById(R.id.AvatarForumImageViewTest) // Asegúrate de usar el ID correcto
 
         fun bind(comment: Comment) {
             userAliasTextView.text = comment.userAlias

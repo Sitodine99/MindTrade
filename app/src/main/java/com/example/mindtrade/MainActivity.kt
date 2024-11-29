@@ -193,6 +193,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 putStringArray("strategyTimeframes", strategy.timeframes.toTypedArray())
                 putStringArray("tradingStyles", strategy.tradingStyles.toTypedArray())
                 putDouble("strategyRating", strategy.rating)
+                putString("algorithmCode", strategy.algorithmCode) // Pasar el campo algorithmCode
             }
         }
 
@@ -251,7 +252,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 createdBy = document.getString("createdBy") ?: "",
                                 indicators = (document.get("indicators") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
                                 timeframes = (document.get("timeframes") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
-                                tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
+                                tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                                algorithmCode = document.getString("algorithmCode") ?: ""
                             )
                         )
                     }

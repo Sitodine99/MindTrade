@@ -7,7 +7,7 @@
 
     <!-- Imagen del avatar -->
     <ImageView
-        android:id="@+id/AvatarForumImageView"
+        android:id="@+id/AvatarForumImageViewTest"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginEnd="8dp"
@@ -23,21 +23,21 @@
 
         <!-- Alias del usuario -->
         <TextView
-            android:id="@+id/userAliasTextView"
+            android:id="@+id/userAliasTextViewTest"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold" />
 
         <!-- Contenido del comentario -->
         <TextView
-            android:id="@+id/contentTextView"
+            android:id="@+id/contentTextViewTest"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="4dp" />
 
         <!-- Timestamp -->
         <TextView
-            android:id="@+id/timestampTextView"
+            android:id="@+id/timestampTextViewTest"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="12sp"

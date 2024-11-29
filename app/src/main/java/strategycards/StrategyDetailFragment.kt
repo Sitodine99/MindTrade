@@ -48,6 +48,7 @@ class StrategyDetailFragment : Fragment() {
         val strategyTimeframes = args?.getStringArray("strategyTimeframes") ?: arrayOf("Sin temporalidades")
         val tradingStyles = args?.getStringArray("tradingStyles") ?: arrayOf("Sin estilos")
         val strategyRating = args?.getDouble("strategyRating") ?: 0.0
+        val algorithmCode = args?.getString("algorithmCode") ?: "" // Extraer algorithmCode
 
         strategyTitleTextView.text = strategyTitle
         strategyAuthorTextView.text = "Por: $strategyAuthor"
@@ -81,6 +82,17 @@ class StrategyDetailFragment : Fragment() {
             }
         }, "Foro")
 
+        // Añade pestaña "Registros"
+        adapter.addFragment(RecordsFragment(), "Registros")
+
+        // Añade la pestaña "Trading Algorítmico" solo si el campo no está vacío
+        if (algorithmCode.isNotBlank()) {
+            adapter.addFragment(AlgorithmFragment().apply {
+                arguments = Bundle().apply {
+                    putString("algorithmCode", algorithmCode)
+                }
+            }, "Bot")
+        }
 
         viewPager.adapter = adapter
         viewPager.offscreenPageLimit = adapter.itemCount

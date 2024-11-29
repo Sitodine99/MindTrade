@@ -88,7 +88,9 @@ class MyStrategiesFragment : Fragment() {
                         timeframes = (document.get("timeframes") as? List<*>)?.filterIsInstance<String>()
                             ?: emptyList(),
                         tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>()
-                            ?: emptyList()
+                            ?: emptyList(),
+                        algorithmCode = document.getString("algorithmCode") ?: ""
+
                     )
                 })
                 adapter.notifyDataSetChanged() // Notifica al adaptador que los datos han cambiado
@@ -130,6 +132,7 @@ class MyStrategiesFragment : Fragment() {
             putExtra("strategyTradingStyles", strategy.tradingStyles.toTypedArray())
             putExtra("strategyIndicators", strategy.indicators.toTypedArray())
             putExtra("strategyTimeframes", strategy.timeframes.toTypedArray())
+            putExtra("algorithmCode", strategy.algorithmCode)
         }
         startActivity(intent)
     }
