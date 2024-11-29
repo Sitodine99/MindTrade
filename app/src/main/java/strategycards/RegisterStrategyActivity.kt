@@ -30,7 +30,7 @@ class RegisterStrategyActivity : AppCompatActivity() {
     private lateinit var cancelButton: Button
     private lateinit var symbolsChipGroup: ChipGroup
     private lateinit var customSymbolsChipGroup: ChipGroup
-    private lateinit var allInstrumentChipGroup: ChipGroup
+    private lateinit var allInstrumentsChipGroup: ChipGroup
     private lateinit var forexChipGroup: ChipGroup
     private lateinit var exoticsChipGroup: ChipGroup
     private lateinit var metalsChipGroup: ChipGroup
@@ -63,7 +63,7 @@ class RegisterStrategyActivity : AppCompatActivity() {
         cancelButton = findViewById(R.id.cancelButton)
         symbolsChipGroup = findViewById(R.id.symbolsChipGroup)
         customSymbolsChipGroup = findViewById(R.id.customSymbolsChipGroup)
-        allInstrumentChipGroup = findViewById(R.id.allInstrumentsChipGroup)
+        allInstrumentsChipGroup = findViewById(R.id.allInstrumentsChipGroup)
         forexChipGroup = findViewById(R.id.forexChipGroup)
         exoticsChipGroup = findViewById(R.id.exoticsChipGroup)
         metalsChipGroup = findViewById(R.id.metalsChipGroup)
@@ -149,6 +149,27 @@ class RegisterStrategyActivity : AppCompatActivity() {
     }
 
     private fun setupPredefinedSymbols() {
+
+        // Forex
+        val allInstrumentsSymbols = listOf("Todos los activos")
+        for (symbol in allInstrumentsSymbols) {
+            val chip = Chip(this).apply {
+                text = symbol
+                isCheckable = true // Permite que el chip sea seleccionable
+                setOnClickListener {
+                    // Crear y añadir directamente al grupo personalizado sin comprobar duplicados
+                    val selectedChip = Chip(this@RegisterStrategyActivity).apply {
+                        text = symbol
+                        isCloseIconVisible = true // Permitir eliminar el chip
+                        setOnCloseIconClickListener {
+                            customSymbolsChipGroup.removeView(this)
+                        }
+                    }
+                    customSymbolsChipGroup.addView(selectedChip)
+                }
+            }
+            allInstrumentsChipGroup.addView(chip)
+        }
         // Forex
         val forexSymbols = listOf("EUR/USD", "USD/JPY", "GBP/USD", "USD/CHF", "AUD/USD", "USD/CAD", "NZD/USD")
         for (symbol in forexSymbols) {
@@ -211,7 +232,7 @@ class RegisterStrategyActivity : AppCompatActivity() {
         }
 
         // Crypto CFD
-        val cryptoSymbols = listOf("BTC/USD", "ETH/USD", "LTC/USD", "XRP/USD", "ADA/USD")
+        val cryptoSymbols = listOf("BTC/USD", "ETH/USD", "LTC/USD", "XRP/USD", "ADA/USD", "DOT/USD")
         for (symbol in cryptoSymbols) {
             val chip = Chip(this).apply {
                 text = symbol
@@ -232,9 +253,9 @@ class RegisterStrategyActivity : AppCompatActivity() {
 
         // Cash CFD
         val cashCFDSymbols = listOf(
-            "CASH/US30", "CASH/SPX500", "CASH/NAS100",
-            "CASH/GER30", "CASH/FRA40", "CASH/UK100", "CASH/ESP35",
-            "CASH/JPN225", "CASH/HK50", "CASH/AUS200"
+            "US30.cash", "SPX500.cash", "NAS100.cash",
+            "GER30.cash", "FRA40.cash", "UK100.cash", "ESP35.cash",
+            "JPN225.cash", "AUS200.cash"
         )
         for (symbol in cashCFDSymbols) {
             val chip = Chip(this).apply {
@@ -372,7 +393,7 @@ class RegisterStrategyActivity : AppCompatActivity() {
         val allGroups = listOf(
             chipGroup, // Incluye el grupo de indicadores
             customSymbolsChipGroup,
-            allInstrumentChipGroup,
+            allInstrumentsChipGroup,
             forexChipGroup,
             exoticsChipGroup,
             metalsChipGroup,
@@ -431,7 +452,7 @@ class RegisterStrategyActivity : AppCompatActivity() {
 
         // Recoger los símbolos seleccionados
         val selectedSymbols = mutableListOf<String>()
-        allInstrumentChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }
+        allInstrumentsChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }
             .mapTo(selectedSymbols) { it.text.toString() }
         forexChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }
             .mapTo(selectedSymbols) { it.text.toString() }
@@ -575,7 +596,7 @@ class RegisterStrategyActivity : AppCompatActivity() {
                     symbols?.forEach { symbol ->
                         // Busca el chip en cada grupo de símbolos y márcalo como seleccionado si coincide
                         val chipGroups = listOf(
-                            allInstrumentChipGroup,
+                            allInstrumentsChipGroup,
                             forexChipGroup,
                             exoticsChipGroup,
                             metalsChipGroup,
