@@ -404,7 +404,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             "Swing trader" -> navTradingStyleText.setTextColor(
                 resources.getColor(
-                    R.color.forest_green,
+                    R.color.blue_light,
                     theme
                 )
             )
