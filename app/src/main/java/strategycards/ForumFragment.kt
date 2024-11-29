@@ -73,26 +73,41 @@ class ForumFragment : Fragment() {
 
     private fun addComment(content: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val userAlias = FirebaseAuth.getInstance().currentUser?.displayName ?: "Anónimo"
 
-        val newComment = Comment(
-            id = UUID.randomUUID().toString(),
-            userId = userId,
-            userAlias = userAlias,
-            content = content,
-            timestamp = System.currentTimeMillis()
-        )
+        // Recuperar el alias y avatar desde Firestore
+        db.collection("users").document(userId).get()
+            .addOnSuccessListener { userDoc ->
+                val userAlias = userDoc.getString("alias") ?: "Anónimo"
+                val avatarUrl = userDoc.getString("avatarUrl")
+                val avatarName = userDoc.getString("avatarName") ?: "default_avatar"
 
-        strategyId?.let { id ->
-            db.collection("strategies").document(id).update(
-                "comments", FieldValue.arrayUnion(newComment)
-            ).addOnSuccessListener {
-                commentEditText.text.clear()
-                loadComments(id)
-                Toast.makeText(context, "Comentario añadido", Toast.LENGTH_SHORT).show()
-            }.addOnFailureListener {
-                Toast.makeText(context, "Error al añadir comentario", Toast.LENGTH_SHORT).show()
+                val newComment = Comment(
+                    id = UUID.randomUUID().toString(),
+                    userId = userId,
+                    userAlias = userAlias,
+                    avatarUrl = avatarUrl,
+                    avatarName = avatarName,
+                    content = content,
+                    timestamp = System.currentTimeMillis()
+                )
+
+                strategyId?.let { id ->
+                    db.collection("strategies").document(id).update(
+                        "comments", FieldValue.arrayUnion(newComment)
+                    ).addOnSuccessListener {
+                        commentEditText.text.clear()
+                        loadComments(id)
+                        Toast.makeText(context, "Comentario añadido", Toast.LENGTH_SHORT).show()
+                    }.addOnFailureListener {
+                        Toast.makeText(context, "Error al añadir comentario", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
             }
-        }
+            .addOnFailureListener {
+                Toast.makeText(context, "Error al recuperar datos del usuario", Toast.LENGTH_SHORT)
+                    .show()
+            }
     }
-}
+    }
+
