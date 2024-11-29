@@ -53,6 +53,8 @@ class SimpleStrategyAdapter(
                     putStringArray("strategyTimeframes", strategy.timeframes.toTypedArray())
                     putStringArray("tradingStyles", strategy.tradingStyles.toTypedArray())
                     putDouble("strategyRating", strategy.rating)
+                    putString("algorithmCode", strategy.algorithmCode)
+
                 }
             }
 
