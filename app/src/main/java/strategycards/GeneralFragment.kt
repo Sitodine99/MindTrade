@@ -28,14 +28,14 @@ class GeneralFragment : Fragment() {
         val tradingStyleTextView: TextView = view.findViewById(R.id.tradingStyleTextView)
         val indicatorsTextView: TextView = view.findViewById(R.id.strategyIndicatorsTextView)
         val timeframesTextView: TextView = view.findViewById(R.id.strategyTimeframesTextView)
-        val symbolsTextView: TextView = view.findViewById(R.id.strategySymbolsTextViewTest) // Vincular el TextView de símbolos
+        val symbolsTextView: TextView = view.findViewById(R.id.strategySymbolsTextViewTest)
         ratingBar = view.findViewById(R.id.strategyRatingBar)
 
         // Obtener datos desde los argumentos
         val tradingStyles = arguments?.getStringArray("tradingStyles")?.joinToString(", ")
         val indicators = arguments?.getStringArray("indicators")?.joinToString(", ")
         val timeframes = arguments?.getStringArray("timeframes")?.joinToString(", ")
-        val symbols = arguments?.getStringArray("symbols")?.joinToString(", ") ?: "Sin símbolos" // Obtener los símbolos
+        val symbols = arguments?.getStringArray("symbols")?.joinToString(", ") ?: "Sin símbolos"
         val rating = arguments?.getFloat("rating", 0f) ?: 0f
         strategyId = arguments?.getString("strategyId")
 
@@ -43,11 +43,11 @@ class GeneralFragment : Fragment() {
         tradingStyleTextView.text = tradingStyles ?: "Sin estilos"
         indicatorsTextView.text = indicators ?: "Sin indicadores"
         timeframesTextView.text = timeframes ?: "Sin temporalidades"
-        symbolsTextView.text = symbols // Mostrar los símbolos
+        symbolsTextView.text = symbols
         ratingBar.rating = rating
 
-        // Configurar el estado inicial del RatingBar
         val userId = FirebaseAuth.getInstance().currentUser?.uid
+
         strategyId?.let { id ->
             db.collection("strategies").document(id).get().addOnSuccessListener { document ->
                 val userRatings = document.get("userRatings") as? Map<String, Double> ?: emptyMap()
@@ -65,18 +65,31 @@ class GeneralFragment : Fragment() {
             }
         }
 
-        // Configurar listener para guardar valoración
+        // Configurar interacción del usuario con el RatingBar
         if (userId != null) {
+            var isUserTouching = false
+
+            // Detectar cuando el usuario interactúa directamente con el RatingBar
+            ratingBar.setOnTouchListener { _, event ->
+                if (event.action == android.view.MotionEvent.ACTION_DOWN) {
+                    isUserTouching = true
+                }
+                false // Permite que otros listeners también funcionen
+            }
+
+            // Solo guardar y mostrar el toast si el usuario cambia el valor manualmente
             ratingBar.setOnRatingBarChangeListener { _, newRating, _ ->
-                saveRating(newRating)
+                if (isUserTouching) {
+                    isUserTouching = false // Reiniciar la bandera
+                    saveRating(newRating)
+                }
             }
         } else {
-            ratingBar.setIsIndicator(true) // Desactivar para usuarios no autenticados
+            ratingBar.setIsIndicator(true)
         }
 
         return view
     }
-
 
     private fun saveRating(userRating: Float) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -89,21 +102,16 @@ class GeneralFragment : Fragment() {
                 val totalVotes = snapshot.getLong("totalVotes")?.toInt() ?: 0
                 val userRatings = snapshot.get("userRatings") as? Map<String, Double> ?: emptyMap()
 
-                // Obtener la valoración previa del usuario, si existe
                 val previousRating = userRatings[userId]
 
-                // Calcular nuevo promedio y total de votos
                 val (newRating, newTotalVotes) = if (previousRating != null) {
-                    // Actualizar promedio eliminando la valoración previa
                     val adjustedTotal = currentRating * totalVotes - previousRating + userRating
                     adjustedTotal / totalVotes to totalVotes
                 } else {
-                    // Nuevo voto del usuario
                     val adjustedTotal = currentRating * totalVotes + userRating
                     adjustedTotal / (totalVotes + 1) to (totalVotes + 1)
                 }
 
-                // Actualizar datos en Firestore
                 transaction.update(
                     docRef,
                     mapOf(
@@ -124,3 +132,4 @@ class GeneralFragment : Fragment() {
         }
     }
 }
+
