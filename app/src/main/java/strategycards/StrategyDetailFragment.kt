@@ -55,6 +55,8 @@ class StrategyDetailFragment : Fragment() {
         loadAvatar(strategyAvatarUrl, strategyAvatarName, avatarImageView)
 
         val adapter = StrategyPagerAdapter(requireActivity())
+
+        //Añade pestaña Datos generales
         adapter.addFragment(GeneralFragment().apply {
             arguments = Bundle().apply {
                 putString("strategyId", strategyId)
@@ -65,11 +67,20 @@ class StrategyDetailFragment : Fragment() {
             }
         }, "General")
 
+        //Añade pestaña descripción
         adapter.addFragment(DescriptionFragment().apply {
             arguments = Bundle().apply {
                 putString("description", strategyDescription)
             }
         }, "Descripción")
+
+        //Añade pestaña foro
+        adapter.addFragment(ForumFragment().apply {
+            arguments = Bundle().apply {
+                putString("strategyId", strategyId)
+            }
+        }, "Foro")
+
 
         viewPager.adapter = adapter
         viewPager.offscreenPageLimit = adapter.itemCount
