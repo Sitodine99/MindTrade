@@ -28,6 +28,8 @@ class RegisterStrategyActivity : AppCompatActivity() {
     private lateinit var algorithmEditText: EditText
     private lateinit var saveButton: Button
     private lateinit var cancelButton: Button
+    private lateinit var symbolsChipGroup: ChipGroup
+    private lateinit var customSymbolsChipGroup: ChipGroup
     private lateinit var allInstrumentChipGroup: ChipGroup
     private lateinit var forexChipGroup: ChipGroup
     private lateinit var exoticsChipGroup: ChipGroup
@@ -59,6 +61,8 @@ class RegisterStrategyActivity : AppCompatActivity() {
         algorithmEditText = findViewById(R.id.tradingAlgorithmCode)
         saveButton = findViewById(R.id.saveButton)
         cancelButton = findViewById(R.id.cancelButton)
+        symbolsChipGroup = findViewById(R.id.symbolsChipGroup)
+        customSymbolsChipGroup = findViewById(R.id.customSymbolsChipGroup)
         allInstrumentChipGroup = findViewById(R.id.allInstrumentsChipGroup)
         forexChipGroup = findViewById(R.id.forexChipGroup)
         exoticsChipGroup = findViewById(R.id.exoticsChipGroup)
@@ -98,29 +102,25 @@ class RegisterStrategyActivity : AppCompatActivity() {
 
         // Configurar chips para símbolos
         setupPredefinedSymbols()
-
-        // Botón para añadir símbolo personalizado
-        addSymbolButton.setOnClickListener {
-            val symbol = addSymbolEditText.text.toString().trim()
-
-            if (symbol.isNotBlank() && !isChipDuplicate(symbol)) {
-                val chip = Chip(this).apply {
-                    text = symbol
-                    isCloseIconVisible = true
-                    setOnCloseIconClickListener { (it.parent as ChipGroup).removeView(this) }
-                }
-                cryptoChipGroup.addView(chip) // Añadir al grupo por defecto
-                addSymbolEditText.text.clear()
-            } else {
-                Toast.makeText(this, "Introduce un símbolo válido y único", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
+
 
     private fun setupPredefinedIndicators() {
         val predefinedIndicators = listOf(
-            "EMA21","EMA50", "EMA200", "SMA21", "SMA50", "SMA200", "MACD", "RSI", "Bollinger Bands",
-            "ADX", "Ichimoku", "Volume", "Fibonacci Retracements", "Pivot Points",
+            "EMA21",
+            "EMA50",
+            "EMA200",
+            "SMA21",
+            "SMA50",
+            "SMA200",
+            "MACD",
+            "RSI",
+            "Bollinger Bands",
+            "ADX",
+            "Ichimoku",
+            "Volume",
+            "Fibonacci Retracements",
+            "Pivot Points",
         )
 
         for (indicator in predefinedIndicators) {
@@ -147,6 +147,155 @@ class RegisterStrategyActivity : AppCompatActivity() {
             predefinedIndicatorsChipGroup.addView(chip)
         }
     }
+
+    private fun setupPredefinedSymbols() {
+        // Forex
+        val forexSymbols = listOf("EUR/USD", "USD/JPY", "GBP/USD", "USD/CHF", "AUD/USD", "USD/CAD", "NZD/USD")
+        for (symbol in forexSymbols) {
+            val chip = Chip(this).apply {
+                text = symbol
+                isCheckable = true // Permite que el chip sea seleccionable
+                setOnClickListener {
+                    // Crear y añadir directamente al grupo personalizado sin comprobar duplicados
+                    val selectedChip = Chip(this@RegisterStrategyActivity).apply {
+                        text = symbol
+                        isCloseIconVisible = true // Permitir eliminar el chip
+                        setOnCloseIconClickListener {
+                            customSymbolsChipGroup.removeView(this)
+                        }
+                    }
+                    customSymbolsChipGroup.addView(selectedChip)
+                }
+            }
+            forexChipGroup.addView(chip)
+        }
+
+        // Exotics
+        val exoticsSymbols = listOf("USD/SEK", "USD/NOK", "USD/ZAR", "EUR/TRY")
+        for (symbol in exoticsSymbols) {
+            val chip = Chip(this).apply {
+                text = symbol
+                isCheckable = true
+                setOnClickListener {
+                    val selectedChip = Chip(this@RegisterStrategyActivity).apply {
+                        text = symbol
+                        isCloseIconVisible = true
+                        setOnCloseIconClickListener {
+                            customSymbolsChipGroup.removeView(this)
+                        }
+                    }
+                    customSymbolsChipGroup.addView(selectedChip)
+                }
+            }
+            exoticsChipGroup.addView(chip)
+        }
+
+        // Metals CFD
+        val metalsSymbols = listOf("XAU/USD", "XAG/USD", "XPT/USD", "XPD/USD")
+        for (symbol in metalsSymbols) {
+            val chip = Chip(this).apply {
+                text = symbol
+                isCheckable = true
+                setOnClickListener {
+                    val selectedChip = Chip(this@RegisterStrategyActivity).apply {
+                        text = symbol
+                        isCloseIconVisible = true
+                        setOnCloseIconClickListener {
+                            customSymbolsChipGroup.removeView(this)
+                        }
+                    }
+                    customSymbolsChipGroup.addView(selectedChip)
+                }
+            }
+            metalsChipGroup.addView(chip)
+        }
+
+        // Crypto CFD
+        val cryptoSymbols = listOf("BTC/USD", "ETH/USD", "LTC/USD", "XRP/USD", "ADA/USD")
+        for (symbol in cryptoSymbols) {
+            val chip = Chip(this).apply {
+                text = symbol
+                isCheckable = true
+                setOnClickListener {
+                    val selectedChip = Chip(this@RegisterStrategyActivity).apply {
+                        text = symbol
+                        isCloseIconVisible = true
+                        setOnCloseIconClickListener {
+                            customSymbolsChipGroup.removeView(this)
+                        }
+                    }
+                    customSymbolsChipGroup.addView(selectedChip)
+                }
+            }
+            cryptoChipGroup.addView(chip)
+        }
+
+        // Cash CFD
+        val cashCFDSymbols = listOf(
+            "CASH/US30", "CASH/SPX500", "CASH/NAS100",
+            "CASH/GER30", "CASH/FRA40", "CASH/UK100", "CASH/ESP35",
+            "CASH/JPN225", "CASH/HK50", "CASH/AUS200"
+        )
+        for (symbol in cashCFDSymbols) {
+            val chip = Chip(this).apply {
+                text = symbol
+                isCheckable = true
+                setOnClickListener {
+                    val selectedChip = Chip(this@RegisterStrategyActivity).apply {
+                        text = symbol
+                        isCloseIconVisible = true
+                        setOnCloseIconClickListener {
+                            customSymbolsChipGroup.removeView(this)
+                        }
+                    }
+                    customSymbolsChipGroup.addView(selectedChip)
+                }
+            }
+            cashCFDChipGroup.addView(chip)
+        }
+
+        // Commodities
+        val commoditiesSymbols = listOf("SOYBEAN", "WHEAT", "CORN", "COFFEE", "COCOA", "USOIL", "NATGAS")
+        for (symbol in commoditiesSymbols) {
+            val chip = Chip(this).apply {
+                text = symbol
+                isCheckable = true
+                setOnClickListener {
+                    val selectedChip = Chip(this@RegisterStrategyActivity).apply {
+                        text = symbol
+                        isCloseIconVisible = true
+                        setOnCloseIconClickListener {
+                            customSymbolsChipGroup.removeView(this)
+                        }
+                    }
+                    customSymbolsChipGroup.addView(selectedChip)
+                }
+            }
+            commoditiesChipGroup.addView(chip)
+        }
+
+        // Equities CFD
+        val equitiesSymbols = listOf("AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "META", "NFLX", "NVDA")
+        for (symbol in equitiesSymbols) {
+            val chip = Chip(this).apply {
+                text = symbol
+                isCheckable = true
+                setOnClickListener {
+                    val selectedChip = Chip(this@RegisterStrategyActivity).apply {
+                        text = symbol
+                        isCloseIconVisible = true
+                        setOnCloseIconClickListener {
+                            customSymbolsChipGroup.removeView(this)
+                        }
+                    }
+                    customSymbolsChipGroup.addView(selectedChip)
+                }
+            }
+            equitiesChipGroup.addView(chip)
+        }
+    }
+
+
 
     private fun setupButtons() {
         // Botón para añadir indicadores al ChipGroup
@@ -186,63 +335,57 @@ class RegisterStrategyActivity : AppCompatActivity() {
         saveButton.setOnClickListener {
             saveStrategyToFirestore()
         }
-    }
 
-    // Validar si un chip con el mismo texto ya existe
-    private fun isChipDuplicate(indicatorText: String): Boolean {
-        for (i in 0 until chipGroup.childCount) {
-            val chip = chipGroup.getChildAt(i) as Chip
-            if (chip.text.toString().equals(indicatorText, ignoreCase = true)) {
-                return true
+        addSymbolButton.setOnClickListener {
+            val symbolText = addSymbolEditText.text.toString().trim()
+
+            if (symbolText.isBlank()) {
+                Toast.makeText(this, "Introduce un símbolo válido", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
+
+            // Evitar duplicados
+            if (isChipDuplicate(symbolText)) {
+                Toast.makeText(this, "El símbolo ya existe", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Crear un nuevo chip dinámico
+            val chip = Chip(this).apply {
+                text = symbolText
+                isCloseIconVisible = true
+                setOnCloseIconClickListener { customSymbolsChipGroup.removeView(this) }
+            }
+
+            // Añadir el chip al grupo de símbolos personalizados
+            customSymbolsChipGroup.addView(chip)
+
+            // Limpiar el campo de texto
+            addSymbolEditText.text.clear()
         }
-        return false
-    }
-
-    private fun setupPredefinedSymbols() {
-        //Todos los símbolos
-        val allInstruments = listOf("Todos los instrumentos")
-        allInstruments.forEach { addChipToGroup(allInstrumentChipGroup, it) }
-
-        // Forex
-        val forexSymbols = listOf("EUR/USD", "USD/JPY", "GBP/USD", "USD/CHF", "AUD/USD", "USD/CAD", "NZD/USD")
-        forexSymbols.forEach { addChipToGroup(forexChipGroup, it) }
-
-        // Exotics
-        val exoticsSymbols = listOf("USD/SEK", "USD/NOK", "USD/ZAR", "EUR/TRY")
-        exoticsSymbols.forEach { addChipToGroup(exoticsChipGroup, it) }
-
-        // Metals CFD
-        val metalsSymbols = listOf("XAU/USD", "XAG/USD", "XPT/USD", "XPD/USD")
-        metalsSymbols.forEach { addChipToGroup(metalsChipGroup, it) }
-
-        // Crypto CFD
-        val cryptoSymbols = listOf("BTC/USD", "ETH/USD", "LTC/USD", "XRP/USD", "ADA/USD")
-        cryptoSymbols.forEach { addChipToGroup(cryptoChipGroup, it) }
-
-        // Cash CFD
-        val cashCFDSymbols = listOf("CASH/US30", "CASH/SPX500", "CASH/NAS100",
-            "CASH/GER30", "CASH/FRA40", "CASH/UK100", "CASH/ESP35",
-            "CASH/JPN225", "CASH/HK50", "CASH/AUS200")
-        cashCFDSymbols.forEach { addChipToGroup(cashCFDChipGroup, it) }
-
-        // Commodities
-        val commoditiesSymbols = listOf("SOYBEAN", "WHEAT", "CORN", "COFFEE", "COCOA", "USOIL", "NATGAS")
-        commoditiesSymbols.forEach { addChipToGroup(commoditiesChipGroup, it) }
-
-        // Equities CFD
-        val equitiesSymbols = listOf("AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "META", "NFLX", "NVDA")
-        equitiesSymbols.forEach { addChipToGroup(equitiesChipGroup, it) }
 
     }
 
-    private fun addChipToGroup(group: ChipGroup, text: String) {
-        val chip = Chip(this).apply {
-            this.text = text
-            isCheckable = true
+
+
+    private fun isChipDuplicate(text: String): Boolean {
+        val allGroups = listOf(
+            chipGroup, // Incluye el grupo de indicadores
+            customSymbolsChipGroup,
+            allInstrumentChipGroup,
+            forexChipGroup,
+            exoticsChipGroup,
+            metalsChipGroup,
+            cryptoChipGroup,
+            cashCFDChipGroup,
+            commoditiesChipGroup,
+            equitiesChipGroup
+        )
+        return allGroups.any { group ->
+            group.children.filterIsInstance<Chip>().any { it.text.toString().equals(text, true) }
         }
-        group.addView(chip)
     }
+
 
     private fun saveStrategyToFirestore() {
         val title = titleEditText.text.toString().trim()
@@ -266,14 +409,16 @@ class RegisterStrategyActivity : AppCompatActivity() {
         }
 
         if (tradingStyles.isEmpty()) {
-            Toast.makeText(this, "Selecciona al menos un estilo de trading", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Selecciona al menos un estilo de trading", Toast.LENGTH_SHORT)
+                .show()
             return
         }
 
         // Validar temporalidades
         val timeFrames = timeFramesCheckBoxes.filter { it.isChecked }.map { it.text.toString() }
         if (timeFrames.isEmpty()) {
-            Toast.makeText(this, "Selecciona al menos una temporalidad", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Selecciona al menos una temporalidad", Toast.LENGTH_SHORT)
+                .show()
             return
         }
 
@@ -286,20 +431,31 @@ class RegisterStrategyActivity : AppCompatActivity() {
 
         // Recoger los símbolos seleccionados
         val selectedSymbols = mutableListOf<String>()
-        allInstrumentChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }.mapTo(selectedSymbols) { it.text.toString() }
-        forexChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }.mapTo(selectedSymbols) { it.text.toString() }
-        exoticsChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }.mapTo(selectedSymbols) { it.text.toString() }
-        metalsChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }.mapTo(selectedSymbols) { it.text.toString() }
-        cryptoChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }.mapTo(selectedSymbols) { it.text.toString() }
-        commoditiesChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }.mapTo(selectedSymbols) { it.text.toString() }
-        cashCFDChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }.mapTo(selectedSymbols) { it.text.toString() }
-        equitiesChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }.mapTo(selectedSymbols) { it.text.toString() }
+        allInstrumentChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }
+            .mapTo(selectedSymbols) { it.text.toString() }
+        forexChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }
+            .mapTo(selectedSymbols) { it.text.toString() }
+        exoticsChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }
+            .mapTo(selectedSymbols) { it.text.toString() }
+        metalsChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }
+            .mapTo(selectedSymbols) { it.text.toString() }
+        cryptoChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }
+            .mapTo(selectedSymbols) { it.text.toString() }
+        commoditiesChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }
+            .mapTo(selectedSymbols) { it.text.toString() }
+        cashCFDChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }
+            .mapTo(selectedSymbols) { it.text.toString() }
+        equitiesChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }
+            .mapTo(selectedSymbols) { it.text.toString() }
 
 
         // Al pasar los datos al fragmento de detalles
         val bundle = Bundle().apply {
             putString("strategyId", strategyId)
-            putStringArray("strategySymbols", selectedSymbols.toTypedArray()) // Pasar los símbolos como StringArray
+            putStringArray(
+                "strategySymbols",
+                selectedSymbols.toTypedArray()
+            ) // Pasar los símbolos como StringArray
         }
         if (selectedSymbols.isEmpty()) {
             Toast.makeText(this, "Selecciona al menos un símbolo", Toast.LENGTH_SHORT).show()
@@ -325,7 +481,8 @@ class RegisterStrategyActivity : AppCompatActivity() {
                 Toast.makeText(this, "Estrategia actualizada", Toast.LENGTH_SHORT).show()
                 finish()
             }.addOnFailureListener {
-                Toast.makeText(this, "Error al actualizar estrategia", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Error al actualizar estrategia", Toast.LENGTH_SHORT)
+                    .show()
             }
         } else {
             // Crear nueva estrategia
@@ -353,7 +510,8 @@ class RegisterStrategyActivity : AppCompatActivity() {
                 )
 
                 db.collection("strategies").add(strategy).addOnSuccessListener { documentRef ->
-                    Toast.makeText(this, "Estrategia guardada exitosamente", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Estrategia guardada exitosamente", Toast.LENGTH_SHORT)
+                        .show()
 
                     val resultIntent = Intent()
                     resultIntent.putExtra("newStrategyId", documentRef.id)
@@ -361,15 +519,15 @@ class RegisterStrategyActivity : AppCompatActivity() {
 
                     finish()
                 }.addOnFailureListener {
-                    Toast.makeText(this, "Error al guardar estrategia", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Error al guardar estrategia", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }.addOnFailureListener {
-                Toast.makeText(this, "Error al obtener datos del usuario", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Error al obtener datos del usuario", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
-
-
 
 
     override fun onBackPressed() {
@@ -377,39 +535,69 @@ class RegisterStrategyActivity : AppCompatActivity() {
         finish()
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
+
     private fun loadStrategyData(strategyId: String) {
-        db.collection("strategies").document(strategyId).get().addOnSuccessListener { document ->
-            if (document.exists()) {
-                // Prellenar los campos con los datos de Firestore
-                titleEditText.setText(document.getString("title"))
-                descriptionEditText.setText(document.getString("description"))
+        db.collection("strategies").document(strategyId).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    // Prellenar los campos con los datos de Firestore
+                    titleEditText.setText(document.getString("title"))
+                    descriptionEditText.setText(document.getString("description"))
 
-                // Prellenar estilos de trading
-                val tradingStyles = document.get("tradingStyles") as? List<*>
-                dayTradingCheckBox.isChecked = tradingStyles?.contains("Day Trading") == true
-                scalpingCheckBox.isChecked = tradingStyles?.contains("Scalping") == true
-                swingTradingCheckBox.isChecked = tradingStyles?.contains("Swing Trading") == true
+                    // Prellenar estilos de trading
+                    val tradingStyles = document.get("tradingStyles") as? List<*>
+                    dayTradingCheckBox.isChecked =
+                        tradingStyles?.contains("Day Trading") == true
+                    scalpingCheckBox.isChecked = tradingStyles?.contains("Scalping") == true
+                    swingTradingCheckBox.isChecked =
+                        tradingStyles?.contains("Swing Trading") == true
 
-                // Prellenar indicadores
-                val indicators = document.get("indicators") as? List<*>
-                indicators?.forEach { indicator ->
-                    val chip = Chip(this).apply {
-                        text = indicator.toString()
-                        isCloseIconVisible = true
-                        setOnCloseIconClickListener { chipGroup.removeView(this) }
+                    // Prellenar indicadores
+                    val indicators = document.get("indicators") as? List<*>
+                    indicators?.forEach { indicator ->
+                        val chip = Chip(this).apply {
+                            text = indicator.toString()
+                            isCloseIconVisible = true
+                            setOnCloseIconClickListener { chipGroup.removeView(this) }
+                        }
+                        chipGroup.addView(chip)
                     }
-                    chipGroup.addView(chip)
-                }
 
-                // Prellenar temporalidades
-                val timeFrames = document.get("timeframes") as? List<*>
-                timeFramesCheckBoxes.forEach { checkBox ->
-                    checkBox.isChecked = timeFrames?.contains(checkBox.text.toString()) == true
-                }
+                    // Prellenar temporalidades
+                    val timeFrames = document.get("timeframes") as? List<*>
+                    timeFramesCheckBoxes.forEach { checkBox ->
+                        checkBox.isChecked =
+                            timeFrames?.contains(checkBox.text.toString()) == true
+                    }
 
-                // Prellenar código de algoritmo
-                algorithmEditText.setText(document.getString("algorithmCode"))
+                    // Prellenar símbolos seleccionados
+                    val symbols = document.get("symbols") as? List<*>
+                    symbols?.forEach { symbol ->
+                        // Busca el chip en cada grupo de símbolos y márcalo como seleccionado si coincide
+                        val chipGroups = listOf(
+                            allInstrumentChipGroup,
+                            forexChipGroup,
+                            exoticsChipGroup,
+                            metalsChipGroup,
+                            cryptoChipGroup,
+                            commoditiesChipGroup,
+                            cashCFDChipGroup,
+                            equitiesChipGroup
+                        )
+                        chipGroups.forEach { group ->
+                            group.children.filterIsInstance<Chip>().forEach { chip ->
+                                if (chip.text.toString() == symbol.toString()) {
+                                    chip.isChecked = true
+                                }
+                            }
+                        }
+                    }
+
+                    // Prellenar código de algoritmo
+                    algorithmEditText.setText(document.getString("algorithmCode"))
+                }
             }
-        }
     }
 }
+
+

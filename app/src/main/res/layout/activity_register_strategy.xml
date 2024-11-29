@@ -125,15 +125,34 @@
             android:textColor="#FFFFFF"
             android:layout_marginTop="8dp" />
 
+
         <!-- Grupo de símbolos -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
             android:text="Símbolos (selecciona uno o varios)"
             android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp" />
+            android:textStyle="bold" />
+
+
+        <!-- Personalizados -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/customSymbolsChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleLine="false"
+            app:chipSpacing="8dp" />
+
+        <!-- Predefinidos -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/symbolsChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleLine="false"
+            app:chipSpacing="8dp" />
+
 
         <!-- Todos los instrumentos -->
         <com.google.android.material.chip.ChipGroup
