@@ -382,13 +382,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             "Swing Trading" -> "Swing trader"
             else -> "Sin estilo"
         }
-        navTradingStyleText.text = tradingStyleText
+        navTradingStyleText.apply {
+            text = tradingStyleText
+            setTypeface(typeface, android.graphics.Typeface.BOLD) // Negrita
+        }
         when (tradingStyleText) {
             "Day trader" -> navTradingStyleText.setTextColor(
                 resources.getColor(
                     R.color.turquoise_blue,
                     theme
                 )
+
             )
 
             "Scalper" -> navTradingStyleText.setTextColor(
@@ -414,7 +418,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         val psicoText = userPsico ?: "Sin estado"
-        navPsicoStateText.text = psicoText
+        navPsicoStateText.apply {
+            text = psicoText
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+        }
+
         when (psicoText) {
             "Psico +" -> navPsicoStateText.setTextColor(resources.getColor(R.color.highlight_green, theme))
             "Psico -" -> navPsicoStateText.setTextColor(resources.getColor(R.color.my_red, theme))
@@ -448,7 +456,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             "Afirmación" -> "Trader afirmativo"
             else -> userEmotion ?: "Sin emoción"
         }
-        navEmotionText.text = emotionText
+            navEmotionText.apply {
+                text = emotionText
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
+            }
 
         val negativeEmotionTexts = listOf(
             "Trader ansioso", "Trader impaciente", "Trader descontrolado",
