@@ -24,10 +24,11 @@ data class Strategy(
     val indicators: List<String> = emptyList(),
     val timeframes: List<String> = emptyList(),
     val tradingStyles: List<String> = emptyList(),
+    val symbols: List<String> = emptyList(), // Nuevo campo para los símbolos
     val algorithmCode: String = "",
     val favoritedBy: List<String> = emptyList(),
     val userRatings: Map<String, Double> = emptyMap(),
-    val comments: List<Comment> = emptyList() // Nuevo campo
+    val comments: List<Comment> = emptyList() // Campo existente
 )
 
 

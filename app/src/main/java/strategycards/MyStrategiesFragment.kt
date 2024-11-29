@@ -89,7 +89,10 @@ class MyStrategiesFragment : Fragment() {
                             ?: emptyList(),
                         tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>()
                             ?: emptyList(),
+                        symbols = (document.get("symbols") as? List<*>)?.filterIsInstance<String>()
+                            ?: emptyList(),
                         algorithmCode = document.getString("algorithmCode") ?: ""
+
 
                     )
                 })
@@ -132,6 +135,7 @@ class MyStrategiesFragment : Fragment() {
             putExtra("strategyTradingStyles", strategy.tradingStyles.toTypedArray())
             putExtra("strategyIndicators", strategy.indicators.toTypedArray())
             putExtra("strategyTimeframes", strategy.timeframes.toTypedArray())
+            putExtra("strategySymbols", strategy.symbols.toTypedArray())
             putExtra("algorithmCode", strategy.algorithmCode)
         }
         startActivity(intent)

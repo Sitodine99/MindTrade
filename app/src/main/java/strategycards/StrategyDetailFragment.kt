@@ -49,6 +49,8 @@ class StrategyDetailFragment : Fragment() {
         val tradingStyles = args?.getStringArray("tradingStyles") ?: arrayOf("Sin estilos")
         val strategyRating = args?.getDouble("strategyRating") ?: 0.0
         val algorithmCode = args?.getString("algorithmCode") ?: "" // Extraer algorithmCode
+        val strategySymbols = args?.getStringArray("strategySymbols") ?: arrayOf("Sin símbolos")
+
 
         strategyTitleTextView.text = strategyTitle
         strategyAuthorTextView.text = "Por: $strategyAuthor"
@@ -65,6 +67,7 @@ class StrategyDetailFragment : Fragment() {
                 putStringArray("indicators", strategyIndicators)
                 putStringArray("timeframes", strategyTimeframes)
                 putFloat("rating", strategyRating.toFloat())
+                putStringArray("symbols", strategySymbols)
             }
         }, "General")
 

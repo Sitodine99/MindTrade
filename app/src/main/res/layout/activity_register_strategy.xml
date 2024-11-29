@@ -201,6 +201,93 @@
                 android:text="Otras" />
         </GridLayout>
 
+        <!-- Grupo de símbolos -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Símbolos (selecciona uno o varios)"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Todos los instrumentos -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/allInstrumentsChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Todos los instrumentos"
+            app:closeIconVisible="false" />
+
+        <!-- Forex -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Forex"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/forexChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:chipSpacing="8dp"
+            app:singleLine="false" />
+
+        <!-- Metals CFD -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Metals CFD"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/metalsChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:chipSpacing="8dp"
+            app:singleLine="false" />
+
+        <!-- Crypto CFD -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Crypto CFD"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/cryptoChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:chipSpacing="8dp"
+            app:singleLine="false" />
+
+        <!-- Añadir símbolo -->
+        <EditText
+            android:id="@+id/addSymbolEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nuevo símbolo"
+            android:layout_marginTop="8dp" />
+
+        <Button
+            android:id="@+id/addSymbolButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Añadir símbolo"
+            android:backgroundTint="@color/black"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="8dp" />
+
+
         <!-- Trading Algorítmico -->
         <TextView
             android:layout_width="wrap_content"

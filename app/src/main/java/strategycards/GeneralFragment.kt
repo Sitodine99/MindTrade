@@ -28,21 +28,22 @@ class GeneralFragment : Fragment() {
         val tradingStyleTextView: TextView = view.findViewById(R.id.tradingStyleTextView)
         val indicatorsTextView: TextView = view.findViewById(R.id.strategyIndicatorsTextView)
         val timeframesTextView: TextView = view.findViewById(R.id.strategyTimeframesTextView)
+        val symbolsTextView: TextView = view.findViewById(R.id.strategySymbolsTextViewTest) // Vincular el TextView de símbolos
         ratingBar = view.findViewById(R.id.strategyRatingBar)
-        Log.d("RatingBar", "RatingBar inicializado: ${ratingBar != null}")
 
         // Obtener datos desde los argumentos
         val tradingStyles = arguments?.getStringArray("tradingStyles")?.joinToString(", ")
         val indicators = arguments?.getStringArray("indicators")?.joinToString(", ")
         val timeframes = arguments?.getStringArray("timeframes")?.joinToString(", ")
+        val symbols = arguments?.getStringArray("symbols")?.joinToString(", ") ?: "Sin símbolos" // Obtener los símbolos
         val rating = arguments?.getFloat("rating", 0f) ?: 0f
         strategyId = arguments?.getString("strategyId")
-        Log.d("GeneralFragment", "Strategy ID recibido: $strategyId")
 
         // Configurar las vistas
         tradingStyleTextView.text = tradingStyles ?: "Sin estilos"
         indicatorsTextView.text = indicators ?: "Sin indicadores"
         timeframesTextView.text = timeframes ?: "Sin temporalidades"
+        symbolsTextView.text = symbols // Mostrar los símbolos
         ratingBar.rating = rating
 
         // Configurar el estado inicial del RatingBar
@@ -67,8 +68,6 @@ class GeneralFragment : Fragment() {
         // Configurar listener para guardar valoración
         if (userId != null) {
             ratingBar.setOnRatingBarChangeListener { _, newRating, _ ->
-                Log.d("RatingBar", "Usuario seleccionó un rating: $newRating")
-                Toast.makeText(context, "Rating seleccionado: $newRating", Toast.LENGTH_SHORT).show()
                 saveRating(newRating)
             }
         } else {
@@ -77,6 +76,7 @@ class GeneralFragment : Fragment() {
 
         return view
     }
+
 
     private fun saveRating(userRating: Float) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return

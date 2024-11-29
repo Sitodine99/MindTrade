@@ -48,6 +48,7 @@ class FavoriteStrategiesFragment : Fragment() {
                     putStringArray("tradingStyles", strategy.tradingStyles.toTypedArray())
                     putDouble("strategyRating", strategy.rating)
                     putString("algorithmCode", strategy.algorithmCode) // Pasar el campo algorithmCode
+                    putStringArray("strategySymbols", strategy.symbols.toTypedArray())
                 }
             }
 
@@ -94,6 +95,7 @@ class FavoriteStrategiesFragment : Fragment() {
                         indicators = (document.get("indicators") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
                         timeframes = (document.get("timeframes") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
                         tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                        symbols = (document.get("symbols") as? List<*>)?.filterIsInstance<kotlin.String>() ?: emptyList(),
                         algorithmCode = document.getString("algorithmCode") ?: ""
                     )
                 })

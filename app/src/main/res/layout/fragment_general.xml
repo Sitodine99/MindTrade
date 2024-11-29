@@ -60,6 +60,23 @@
             android:textSize="16sp"
             android:layout_marginBottom="16dp" />
 
+        <!-- Símbolos -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Símbolos"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/strategySymbolsTextViewTest"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Símbolos seleccionados"
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp" />
+
         <!-- Valoración -->
         <TextView
             android:layout_width="wrap_content"

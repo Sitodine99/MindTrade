@@ -4,12 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.children
 import com.example.mindtrade.R
 import com.example.mindtrade.finishWithFade
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+
 
 class RegisterStrategyActivity : AppCompatActivity() {
 
@@ -26,6 +28,11 @@ class RegisterStrategyActivity : AppCompatActivity() {
     private lateinit var algorithmEditText: EditText
     private lateinit var saveButton: Button
     private lateinit var cancelButton: Button
+    private lateinit var forexChipGroup: ChipGroup
+    private lateinit var metalsChipGroup: ChipGroup
+    private lateinit var cryptoChipGroup: ChipGroup
+    private lateinit var addSymbolEditText: EditText
+    private lateinit var addSymbolButton: Button
 
     private val db = FirebaseFirestore.getInstance()
     private val currentUser = FirebaseAuth.getInstance().currentUser
@@ -47,6 +54,11 @@ class RegisterStrategyActivity : AppCompatActivity() {
         algorithmEditText = findViewById(R.id.tradingAlgorithmCode)
         saveButton = findViewById(R.id.saveButton)
         cancelButton = findViewById(R.id.cancelButton)
+        forexChipGroup = findViewById(R.id.forexChipGroup)
+        metalsChipGroup = findViewById(R.id.metalsChipGroup)
+        cryptoChipGroup = findViewById(R.id.cryptoChipGroup)
+        addSymbolEditText = findViewById(R.id.addSymbolEditText)
+        addSymbolButton = findViewById(R.id.addSymbolButton)
 
         // Cargar datos de estrategia si es modo edición
         val strategyId = intent.getStringExtra("strategyId")
@@ -73,6 +85,26 @@ class RegisterStrategyActivity : AppCompatActivity() {
 
         // Configurar botones
         setupButtons()
+
+        // Configurar chips para símbolos
+                setupPredefinedSymbols()
+
+        // Botón para añadir símbolo personalizado
+        addSymbolButton.setOnClickListener {
+            val symbol = addSymbolEditText.text.toString().trim()
+
+            if (symbol.isNotBlank() && !isChipDuplicate(symbol)) {
+                val chip = Chip(this).apply {
+                    text = symbol
+                    isCloseIconVisible = true
+                    setOnCloseIconClickListener { (it.parent as ChipGroup).removeView(this) }
+                }
+                cryptoChipGroup.addView(chip) // Añadir al grupo por defecto
+                addSymbolEditText.text.clear()
+            } else {
+                Toast.makeText(this, "Introduce un símbolo válido y único", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun setupPredefinedIndicators() {
@@ -157,10 +189,34 @@ class RegisterStrategyActivity : AppCompatActivity() {
         return false
     }
 
+    private fun setupPredefinedSymbols() {
+        // Forex
+        val forexSymbols = listOf("EUR/USD", "USD/JPY", "GBP/USD", "USD/CHF", "AUD/USD", "USD/CAD", "NZD/USD")
+        forexSymbols.forEach { addChipToGroup(forexChipGroup, it) }
+
+        // Metals CFD
+        val metalsSymbols = listOf("XAU/USD", "XAG/USD", "XPT/USD", "XPD/USD")
+        metalsSymbols.forEach { addChipToGroup(metalsChipGroup, it) }
+
+        // Crypto CFD
+        val cryptoSymbols = listOf("BTC/USD", "ETH/USD", "LTC/USD", "XRP/USD", "ADA/USD")
+        cryptoSymbols.forEach { addChipToGroup(cryptoChipGroup, it) }
+    }
+
+    private fun addChipToGroup(group: ChipGroup, text: String) {
+        val chip = Chip(this).apply {
+            this.text = text
+            isCheckable = true
+        }
+        group.addView(chip)
+    }
+
     private fun saveStrategyToFirestore() {
         val title = titleEditText.text.toString().trim()
         val description = descriptionEditText.text.toString().trim()
         val tradingStyles = mutableListOf<String>()
+        val strategyId = intent.getStringExtra("strategyId")
+
         if (dayTradingCheckBox.isChecked) tradingStyles.add("Day Trading")
         if (scalpingCheckBox.isChecked) tradingStyles.add("Scalping")
         if (swingTradingCheckBox.isChecked) tradingStyles.add("Swing Trading")
@@ -195,9 +251,23 @@ class RegisterStrategyActivity : AppCompatActivity() {
             indicators.add(chip.text.toString())
         }
 
+        // Recoger los símbolos seleccionados
+        val selectedSymbols = mutableListOf<String>()
+        forexChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }.mapTo(selectedSymbols) { it.text.toString() }
+        metalsChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }.mapTo(selectedSymbols) { it.text.toString() }
+        cryptoChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }.mapTo(selectedSymbols) { it.text.toString() }
+        // Al pasar los datos al fragmento de detalles
+        val bundle = Bundle().apply {
+            putString("strategyId", strategyId)
+            putStringArray("strategySymbols", selectedSymbols.toTypedArray()) // Pasar los símbolos como StringArray
+        }
+        if (selectedSymbols.isEmpty()) {
+            Toast.makeText(this, "Selecciona al menos un símbolo", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val algorithmCode = algorithmEditText.text.toString().trim()
 
-        val strategyId = intent.getStringExtra("strategyId")
         if (strategyId != null) {
             // Actualizar estrategia existente
             db.collection("strategies").document(strategyId).update(
@@ -207,6 +277,7 @@ class RegisterStrategyActivity : AppCompatActivity() {
                     "tradingStyles" to tradingStyles,
                     "indicators" to indicators,
                     "timeframes" to timeFrames,
+                    "symbols" to selectedSymbols, // Guardar los símbolos
                     "algorithmCode" to algorithmCode,
                     "timestamp" to System.currentTimeMillis()
                 )
@@ -232,6 +303,7 @@ class RegisterStrategyActivity : AppCompatActivity() {
                     "tradingStyles" to tradingStyles,
                     "indicators" to indicators,
                     "timeframes" to timeFrames,
+                    "symbols" to selectedSymbols, // Guardar los símbolos
                     "algorithmCode" to algorithmCode,
                     "favoritedBy" to emptyList<String>(),
                     "userRatings" to emptyMap<String, Double>(),
@@ -256,6 +328,7 @@ class RegisterStrategyActivity : AppCompatActivity() {
             }
         }
     }
+
 
 
 

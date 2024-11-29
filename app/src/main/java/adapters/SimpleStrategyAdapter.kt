@@ -54,6 +54,7 @@ class SimpleStrategyAdapter(
                     putStringArray("tradingStyles", strategy.tradingStyles.toTypedArray())
                     putDouble("strategyRating", strategy.rating)
                     putString("algorithmCode", strategy.algorithmCode)
+                    putStringArray("strategySymbols", strategy.symbols.toTypedArray())
 
                 }
             }
@@ -82,6 +83,7 @@ class SimpleStrategyAdapter(
                 putExtra("strategyIndicators", strategy.indicators.toTypedArray())
                 putExtra("strategyTimeframes", strategy.timeframes.toTypedArray())
                 putExtra("strategyAlgorithmCode", strategy.algorithmCode)
+                putExtra("strategySymbols", strategy.symbols.toTypedArray())
             }
             fragmentActivity.startActivity(intent)
             // Implementar funcionalidad de edición si es necesario
