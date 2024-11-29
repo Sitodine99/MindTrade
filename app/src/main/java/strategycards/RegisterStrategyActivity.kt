@@ -28,9 +28,14 @@ class RegisterStrategyActivity : AppCompatActivity() {
     private lateinit var algorithmEditText: EditText
     private lateinit var saveButton: Button
     private lateinit var cancelButton: Button
+    private lateinit var allInstrumentChipGroup: ChipGroup
     private lateinit var forexChipGroup: ChipGroup
+    private lateinit var exoticsChipGroup: ChipGroup
     private lateinit var metalsChipGroup: ChipGroup
     private lateinit var cryptoChipGroup: ChipGroup
+    private lateinit var cashCFDChipGroup: ChipGroup
+    private lateinit var commoditiesChipGroup: ChipGroup
+    private lateinit var equitiesChipGroup: ChipGroup
     private lateinit var addSymbolEditText: EditText
     private lateinit var addSymbolButton: Button
 
@@ -48,15 +53,20 @@ class RegisterStrategyActivity : AppCompatActivity() {
         scalpingCheckBox = findViewById(R.id.tradingStyleScalping)
         swingTradingCheckBox = findViewById(R.id.tradingStyleSwingTrading)
         chipGroup = findViewById(R.id.indicatorChipGroup)
-        predefinedIndicatorsChipGroup = findViewById(R.id.predefinedIndicatorChipGroup) // Nuevo grupo para chips predefinidos
+        predefinedIndicatorsChipGroup = findViewById(R.id.predefinedIndicatorChipGroup)
         addIndicatorEditText = findViewById(R.id.addIndicatorEditText)
         addIndicatorButton = findViewById(R.id.addIndicatorButton)
         algorithmEditText = findViewById(R.id.tradingAlgorithmCode)
         saveButton = findViewById(R.id.saveButton)
         cancelButton = findViewById(R.id.cancelButton)
+        allInstrumentChipGroup = findViewById(R.id.allInstrumentsChipGroup)
         forexChipGroup = findViewById(R.id.forexChipGroup)
+        exoticsChipGroup = findViewById(R.id.exoticsChipGroup)
         metalsChipGroup = findViewById(R.id.metalsChipGroup)
         cryptoChipGroup = findViewById(R.id.cryptoChipGroup)
+        cashCFDChipGroup = findViewById(R.id.cashCFDChipGroup)
+        commoditiesChipGroup = findViewById(R.id.commoditiesChipGroup)
+        equitiesChipGroup = findViewById(R.id.equitiesChipGroup)
         addSymbolEditText = findViewById(R.id.addSymbolEditText)
         addSymbolButton = findViewById(R.id.addSymbolButton)
 
@@ -190,9 +200,17 @@ class RegisterStrategyActivity : AppCompatActivity() {
     }
 
     private fun setupPredefinedSymbols() {
+        //Todos los símbolos
+        val allInstruments = listOf("Todos los instrumentos")
+        allInstruments.forEach { addChipToGroup(allInstrumentChipGroup, it) }
+
         // Forex
         val forexSymbols = listOf("EUR/USD", "USD/JPY", "GBP/USD", "USD/CHF", "AUD/USD", "USD/CAD", "NZD/USD")
         forexSymbols.forEach { addChipToGroup(forexChipGroup, it) }
+
+        // Exotics
+        val exoticsSymbols = listOf("USD/SEK", "USD/NOK", "USD/ZAR", "EUR/TRY")
+        exoticsSymbols.forEach { addChipToGroup(exoticsChipGroup, it) }
 
         // Metals CFD
         val metalsSymbols = listOf("XAU/USD", "XAG/USD", "XPT/USD", "XPD/USD")
@@ -201,6 +219,21 @@ class RegisterStrategyActivity : AppCompatActivity() {
         // Crypto CFD
         val cryptoSymbols = listOf("BTC/USD", "ETH/USD", "LTC/USD", "XRP/USD", "ADA/USD")
         cryptoSymbols.forEach { addChipToGroup(cryptoChipGroup, it) }
+
+        // Cash CFD
+        val cashCFDSymbols = listOf("CASH/US30", "CASH/SPX500", "CASH/NAS100",
+            "CASH/GER30", "CASH/FRA40", "CASH/UK100", "CASH/ESP35",
+            "CASH/JPN225", "CASH/HK50", "CASH/AUS200")
+        cashCFDSymbols.forEach { addChipToGroup(cashCFDChipGroup, it) }
+
+        // Commodities
+        val commoditiesSymbols = listOf("SOYBEAN", "WHEAT", "CORN", "COFFEE", "COCOA", "USOIL", "NATGAS")
+        commoditiesSymbols.forEach { addChipToGroup(commoditiesChipGroup, it) }
+
+        // Equities CFD
+        val equitiesSymbols = listOf("AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "META", "NFLX", "NVDA")
+        equitiesSymbols.forEach { addChipToGroup(equitiesChipGroup, it) }
+
     }
 
     private fun addChipToGroup(group: ChipGroup, text: String) {
@@ -253,9 +286,16 @@ class RegisterStrategyActivity : AppCompatActivity() {
 
         // Recoger los símbolos seleccionados
         val selectedSymbols = mutableListOf<String>()
+        allInstrumentChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }.mapTo(selectedSymbols) { it.text.toString() }
         forexChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }.mapTo(selectedSymbols) { it.text.toString() }
+        exoticsChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }.mapTo(selectedSymbols) { it.text.toString() }
         metalsChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }.mapTo(selectedSymbols) { it.text.toString() }
         cryptoChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }.mapTo(selectedSymbols) { it.text.toString() }
+        commoditiesChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }.mapTo(selectedSymbols) { it.text.toString() }
+        cashCFDChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }.mapTo(selectedSymbols) { it.text.toString() }
+        equitiesChipGroup.children.filterIsInstance<Chip>().filter { it.isChecked }.mapTo(selectedSymbols) { it.text.toString() }
+
+
         // Al pasar los datos al fragmento de detalles
         val bundle = Bundle().apply {
             putString("strategyId", strategyId)
