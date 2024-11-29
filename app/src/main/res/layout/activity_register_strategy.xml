@@ -22,6 +22,7 @@
             android:id="@+id/strategyTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/edittext_background"
             android:hint="Introduce el título de la estrategia" />
 
         <!-- Campo de descripción -->
@@ -39,6 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Describe tu estrategia"
+            android:background="@drawable/edittext_background"
             android:minLines="4"
             android:gravity="top|start" />
 

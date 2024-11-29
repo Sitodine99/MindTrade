@@ -97,7 +97,7 @@ class RegisterStrategyActivity : AppCompatActivity() {
         setupButtons()
 
         // Configurar chips para símbolos
-                setupPredefinedSymbols()
+        setupPredefinedSymbols()
 
         // Botón para añadir símbolo personalizado
         addSymbolButton.setOnClickListener {
@@ -373,10 +373,10 @@ class RegisterStrategyActivity : AppCompatActivity() {
 
 
     override fun onBackPressed() {
-    setResult(RESULT_CANCELED)
-    finish()
+        setResult(RESULT_CANCELED)
+        finish()
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-}
+    }
     private fun loadStrategyData(strategyId: String) {
         db.collection("strategies").document(strategyId).get().addOnSuccessListener { document ->
             if (document.exists()) {
@@ -413,4 +413,3 @@ class RegisterStrategyActivity : AppCompatActivity() {
         }
     }
 }
-
