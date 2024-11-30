@@ -5,18 +5,8 @@
     android:padding="16dp">
 
     <LinearLayout
+        android:id="@+id/descriptionLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <!-- Texto de descripción -->
-        <TextView
-            android:id="@+id/strategyDescriptionTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Aquí va la descripción de la estrategia"
-            android:textSize="16sp"
-            android:lineSpacingExtra="4dp" />
-
-    </LinearLayout>
+        android:orientation="vertical" />
 </ScrollView>

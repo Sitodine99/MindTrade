@@ -17,6 +17,12 @@
         <item name="android:layout_marginTop">1dp</item>
     </style>
 
+    <style name="TextAppearance.SemiBold" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:fontWeight">600</item>
+    </style>
+
+
+
 
 
 </resources>

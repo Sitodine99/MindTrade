@@ -18,6 +18,11 @@ class RegisterStrategyActivity : AppCompatActivity() {
 
     private lateinit var titleEditText: EditText
     private lateinit var descriptionEditText: EditText
+    private lateinit var entryConditionEditText: EditText
+    private lateinit var exitConditionEditText: EditText
+    private lateinit var generalConsiderationsEditText: EditText
+
+
     private lateinit var dayTradingCheckBox: CheckBox
     private lateinit var scalpingCheckBox: CheckBox
     private lateinit var swingTradingCheckBox: CheckBox
@@ -51,7 +56,9 @@ class RegisterStrategyActivity : AppCompatActivity() {
 
         // Referenciar elementos del diseño
         titleEditText = findViewById(R.id.strategyTitle)
-        descriptionEditText = findViewById(R.id.strategyDescription)
+        entryConditionEditText = findViewById(R.id.entryConditionEditText)
+        exitConditionEditText = findViewById(R.id.exitConditionEditText)
+        generalConsiderationsEditText = findViewById(R.id.generalConsiderationsEditText)
         dayTradingCheckBox = findViewById(R.id.tradingStyleDayTrading)
         scalpingCheckBox = findViewById(R.id.tradingStyleScalping)
         swingTradingCheckBox = findViewById(R.id.tradingStyleSwingTrading)
@@ -440,7 +447,21 @@ class RegisterStrategyActivity : AppCompatActivity() {
 
     private fun saveStrategyToFirestore() {
         val title = titleEditText.text.toString().trim()
-        val description = descriptionEditText.text.toString().trim()
+        val entryCondition = entryConditionEditText.text.toString().trim()
+        val exitCondition = exitConditionEditText.text.toString().trim()
+        val generalConsiderations = generalConsiderationsEditText.text.toString().trim()
+        // Concatenar la descripción completa
+        val description = """
+        Condición de entrada:
+        $entryCondition
+
+        Condición de salida:
+        $exitCondition
+
+        Consideraciones generales:
+        $generalConsiderations
+    """.trimIndent()
+
         val tradingStyles = mutableListOf<String>()
         val strategyId = intent.getStringExtra("strategyId")
 
@@ -591,9 +612,19 @@ class RegisterStrategyActivity : AppCompatActivity() {
         db.collection("strategies").document(strategyId).get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
-                    // Prellenar los campos con los datos de Firestore
+                    // Prellenar el campo de título
                     titleEditText.setText(document.getString("title"))
-                    descriptionEditText.setText(document.getString("description"))
+
+                    // Analizar y dividir el campo de descripción
+                    val description = document.getString("description") ?: ""
+                    val entryCondition = extractSection(description, "Condición de entrada:")
+                    val exitCondition = extractSection(description, "Condición de salida:")
+                    val generalConsiderations = extractSection(description, "Consideraciones generales:")
+
+                    // Prellenar los campos de descripción dividida
+                    entryConditionEditText.setText(entryCondition)
+                    exitConditionEditText.setText(exitCondition)
+                    generalConsiderationsEditText.setText(generalConsiderations)
 
                     // Prellenar estilos de trading
                     val tradingStyles = document.get("tradingStyles") as? List<*>
@@ -648,6 +679,21 @@ class RegisterStrategyActivity : AppCompatActivity() {
                     algorithmEditText.setText(document.getString("algorithmCode"))
                 }
             }
+    }
+    // Método para extraer una sección específica del texto
+    private fun extractSection(description: String, sectionHeader: String): String {
+        val sectionStart = description.indexOf(sectionHeader)
+        if (sectionStart == -1) return "" // Si no se encuentra la sección, devolver vacío
+
+        // Encontrar el final de la sección actual y el inicio de la siguiente
+        val sectionEnd = description.indexOf("\n\n", sectionStart + sectionHeader.length)
+        return if (sectionEnd == -1) {
+            // Si no hay otra sección después, devolver hasta el final del texto
+            description.substring(sectionStart + sectionHeader.length).trim()
+        } else {
+            // Devolver solo el contenido de esta sección
+            description.substring(sectionStart + sectionHeader.length, sectionEnd).trim()
+        }
     }
 }
 

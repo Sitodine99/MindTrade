@@ -25,24 +25,73 @@
             android:background="@drawable/edittext_background"
             android:hint="Introduce el título de la estrategia" />
 
-        <!-- Campo de descripción -->
+        <!-- Campo de descripción dividido en secciones -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Descripción"
+            android:text="Descripción detallada de la estrategia"
             android:textSize="16sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp" />
 
+        <!-- Condición de entrada -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Condición de entrada"
+            android:textSize="14sp"
+            android:layout_marginTop="8dp" />
+
         <EditText
-            android:id="@+id/strategyDescription"
+            android:id="@+id/entryConditionEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Describe tu estrategia"
+            android:hint="Describe las condiciones para entrar"
             android:background="@drawable/edittext_background"
-            android:minLines="4"
-            android:gravity="top|start" />
+            android:inputType="textMultiLine"
+            android:gravity="top|start"
+            android:minLines="3"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Condición de salida -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Condición de salida"
+            android:textSize="14sp"
+            android:layout_marginTop="8dp" />
+
+        <EditText
+            android:id="@+id/exitConditionEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Describe las condiciones para salir"
+            android:background="@drawable/edittext_background"
+            android:inputType="textMultiLine"
+            android:gravity="top|start"
+            android:minLines="3"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Consideraciones generales -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Consideraciones generales"
+            android:textSize="14sp"
+            android:layout_marginTop="8dp" />
+
+        <EditText
+            android:id="@+id/generalConsiderationsEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Describe cualquier detalle adicional"
+            android:background="@drawable/edittext_background"
+            android:inputType="textMultiLine"
+            android:gravity="top|start"
+            android:minLines="3"
+            android:layout_marginBottom="16dp" />
+
 
         <!-- Estilo de trading -->
         <TextView
