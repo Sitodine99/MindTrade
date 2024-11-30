@@ -7,7 +7,10 @@
         android:id="@+id/algorithmTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
+        android:padding="16dp"
+        android:textSize="14sp"
         android:textColor="@android:color/black"
-        android:padding="8dp" />
+        android:fontFamily="monospace"
+        android:background="@drawable/edittext_background"
+        android:textIsSelectable="true" />
 </ScrollView>
