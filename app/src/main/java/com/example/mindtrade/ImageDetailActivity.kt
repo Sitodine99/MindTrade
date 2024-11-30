@@ -5,6 +5,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
 
 class ImageDetailActivity : AppCompatActivity() {
 
@@ -17,12 +18,33 @@ class ImageDetailActivity : AppCompatActivity() {
         val textView: TextView = findViewById(R.id.photoTextView)
 
         // Recuperar los datos de la intención
-        val imageResId = intent.getIntExtra("imageResId", 0)
+        val imageUrl = intent.getStringExtra("imageUrl") // URL de la imagen
+        val imageResId = intent.getIntExtra("imageResId", 0) // Recurso local
         val imageName = intent.getStringExtra("imageName") ?: "Sin nombre"
 
-        // Establecer la imagen y el texto
-        imageView.setImageResource(imageResId)
+        // Establecer el texto
         textView.text = imageName
+
+        // Cargar la imagen según sea una URL o un recurso local
+        if (!imageUrl.isNullOrEmpty() && imageUrl.startsWith("https://")) {
+            // Cargar desde URL usando Glide
+            Glide.with(this)
+                .load(imageUrl)
+                .placeholder(R.drawable.interrogacion) // Imagen mientras se carga
+                .error(R.drawable.interrogacion) // Imagen si falla la carga
+                .into(imageView)
+        } else if (imageResId != 0) {
+            // Cargar desde un recurso local
+            imageView.setImageResource(imageResId)
+        } else {
+            // Imagen predeterminada
+            imageView.setImageResource(R.drawable.interrogacion)
+        }
+
+        // Configurar OnClickListener para cerrar la actividad al tocar la pantalla
+        rootView.setOnClickListener {
+            finishWithFade()
+        }
 
         // Listas de emociones negativas y positivas (basadas en emotionText del MainActivity)
         val negativeEmotionTexts = listOf(
@@ -63,4 +85,3 @@ class ImageDetailActivity : AppCompatActivity() {
         finishWithFade()
     }
 }
-

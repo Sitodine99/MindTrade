@@ -21,6 +21,7 @@ import auth.LoginActivity
 import adapters.StrategyAdapter
 import android.view.View
 import androidx.fragment.app.FragmentContainerView
+import com.bumptech.glide.Glide
 import com.example.mindtrade.model.Strategy
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.navigation.NavigationView
@@ -31,7 +32,7 @@ import strategycards.FavoriteStrategiesFragment
 import strategycards.RegisterStrategyActivity
 import strategycards.StrategyDetailFragment
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyStrategiesFragment.OnStrategyDeletedListener  {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyStrategiesFragment.OnStrategyDeletedListener {
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var avatarImage: ShapeableImageView
@@ -52,6 +53,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private var userAlias: String? = null
     private var userAvatarName: String? = null
+    private var avatarUrl: String? = null
     private var userTradingStyle: String? = null
     private var userPsico: String? = null
     private var userEmotion: String? = null
@@ -69,7 +71,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawerLayout = findViewById(R.id.drawer_layout)
         val navigationView: NavigationView = findViewById(R.id.navigationView)
         val toggle = ActionBarDrawerToggle(
-            this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
+            this,
+            drawerLayout,
+            toolbar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
         )
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
@@ -101,16 +107,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             return
         }
 
-        registerStrategyLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                val newStrategyId = result.data?.getStringExtra("newStrategyId")
-                if (newStrategyId != null) {
-                    // Recargar las estrategias y resaltar la nueva
-                    setupStrategiesRecyclerView()
-                    Toast.makeText(this, "Nueva estrategia añadida", Toast.LENGTH_SHORT).show()
+        registerStrategyLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    val newStrategyId = result.data?.getStringExtra("newStrategyId")
+                    if (newStrategyId != null) {
+                        // Recargar las estrategias y resaltar la nueva
+                        setupStrategiesRecyclerView()
+                        Toast.makeText(this, "Nueva estrategia añadida", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
-        }
 
 
         setupAccountsRecyclerView()
@@ -122,7 +129,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun setupAccountsRecyclerView() {
         val accountsList = listOf("Cuenta 1", "Cuenta 2", "Cuenta 3", "Cuenta 4", "Cuenta 5")
-        accountsRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        accountsRecyclerView.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         accountsRecyclerView.adapter = AccountAdapter(accountsList)
     }
 
@@ -163,7 +171,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
 
-
 // Sobrescribir el performClick en el RecyclerView
         strategiesRecyclerView.setOnClickListener {
             strategiesRecyclerView.performClick()
@@ -189,6 +196,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 putString("strategyDescription", strategy.description)
                 putString("strategyAuthor", strategy.author)
                 putString("strategyAvatarName", strategy.avatarName)
+                putString("strategyAvatarUrl", strategy.avatarUrl) // PASA EL AVATAR URL AQUÍ
                 putStringArray("strategyIndicators", strategy.indicators.toTypedArray())
                 putStringArray("strategyTimeframes", strategy.timeframes.toTypedArray())
                 putStringArray("tradingStyles", strategy.tradingStyles.toTypedArray())
@@ -233,7 +241,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 if (error != null) {
                     // Validar que el usuario sigue autenticado antes de mostrar el Toast
                     if (FirebaseAuth.getInstance().currentUser != null) {
-                        Toast.makeText(this, "Error al escuchar estrategias: ${error.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this,
+                            "Error al escuchar estrategias: ${error.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                     return@addSnapshotListener
                 }
@@ -245,16 +257,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             Strategy(
                                 id = document.id,
                                 title = document.getString("title") ?: "Sin título",
-                                description = document.getString("description") ?: "Sin descripción",
+                                description = document.getString("description")
+                                    ?: "Sin descripción",
                                 author = document.getString("authorAlias") ?: "Anónimo",
                                 avatarName = document.getString("avatarName"),
                                 avatarUrl = document.getString("avatarUrl"),
                                 rating = document.getDouble("rating") ?: 0.0,
                                 createdBy = document.getString("createdBy") ?: "",
-                                indicators = (document.get("indicators") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
-                                timeframes = (document.get("timeframes") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
-                                tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
-                                symbols = (document.get("symbols") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                                indicators = (document.get("indicators") as? List<*>)?.filterIsInstance<String>()
+                                    ?: emptyList(),
+                                timeframes = (document.get("timeframes") as? List<*>)?.filterIsInstance<String>()
+                                    ?: emptyList(),
+                                tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>()
+                                    ?: emptyList(),
+                                symbols = (document.get("symbols") as? List<*>)?.filterIsInstance<String>()
+                                    ?: emptyList(),
                                 algorithmCode = document.getString("algorithmCode") ?: ""
                             )
                         )
@@ -268,12 +285,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
-
     private fun setupImageClickListeners() {
         avatarImage.setOnClickListener {
             val alias = userAlias ?: "Sin alias"
-            val avatarImageResource = getAvatarImageResource(userAvatarName)
-            openImageDetail(avatarImageResource, alias)
+
+            // Comprobamos si el avatar es una URL subida o un recurso local
+            if (!userAvatarName.isNullOrEmpty() && userAvatarName == "default_avatar" && !avatarUrl.isNullOrEmpty()) {
+                // Es una URL (imagen subida por el usuario)
+                val intent = Intent(this, ImageDetailActivity::class.java).apply {
+                    putExtra("imageUrl", avatarUrl) // Pasar la URL al detalle
+                    putExtra("imageName", alias) // Alias del usuario
+                }
+                startActivityWithFade(intent)
+            } else {
+                // Es un recurso local
+                val avatarImageResource = getAvatarImageResource(userAvatarName)
+                val intent = Intent(this, ImageDetailActivity::class.java).apply {
+                    putExtra("imageResId", avatarImageResource ?: R.drawable.interrogacion) // Recurso local o imagen predeterminada
+                    putExtra("imageName", alias) // Alias del usuario
+                }
+                startActivityWithFade(intent)
+            }
         }
 
         tradingStyleImage.setOnClickListener {
@@ -350,34 +382,53 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 .addOnSuccessListener { document ->
                     if (document.exists()) {
                         userAlias = document.getString("alias")
-                        userAvatarName = document.getString("avatarName")
+                        avatarUrl = document.getString("avatarUrl") // URL subida
+                        userAvatarName = document.getString("avatarName") // Nombre del avatar local
                         userTradingStyle = document.getString("trading_style")
                         userPsico = document.getString("psico")
                         userEmotion = document.getString("emotion")
 
-                        setAvatarImage(userAvatarName)
+                        // Actualizar imágenes de avatar y otros elementos
+                        setAvatarImage(avatarUrl, userAvatarName)
                         setTradingStyleImage(userTradingStyle)
                         setPsicoImage(userPsico)
                         setEmotionImage(userEmotion)
 
-                        updateNavigationView()
+                        updateNavigationView(avatarUrl, userAvatarName)
                     } else {
                         println("El documento del usuario no existe.")
                     }
                 }
                 .addOnFailureListener { e ->
-                    Toast.makeText(this, "Error al cargar datos: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Error al cargar datos: ${e.message}", Toast.LENGTH_SHORT)
+                        .show()
                 }
         }
     }
 
 
-    private fun updateNavigationView() {
-        val avatarResource = getAvatarImageResource(userAvatarName)
-        avatarResource?.let { navAvatarImage.setImageResource(it) }
+    private fun updateNavigationView(avatarUrl: String?, avatarName: String?) {
+        // Actualizar avatar en el NavigationView
+        if (!avatarUrl.isNullOrEmpty() && avatarUrl.startsWith("https://")) {
+            // Si hay una URL válida, cargar desde la URL
+            Glide.with(this)
+                .load(avatarUrl)
+                .placeholder(R.drawable.interrogacion) // Imagen de carga
+                .error(R.drawable.interrogacion) // Imagen en caso de error
+                .into(navAvatarImage)
+        } else if (!avatarName.isNullOrEmpty()) {
+            // Si no hay URL, usar un recurso local basado en avatarName
+            val avatarResource = getAvatarImageResource(avatarName)
+            avatarResource?.let { navAvatarImage.setImageResource(it) }
+        } else {
+            // Si no hay avatar definido, usar imagen predeterminada
+            navAvatarImage.setImageResource(R.drawable.interrogacion)
+        }
 
+        // Actualizar alias del usuario
         navUserNameText.text = userAlias ?: "Sin alias"
 
+        // Actualizar estilo de trading
         val tradingStyleText = when (userTradingStyle) {
             "Day Trading" -> "Day trader"
             "Scalping" -> "Scalper"
@@ -386,51 +437,42 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         navTradingStyleText.apply {
             text = tradingStyleText
-            setTypeface(typeface, android.graphics.Typeface.BOLD) // Negrita
+            setTypeface(typeface, android.graphics.Typeface.BOLD) // Texto en negrita
         }
         when (tradingStyleText) {
             "Day trader" -> navTradingStyleText.setTextColor(
-                resources.getColor(
-                    R.color.turquoise_blue,
-                    theme
-                )
-
+                resources.getColor(R.color.turquoise_blue, theme)
             )
-
             "Scalper" -> navTradingStyleText.setTextColor(
-                resources.getColor(
-                    R.color.orange,
-                    theme
-                )
+                resources.getColor(R.color.orange, theme)
             )
-
             "Swing trader" -> navTradingStyleText.setTextColor(
-                resources.getColor(
-                    R.color.blue_light,
-                    theme
-                )
+                resources.getColor(R.color.blue_light, theme)
             )
-
             else -> navTradingStyleText.setTextColor(
-                resources.getColor(
-                    android.R.color.white,
-                    theme
-                )
+                resources.getColor(android.R.color.white, theme)
             )
         }
 
+        // Actualizar estado psicológico (Psico)
         val psicoText = userPsico ?: "Sin estado"
         navPsicoStateText.apply {
             text = psicoText
-            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            setTypeface(typeface, android.graphics.Typeface.BOLD) // Texto en negrita
         }
-
         when (psicoText) {
-            "Psico +" -> navPsicoStateText.setTextColor(resources.getColor(R.color.highlight_green, theme))
-            "Psico -" -> navPsicoStateText.setTextColor(resources.getColor(R.color.my_red, theme))
-            else -> navPsicoStateText.setTextColor(resources.getColor(android.R.color.white, theme))
+            "Psico +" -> navPsicoStateText.setTextColor(
+                resources.getColor(R.color.highlight_green, theme)
+            )
+            "Psico -" -> navPsicoStateText.setTextColor(
+                resources.getColor(R.color.my_red, theme)
+            )
+            else -> navPsicoStateText.setTextColor(
+                resources.getColor(android.R.color.white, theme)
+            )
         }
 
+        // Actualizar emoción
         val emotionText = when (userEmotion) {
             "Ansiedad" -> "Trader ansioso"
             "Impaciencia" -> "Trader impaciente"
@@ -458,10 +500,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             "Afirmación" -> "Trader afirmativo"
             else -> userEmotion ?: "Sin emoción"
         }
-            navEmotionText.apply {
-                text = emotionText
-                setTypeface(typeface, android.graphics.Typeface.BOLD)
-            }
+        navEmotionText.apply {
+            text = emotionText
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+        }
 
         val negativeEmotionTexts = listOf(
             "Trader ansioso", "Trader impaciente", "Trader descontrolado",
@@ -476,16 +518,44 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             "Trader tranquilo", "Trader aceptado", "Trader afirmativo"
         )
         when (emotionText) {
-            in negativeEmotionTexts -> navEmotionText.setTextColor(resources.getColor(R.color.my_red, theme))
-            in positiveEmotionTexts -> navEmotionText.setTextColor(resources.getColor(R.color.highlight_green, theme))
-            else -> navEmotionText.setTextColor(resources.getColor(android.R.color.white, theme))
+            in negativeEmotionTexts -> navEmotionText.setTextColor(
+                resources.getColor(R.color.my_red, theme)
+            )
+            in positiveEmotionTexts -> navEmotionText.setTextColor(
+                resources.getColor(R.color.highlight_green, theme)
+            )
+            else -> navEmotionText.setTextColor(
+                resources.getColor(android.R.color.white, theme)
+            )
         }
     }
 
-    private fun setAvatarImage(avatarName: String?) {
-        val avatarResource = getAvatarImageResource(avatarName)
-        avatarResource?.let { avatarImage.setImageResource(it) }
+
+    private fun setAvatarImage(avatarUrl: String?, avatarName: String?) {
+        if (!avatarUrl.isNullOrEmpty() && avatarUrl.startsWith("https://")) {
+            // Es una URL subida al Firebase Storage
+            Glide.with(this)
+                .load(avatarUrl)
+                .placeholder(R.drawable.interrogacion) // Imagen mientras se carga
+                .error(R.drawable.interrogacion) // Imagen si falla la carga
+                .into(avatarImage)
+        } else if (!avatarName.isNullOrEmpty()) {
+            // Es un recurso local (por nombre)
+            val avatarResource = getAvatarImageResource(avatarName)
+            if (avatarResource != null) {
+                avatarImage.setImageResource(avatarResource)
+            } else {
+                // Si el nombre no coincide con un recurso válido
+                avatarImage.setImageResource(R.drawable.interrogacion)
+            }
+        } else {
+            // Caso predeterminado: ninguna opción disponible
+            avatarImage.setImageResource(R.drawable.interrogacion)
+        }
     }
+
+
+
 
     private fun setTradingStyleImage(tradingStyle: String?) {
         val tradingResource = getTradingStyleImageResource(tradingStyle)

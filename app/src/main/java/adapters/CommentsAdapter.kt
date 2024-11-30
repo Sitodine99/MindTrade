@@ -48,19 +48,25 @@ class CommentsAdapter : RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>(
                 android.text.format.DateFormat.format("yyyy-MM-dd HH:mm", comment.timestamp)
 
             // Cargar avatar
-            if (!comment.avatarUrl.isNullOrEmpty()) {
+            if (!comment.avatarUrl.isNullOrEmpty() && comment.avatarUrl.startsWith("https://")) {
+                // Si hay una URL válida, úsala
                 Glide.with(avatarImageView.context)
                     .load(comment.avatarUrl)
+                    .placeholder(R.drawable.ic_placeholder) // Placeholder mientras carga
+                    .error(R.drawable.ic_placeholder) // Imagen si falla
                     .circleCrop()
-                    .into(avatarImageView) // Usa el `avatarImageView` referenciado correctamente
+                    .into(avatarImageView)
             } else {
+                // Si no hay URL válida, usa el recurso local basado en avatarName
                 val avatarResId = getAvatarResource(comment.avatarName ?: "default_avatar")
                 Glide.with(avatarImageView.context)
                     .load(avatarResId)
+                    .placeholder(R.drawable.ic_placeholder) // Placeholder para recursos locales
                     .circleCrop()
                     .into(avatarImageView)
             }
         }
+
 
         private fun getAvatarResource(avatarName: String): Int {
             return when (avatarName) {

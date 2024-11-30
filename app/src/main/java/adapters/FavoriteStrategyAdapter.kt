@@ -38,11 +38,24 @@ class FavoriteStrategyAdapter(
         holder.titleTextView.text = strategy.title
         holder.authorTextView.text = "Por: ${strategy.author}"
         holder.ratingBar.rating = strategy.rating.toFloat()
-        val avatarResId = getAvatarResource(strategy.avatarName ?: "default_avatar")
-        Glide.with(holder.avatarImageView.context)
-            .load(avatarResId)
-            .circleCrop()
-            .into(holder.avatarImageView)
+
+        // Verificar si hay un avatarUrl disponible
+        if (!strategy.avatarUrl.isNullOrEmpty() && strategy.avatarUrl.startsWith("https://")) {
+            // Cargar desde URL
+            Glide.with(holder.avatarImageView.context)
+                .load(strategy.avatarUrl)
+                .placeholder(R.drawable.interrogacion) // Placeholder mientras carga
+                .error(R.drawable.interrogacion) // Imagen si hay error
+                .circleCrop()
+                .into(holder.avatarImageView)
+        } else {
+            // Si no hay URL, usar el recurso local basado en avatarName
+            val avatarResId = getAvatarResource(strategy.avatarName ?: "default_avatar")
+            Glide.with(holder.avatarImageView.context)
+                .load(avatarResId)
+                .circleCrop()
+                .into(holder.avatarImageView)
+        }
 
         // Manejar clics mediante onItemClick
         holder.itemView.setOnClickListener {
@@ -50,7 +63,6 @@ class FavoriteStrategyAdapter(
         }
     }
 
-    // Mapea avatarName a recursos drawable
     private fun getAvatarResource(avatarName: String): Int {
         return when (avatarName) {
             "avatar_hombre" -> R.drawable.avatarhombre
@@ -60,9 +72,11 @@ class FavoriteStrategyAdapter(
             "avatar_frankenstein" -> R.drawable.avatarfrankenstein
             "avatar_lobo" -> R.drawable.avatarlobo
             "avatar_vampira" -> R.drawable.avatarvampira
-            else -> R.drawable.ic_placeholder
+            else -> R.drawable.ic_placeholder // Recurso predeterminado en caso de que el avatar no coincida
         }
     }
+
+
 
     override fun getItemCount(): Int = strategies.size
 }

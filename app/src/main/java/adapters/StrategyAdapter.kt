@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.mindtrade.R
 import com.example.mindtrade.model.Strategy
+import com.google.firebase.firestore.FirebaseFirestore
 
 class StrategyAdapter(
     private val strategies: List<Strategy>,
@@ -36,18 +37,28 @@ class StrategyAdapter(
         // Asignar el valor al RatingBar
         holder.strategyRatingBar.rating = strategy.rating.toFloat()
 
-        // Cargar imagen del avatar con Glide
-        val avatarResId = getAvatarResource(strategy.avatarName ?: "default_avatar")
-        Glide.with(holder.avatarImageView.context)
-            .load(avatarResId)
-            .circleCrop()
-            .into(holder.avatarImageView)
+        // Cargar avatar del autor de la estrategia
+        if (!strategy.avatarUrl.isNullOrEmpty() && strategy.avatarUrl.startsWith("https://")) {
+            Glide.with(holder.avatarImageView.context)
+                .load(strategy.avatarUrl)
+                .placeholder(R.drawable.interrogacion)
+                .error(R.drawable.interrogacion)
+                .circleCrop()
+                .into(holder.avatarImageView)
+        } else {
+            val avatarResId = getAvatarResource(strategy.avatarName ?: "default_avatar")
+            Glide.with(holder.avatarImageView.context)
+                .load(avatarResId)
+                .circleCrop()
+                .into(holder.avatarImageView)
+        }
 
         // Manejar clics mediante onItemClick
         holder.itemView.setOnClickListener {
             onItemClick(strategy)
         }
     }
+
 
     // Mapea avatarName a recursos drawable
     private fun getAvatarResource(avatarName: String): Int {

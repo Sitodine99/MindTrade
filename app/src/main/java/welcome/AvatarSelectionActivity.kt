@@ -1,35 +1,49 @@
 package welcome
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.DatePicker
 import android.widget.EditText
-import android.widget.GridView
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import adapters.AvatarAdapter
+import android.widget.GridView
+import com.bumptech.glide.Glide
 import com.example.mindtrade.MainActivity
 import com.example.mindtrade.R
 import com.example.mindtrade.finishWithFade
 import com.example.mindtrade.startActivityWithFade
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.storage.FirebaseStorage
+import java.util.*
 
 class AvatarSelectionActivity : AppCompatActivity() {
 
     private var userId: String? = null
     private val db = FirebaseFirestore.getInstance()
+    private val storage = FirebaseStorage.getInstance()
     private lateinit var avatarImage: ImageView
     private lateinit var aliasInput: EditText
     private lateinit var dobPicker: DatePicker
     private lateinit var continueButton: Button
-    private var selectedAvatarImage: Int = R.drawable.interrogacion
+    private var selectedAvatarUri: Uri? = null
     private var selectedAvatarName: String = "default_avatar"
+
+    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        if (uri != null) {
+            selectedAvatarUri = uri
+            Glide.with(this).load(uri).circleCrop().into(avatarImage)
+        }
+    }
 
     private fun getUserIdFromPreferences(): String? {
         val sharedPreferences = getSharedPreferences("MindTradePrefs", MODE_PRIVATE)
@@ -67,14 +81,15 @@ class AvatarSelectionActivity : AppCompatActivity() {
             } else if (dateOfBirth.isEmpty()) {
                 Toast.makeText(this, "Por favor, selecciona tu fecha de nacimiento", Toast.LENGTH_SHORT).show()
             } else {
-                saveUserData(selectedAvatarName, alias, dateOfBirth)
+                uploadAvatarToFirebase { avatarUrl ->
+                    saveUserData(avatarUrl, alias, dateOfBirth)
+                }
             }
         }
 
-        // Configuración de la animación para el botón de "Atrás"
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                finishWithFade()  // Termina con animación de fade-out al presionar "Atrás"
+                finishWithFade()
             }
         })
     }
@@ -100,16 +115,22 @@ class AvatarSelectionActivity : AppCompatActivity() {
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
             .setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
+            .setNeutralButton("Subir Imagen") { _, _ -> openImagePicker() }
             .create()
 
         avatarGridView.setOnItemClickListener { _, _, position, _ ->
-            selectedAvatarImage = avatarImages[position]
+            selectedAvatarUri = null
             selectedAvatarName = avatarNames[position]
-            avatarImage.setImageResource(selectedAvatarImage)
+            avatarImage.setImageResource(avatarImages[position])
             dialog.dismiss()
         }
 
         dialog.show()
+    }
+
+    private fun openImagePicker() {
+        selectedAvatarName = "default_avatar"
+        pickImageLauncher.launch("image/*")
     }
 
     private fun getDateOfBirth(): String {
@@ -119,22 +140,39 @@ class AvatarSelectionActivity : AppCompatActivity() {
         return "$day/$month/$year"
     }
 
-    private fun saveUserData(avatar: String, alias: String, dateOfBirth: String) {
+    private fun uploadAvatarToFirebase(onSuccess: (String) -> Unit) {
+        val uri = selectedAvatarUri
+        if (uri != null) {
+            val storageRef = storage.reference.child("avatars/${UUID.randomUUID()}.jpg")
+            storageRef.putFile(uri)
+                .addOnSuccessListener {
+                    storageRef.downloadUrl.addOnSuccessListener { downloadUrl ->
+                        selectedAvatarName = "default_avatar"
+                        onSuccess(downloadUrl.toString())
+                    }
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Error al subir avatar", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            onSuccess("default_avatar_url") // URL por defecto
+        }
+    }
+
+    private fun saveUserData(avatarUrl: String, alias: String, dateOfBirth: String) {
         if (userId != null) {
             val userData = mapOf(
-                "avatarImage" to selectedAvatarImage,
-                "avatarName" to avatar,
+                "avatarUrl" to avatarUrl,
+                "avatarName" to selectedAvatarName,
                 "alias" to alias,
                 "dateOfBirth" to dateOfBirth,
                 "registration_progress" to "avatar_selection",
-                "registrationComplete" to true // Indicar que el registro está completo
+                "registrationComplete" to true
             )
 
             db.collection("users").document(userId!!).set(userData, SetOptions.merge())
                 .addOnSuccessListener {
                     Toast.makeText(this, "Datos guardados correctamente", Toast.LENGTH_SHORT).show()
-
-                    // Redirigir a MainActivity y limpiar el stack
                     val intent = Intent(this, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivityWithFade(intent)

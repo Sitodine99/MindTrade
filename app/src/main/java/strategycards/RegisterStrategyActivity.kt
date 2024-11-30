@@ -562,12 +562,14 @@ class RegisterStrategyActivity : AppCompatActivity() {
             db.collection("users").document(userId).get().addOnSuccessListener { userDoc ->
                 val alias = userDoc.getString("alias") ?: "Anónimo"
                 val avatarName = userDoc.getString("avatarName") ?: "default_avatar"
+                val avatarUrl = userDoc.getString("avatarUrl") ?: ""
 
                 val strategy = hashMapOf(
                     "title" to title,
                     "createdBy" to userId,
                     "authorAlias" to alias,
                     "avatarName" to avatarName,
+                    "avatarUrl" to avatarUrl,
                     "description" to description,
                     "tradingStyles" to tradingStyles,
                     "indicators" to indicators,

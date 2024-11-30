@@ -43,6 +43,7 @@ class FavoriteStrategiesFragment : Fragment() {
                     putString("strategyDescription", strategy.description)
                     putString("strategyAuthor", strategy.author)
                     putString("strategyAvatarName", strategy.avatarName)
+                    putString("strategyAvatarUrl", strategy.avatarUrl)
                     putStringArray("strategyIndicators", strategy.indicators.toTypedArray())
                     putStringArray("strategyTimeframes", strategy.timeframes.toTypedArray())
                     putStringArray("tradingStyles", strategy.tradingStyles.toTypedArray())

@@ -509,7 +509,7 @@
             android:layout_height="200dp"
             android:hint="Pega el código en MQL5 aquí"
             android:gravity="top|start"
-            android:background="@drawable/code_editor_background"
+            android:background="@drawable/edittext_background"
             android:padding="8dp"
             android:scrollbars="vertical|horizontal"
             android:overScrollMode="always"

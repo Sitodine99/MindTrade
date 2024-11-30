@@ -37,6 +37,7 @@ class StrategyDetailFragment : Fragment() {
         val tabLayout: TabLayout = view.findViewById(R.id.tabLayout)
         val viewPager: ViewPager2 = view.findViewById(R.id.viewPager)
 
+
         val args = arguments
         val strategyId = args?.getString("strategyId") ?: "" // Extraer el ID de la estrategia
         val strategyTitle = args?.getString("strategyTitle") ?: "Sin título"
@@ -111,9 +112,16 @@ class StrategyDetailFragment : Fragment() {
 
 
     private fun loadAvatar(avatarUrl: String?, avatarName: String, imageView: ImageView) {
-        if (!avatarUrl.isNullOrEmpty()) {
-            Glide.with(this).load(avatarUrl).circleCrop().into(imageView)
+        if (!avatarUrl.isNullOrEmpty() && avatarUrl.startsWith("https://")) {
+            // Cargar desde URL
+            Glide.with(this)
+                .load(avatarUrl)
+                .placeholder(R.drawable.interrogacion) // Imagen de carga
+                .error(R.drawable.interrogacion) // Imagen de error
+                .circleCrop() // Recorte circular
+                .into(imageView)
         } else {
+            // Cargar desde recursos locales
             val avatarResId = when (avatarName) {
                 "avatar_hombre" -> R.drawable.avatarhombre
                 "avatar_mujer" -> R.drawable.avatarmujer
@@ -124,9 +132,13 @@ class StrategyDetailFragment : Fragment() {
                 "avatar_vampira" -> R.drawable.avatarvampira
                 else -> R.drawable.ic_placeholder
             }
-            Glide.with(this).load(avatarResId).circleCrop().into(imageView)
+            Glide.with(this)
+                .load(avatarResId)
+                .circleCrop()
+                .into(imageView)
         }
     }
+
     private fun initializeFavoriteButton(strategyId: String, favoriteIcon: ImageView) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val db = FirebaseFirestore.getInstance()
