@@ -2,6 +2,7 @@ package strategycards
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
@@ -103,6 +104,35 @@ class RegisterStrategyActivity : AppCompatActivity() {
         // Configurar chips para símbolos
         setupPredefinedSymbols()
     }
+
+    fun toggleGroupVisibility(view: View) {
+        val chipGroup: ChipGroup? = when (view.id) {
+
+            R.id.indicatorHeader -> findViewById(R.id.predefinedIndicatorChipGroup)
+            R.id.allInstrumentsHeader -> findViewById(R.id.allInstrumentsChipGroup)
+            R.id.forexHeader -> findViewById(R.id.forexChipGroup)
+            R.id.exoticsHeader -> findViewById(R.id.exoticsChipGroup)
+            R.id.cashCFDHeader -> findViewById(R.id.cashCFDChipGroup)
+            R.id.metalsHeader -> findViewById(R.id.metalsChipGroup)
+            R.id.commoditiesHeader -> findViewById(R.id.commoditiesChipGroup)
+            R.id.cryptoHeader -> findViewById(R.id.cryptoChipGroup)
+            R.id.equitiesHeader -> findViewById(R.id.equitiesChipGroup)
+
+            else -> null
+        }
+
+        if (chipGroup != null) {
+            if (chipGroup.visibility == View.VISIBLE) {
+                chipGroup.visibility = View.GONE
+                (view as TextView).setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_expand, 0)
+            } else {
+                chipGroup.visibility = View.VISIBLE
+                (view as TextView).setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_collapse, 0)
+            }
+        }
+    }
+
+
 
 
     private fun setupPredefinedIndicators() {

@@ -58,19 +58,21 @@
             android:id="@+id/tradingStyleCheckBoxGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
             <!-- Reordenados -->
             <CheckBox
                 android:id="@+id/tradingStyleScalping"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
                 android:text="Scalping" />
 
             <CheckBox
                 android:id="@+id/tradingStyleDayTrading"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
                 android:text="Day Trader" />
 
             <CheckBox
@@ -82,29 +84,34 @@
 
 
 
+
         <!-- Indicadores -->
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/indicatorHeader"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
             android:text="Indicadores"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp" />
+            android:drawableEnd="@drawable/ic_expand"
+            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
+            android:onClick="toggleGroupVisibility" />
 
         <!-- Grupo para los chips dinámicos -->
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/indicatorChipGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:singleLine="false"
-            app:chipSpacing="8dp" />
-
+            app:chipSpacing="8dp"
+            app:singleLine="false" />
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/predefinedIndicatorChipGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             app:chipSpacing="8dp"
             app:singleLine="false" />
 
@@ -155,129 +162,179 @@
 
 
         <!-- Todos los instrumentos -->
+        <TextView
+            android:id="@+id/allInstrumentsHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Todos los activos"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:drawableEnd="@drawable/ic_expand"
+            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
+            android:onClick="toggleGroupVisibility" />
+
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/allInstrumentsChipGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:chipSpacing="8dp"
+            android:visibility="gone"
             app:closeIconVisible="false" />
 
         <!-- Forex -->
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/forexHeader"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
             android:text="Forex"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="4dp" />
+            android:drawableEnd="@drawable/ic_expand"
+            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
+            android:onClick="toggleGroupVisibility" />
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/forexChipGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             app:chipSpacing="8dp"
             app:singleLine="false" />
 
         <!-- Exotics -->
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/exoticsHeader"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
             android:text="Exotics"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="4dp" />
+            android:drawableEnd="@drawable/ic_expand"
+            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
+            android:onClick="toggleGroupVisibility" />
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/exoticsChipGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             app:chipSpacing="8dp"
             app:singleLine="false" />
 
         <!-- Cash CFD -->
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/cashCFDHeader"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
             android:text="Cash CFD"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="4dp" />
+            android:drawableEnd="@drawable/ic_expand"
+            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
+            android:onClick="toggleGroupVisibility" />
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/cashCFDChipGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             app:chipSpacing="8dp"
             app:singleLine="false" />
 
         <!-- Metals CFD -->
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/metalsHeader"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
             android:text="Metals CFD"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="4dp" />
+            android:drawableEnd="@drawable/ic_expand"
+            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
+            android:onClick="toggleGroupVisibility" />
+
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/metalsChipGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:chipSpacing="8dp"
+            android:visibility="gone"
             app:singleLine="false" />
 
         <!-- Commodities -->
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/commoditiesHeader"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
             android:text="Commodities"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="4dp" />
+            android:drawableEnd="@drawable/ic_expand"
+            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
+            android:onClick="toggleGroupVisibility" />
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/commoditiesChipGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             app:chipSpacing="8dp"
             app:singleLine="false" />
 
         <!-- Crypto CFD -->
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/cryptoHeader"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
             android:text="Crypto CFD"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="4dp" />
+            android:drawableEnd="@drawable/ic_expand"
+            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
+            android:onClick="toggleGroupVisibility" />
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/cryptoChipGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             app:chipSpacing="8dp"
             app:singleLine="false" />
 
         <!-- Equities -->
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/equitiesHeader"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="8dp"
             android:text="Equities CFD"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="4dp" />
+            android:drawableEnd="@drawable/ic_expand"
+            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
+            android:onClick="toggleGroupVisibility" />
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/equitiesChipGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             app:chipSpacing="8dp"
             app:singleLine="false" />
 
@@ -302,7 +359,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Temporalidades (opcional)"
+            android:text="Temporalidades (Selecciona una o varias)"
             android:textSize="16sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
@@ -319,60 +376,70 @@
                 android:id="@+id/timeM1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
                 android:text="M1" />
 
             <CheckBox
                 android:id="@+id/timeM3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
                 android:text="M3" />
 
             <CheckBox
                 android:id="@+id/timeM5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
                 android:text="M5" />
 
             <CheckBox
                 android:id="@+id/timeM15"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
                 android:text="M15" />
 
             <CheckBox
                 android:id="@+id/timeM30"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
                 android:text="M30" />
 
             <CheckBox
                 android:id="@+id/timeH1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
                 android:text="H1" />
 
             <CheckBox
                 android:id="@+id/timeH4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
                 android:text="H4" />
 
             <CheckBox
                 android:id="@+id/timeD1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
                 android:text="D1" />
 
             <CheckBox
                 android:id="@+id/timeW1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
                 android:text="W1" />
 
             <CheckBox
                 android:id="@+id/timeOtras"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
                 android:text="Otras" />
         </GridLayout>
 
