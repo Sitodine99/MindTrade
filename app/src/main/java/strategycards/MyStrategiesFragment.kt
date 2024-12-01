@@ -1,3 +1,5 @@
+package strategycards
+
 import adapters.SimpleStrategyAdapter
 import android.content.Context
 import android.content.Intent
@@ -8,22 +10,22 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentContainerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mindtrade.R
 import com.example.mindtrade.model.Strategy
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import strategycards.RegisterStrategyActivity
 
 class MyStrategiesFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: SimpleStrategyAdapter // Instancia global del adaptador
+    private lateinit var adapter: SimpleStrategyAdapter
     private val db = FirebaseFirestore.getInstance()
     private var userId: String? = null
-    private var userAlias: String = "Anónimo" // Alias por defecto
-    private val strategies = mutableListOf<Strategy>() // Lista local sincronizada
+    private var userAlias: String = "Anónimo"
+    private val strategies = mutableListOf<Strategy>()
     private var listener: OnStrategyDeletedListener? = null
 
     override fun onCreateView(
@@ -32,17 +34,20 @@ class MyStrategiesFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.activity_my_strategies, container, false)
 
+        // Configurar el RecyclerView
         recyclerView = view.findViewById(R.id.recyclerViewMyStrategies)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        // Inicializa el adaptador con la lista vacía
+        // Inicializar el adaptador
         adapter = SimpleStrategyAdapter(
-            strategies, requireActivity(),
+            strategies,
+            onItemClick = { strategy -> openStrategyDetailFragment(strategy) },
             onDeleteClick = { strategy -> showDeleteConfirmationDialog(strategy) },
             onEditClick = { strategy -> showEditConfirmationDialog(strategy) }
         )
         recyclerView.adapter = adapter
 
+        // Obtener el ID del usuario autenticado
         userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId == null) {
             Toast.makeText(requireContext(), "Usuario no autenticado", Toast.LENGTH_SHORT).show()
@@ -68,11 +73,13 @@ class MyStrategiesFragment : Fragment() {
     }
 
     private fun loadUserStrategies() {
+        recyclerView.visibility = View.INVISIBLE // Ocultar RecyclerView inicialmente
+
         db.collection("strategies")
             .whereEqualTo("createdBy", userId)
             .get()
             .addOnSuccessListener { result ->
-                strategies.clear() // Limpia la lista local
+                strategies.clear()
                 strategies.addAll(result.map { document ->
                     Strategy(
                         id = document.id,
@@ -92,15 +99,61 @@ class MyStrategiesFragment : Fragment() {
                         symbols = (document.get("symbols") as? List<*>)?.filterIsInstance<String>()
                             ?: emptyList(),
                         algorithmCode = document.getString("algorithmCode") ?: ""
-
-
                     )
                 })
-                adapter.notifyDataSetChanged() // Notifica al adaptador que los datos han cambiado
+                adapter.notifyDataSetChanged()
+
+                // Retrasar la visibilidad del RecyclerView para una transición suave
+                recyclerView.postDelayed({
+                    recyclerView.visibility = View.VISIBLE
+                }, 300)
             }
             .addOnFailureListener {
                 Toast.makeText(requireContext(), "Error al cargar estrategias", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun openStrategyDetailFragment(strategy: Strategy) {
+        val fragmentContainer = requireActivity().findViewById<FragmentContainerView>(R.id.fragmentContainer)
+
+        // Ocultar RecyclerView y fragmentContainer antes de la transición
+        recyclerView.visibility = View.INVISIBLE
+        fragmentContainer?.visibility = View.INVISIBLE
+
+        // Crear el fragmento de detalle
+        val fragment = StrategyDetailFragment().apply {
+            arguments = Bundle().apply {
+                putString("strategyId", strategy.id)
+                putString("strategyTitle", strategy.title)
+                putString("strategyDescription", strategy.description)
+                putString("strategyAuthor", strategy.author)
+                putString("strategyAvatarName", strategy.avatarName)
+                putString("strategyAvatarUrl", strategy.avatarUrl)
+                putStringArray("strategyIndicators", strategy.indicators.toTypedArray())
+                putStringArray("strategyTimeframes", strategy.timeframes.toTypedArray())
+                putStringArray("tradingStyles", strategy.tradingStyles.toTypedArray())
+                putDouble("strategyRating", strategy.rating)
+                putString("algorithmCode", strategy.algorithmCode)
+                putStringArray("strategySymbols", strategy.symbols.toTypedArray())
+            }
+        }
+
+        // Iniciar la transacción del fragmento con animaciones
+        requireActivity().supportFragmentManager.beginTransaction()
+            .setCustomAnimations(
+                R.anim.fade_in,
+                R.anim.fade_out,
+                R.anim.fade_in,
+                R.anim.fade_out
+            )
+            .replace(R.id.fragmentContainer, fragment)
+            .addToBackStack(null)
+            .commit()
+
+        // Retrasar la visibilidad del contenedor del fragmento
+        fragmentContainer?.postDelayed({
+            fragmentContainer.visibility = View.VISIBLE
+        }, 300)
     }
 
     private fun showDeleteConfirmationDialog(strategy: Strategy) {
@@ -138,7 +191,9 @@ class MyStrategiesFragment : Fragment() {
             putExtra("strategySymbols", strategy.symbols.toTypedArray())
             putExtra("algorithmCode", strategy.algorithmCode)
         }
+        // Iniciar la actividad con una animación personalizada
         startActivity(intent)
+        requireActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     }
 
     private fun deleteStrategy(strategy: Strategy) {
@@ -147,10 +202,9 @@ class MyStrategiesFragment : Fragment() {
             .addOnSuccessListener {
                 Toast.makeText(requireContext(), "Estrategia eliminada", Toast.LENGTH_SHORT).show()
 
-                // Actualiza la lista local y el adaptador
-                strategies.remove(strategy) // Elimina de la lista local
-                adapter.notifyDataSetChanged() // Notifica al adaptador del cambio
-                listener?.onStrategyDeleted() // Notifica al MainActivity
+                strategies.remove(strategy)
+                adapter.notifyDataSetChanged()
+                listener?.onStrategyDeleted()
             }
             .addOnFailureListener {
                 Toast.makeText(requireContext(), "Error al eliminar estrategia", Toast.LENGTH_SHORT).show()
@@ -170,10 +224,9 @@ class MyStrategiesFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        loadUserStrategies() // Recarga las estrategias al volver al fragmento
+        loadUserStrategies()
     }
 }
-
 
 
 

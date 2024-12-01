@@ -61,15 +61,60 @@ class ForumFragment : Fragment() {
     }
 
     private fun loadComments(strategyId: String) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
         db.collection("strategies").document(strategyId).get()
             .addOnSuccessListener { document ->
-                val comments = document.toObject(Strategy::class.java)?.comments ?: emptyList()
-                commentsAdapter.setComments(comments)
+                val strategy = document.toObject(Strategy::class.java)
+                val comments = strategy?.comments ?: emptyList()
+
+                // Recuperar los datos actuales del usuario
+                db.collection("users").document(userId).get()
+                    .addOnSuccessListener { userDoc ->
+                        val currentAlias = userDoc.getString("alias") ?: "Anónimo"
+                        val currentAvatarUrl = userDoc.getString("avatarUrl")
+                        val currentAvatarName = userDoc.getString("avatarName") ?: "default_avatar"
+
+                        // Actualizar comentarios con datos actuales del usuario
+                        val updatedComments = comments.map { comment ->
+                            if (comment.userId == userId &&
+                                (comment.avatarUrl != currentAvatarUrl || comment.avatarName != currentAvatarName)
+                            ) {
+                                comment.copy(
+                                    userAlias = currentAlias,
+                                    avatarUrl = currentAvatarUrl,
+                                    avatarName = currentAvatarName
+                                )
+                            } else {
+                                comment
+                            }
+                        }
+
+                        // Actualizar Firestore si hay cambios
+                        if (updatedComments != comments) {
+                            db.collection("strategies").document(strategyId).update(
+                                "comments", updatedComments
+                            ).addOnFailureListener {
+                                Toast.makeText(
+                                    context,
+                                    "Error al actualizar comentarios",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+
+                        // Mostrar los comentarios actualizados
+                        commentsAdapter.setComments(updatedComments)
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(context, "Error al recuperar datos del usuario", Toast.LENGTH_SHORT).show()
+                    }
             }
             .addOnFailureListener {
                 Toast.makeText(context, "Error al cargar comentarios", Toast.LENGTH_SHORT).show()
             }
     }
+
 
     private fun addComment(content: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return

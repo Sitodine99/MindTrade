@@ -1,6 +1,5 @@
 package com.example.mindtrade
 
-import MyStrategiesFragment
 import adapters.AccountAdapter
 import android.content.Intent
 import android.os.Bundle
@@ -29,6 +28,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import strategycards.FavoriteStrategiesFragment
+import strategycards.MyStrategiesFragment
 import strategycards.RegisterStrategyActivity
 import strategycards.StrategyDetailFragment
 import welcome.AvatarSelectionActivity
@@ -159,12 +159,34 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
-        private fun getUserDateOfBirthFromFirestore(): String? {
+    private fun getUserDateOfBirthFromFirestore(): String? {
         // Devuelve la fecha de nacimiento en el formato que uses en Firestore (por ejemplo, "dd/MM/yyyy")
         // Este valor debe haberse extraído previamente en loadUserData si existe en Firestore
         return db.collection("users").document(userId!!).get()
             .result
             ?.getString("dateOfBirth")
+    }
+
+    // Método para actualizar las estrategias del usuario
+    private fun updateUserStrategies(newAlias: String, newAvatarUrl: String?, newAvatarName: String) {
+        userId?.let { id ->
+            // Buscar todas las estrategias creadas por el usuario
+            db.collection("strategies").whereEqualTo("createdBy", id).get()
+                .addOnSuccessListener { querySnapshot ->
+                    for (document in querySnapshot.documents) {
+                        // Actualizar cada estrategia con el nuevo alias, avatar URL y avatar name
+                        val updates = hashMapOf<String, Any>(
+                            "authorAlias" to newAlias,
+                            "avatarUrl" to (newAvatarUrl ?: ""),
+                            "avatarName" to newAvatarName
+                        )
+                        db.collection("strategies").document(document.id).update(updates)
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error actualizando estrategias: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
     }
 
 
@@ -220,46 +242,61 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun openStrategyDetailFragment(strategy: Strategy) {
-        // Ocultar vistas principales
-        findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.GONE
-        findViewById<TextView>(R.id.accountsSummary).visibility = View.GONE
-        findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.GONE
-        findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.GONE
-        findViewById<Button>(R.id.addStrategyButton).visibility = View.GONE
+        // Retrasar la transición hasta que los datos estén listos (aunque ya los tienes)
+        val strategyId = strategy.id
 
-        // Mostrar el contenedor de fragmentos
-        findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility = View.VISIBLE
+        // Solo para asegurarte de que los datos son válidos:
+        if (strategyId.isNotEmpty()) {
+            // Ocultar vistas principales
+            findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.GONE
+            findViewById<TextView>(R.id.accountsSummary).visibility = View.GONE
+            findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.GONE
+            findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.GONE
+            findViewById<Button>(R.id.addStrategyButton).visibility = View.GONE
 
-        // Crear y agregar el fragmento
-        val fragment = StrategyDetailFragment().apply {
-            arguments = Bundle().apply {
-                putString("strategyId", strategy.id) // Añadir el ID de la estrategia
-                putString("strategyTitle", strategy.title)
-                putString("strategyDescription", strategy.description)
-                putString("strategyAuthor", strategy.author)
-                putString("strategyAvatarName", strategy.avatarName)
-                putString("strategyAvatarUrl", strategy.avatarUrl) // PASA EL AVATAR URL AQUÍ
-                putStringArray("strategyIndicators", strategy.indicators.toTypedArray())
-                putStringArray("strategyTimeframes", strategy.timeframes.toTypedArray())
-                putStringArray("tradingStyles", strategy.tradingStyles.toTypedArray())
-                putDouble("strategyRating", strategy.rating)
-                putStringArray("strategySymbols", strategy.symbols.toTypedArray())
-                putString("algorithmCode", strategy.algorithmCode) // Pasar el campo algorithmCode
+            // Mostrar el contenedor de fragmentos pero inicialmente invisible
+            val fragmentContainer = findViewById<FragmentContainerView>(R.id.fragmentContainer)
+            fragmentContainer.visibility = View.INVISIBLE // Mantén el contenedor invisible
+
+            // Crear y agregar el fragmento
+            val fragment = StrategyDetailFragment().apply {
+                arguments = Bundle().apply {
+                    putString("strategyId", strategy.id) // Añadir el ID de la estrategia
+                    putString("strategyTitle", strategy.title)
+                    putString("strategyDescription", strategy.description)
+                    putString("strategyAuthor", strategy.author)
+                    putString("strategyAvatarName", strategy.avatarName)
+                    putString("strategyAvatarUrl", strategy.avatarUrl) // PASA EL AVATAR URL AQUÍ
+                    putStringArray("strategyIndicators", strategy.indicators.toTypedArray())
+                    putStringArray("strategyTimeframes", strategy.timeframes.toTypedArray())
+                    putStringArray("tradingStyles", strategy.tradingStyles.toTypedArray())
+                    putDouble("strategyRating", strategy.rating)
+                    putStringArray("strategySymbols", strategy.symbols.toTypedArray())
+                    putString("algorithmCode", strategy.algorithmCode) // Pasar el campo algorithmCode
+                }
             }
-        }
 
-        // Añade animaciones para la transacción del fragmento
-        supportFragmentManager.beginTransaction()
-            .setCustomAnimations(
-                R.anim.fade_in, // Animación de entrada
-                R.anim.fade_out, // Animación de salida
-                R.anim.fade_in, // Animación al retroceder (popEnter)
-                R.anim.fade_out  // Animación al salir (popExit)
-            )
-            .replace(R.id.fragmentContainer, fragment)
-            .addToBackStack(null) // Agrega el fragmento a la pila de retroceso
-            .commit()
+            // Añade el fragmento a la pila pero sin mostrarlo inmediatamente
+            supportFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.fade_in, // Animación de entrada
+                    R.anim.fade_out, // Animación de salida
+                    R.anim.fade_in, // Animación al retroceder (popEnter)
+                    R.anim.fade_out  // Animación al salir (popExit)
+                )
+                .replace(R.id.fragmentContainer, fragment)
+                .addToBackStack(null) // Agrega el fragmento a la pila de retroceso
+                .commit()
+
+            // Retrasar la visibilidad del contenedor hasta que el fragmento esté cargado
+            fragmentContainer.postDelayed({
+                fragmentContainer.visibility = View.VISIBLE // Muestra el fragmento cargado
+            }, 300) // Retraso de 300ms (puedes ajustar este valor si es necesario)
+        } else {
+            Toast.makeText(this, "ID de estrategia no válido.", Toast.LENGTH_SHORT).show()
+        }
     }
+
 
 
     private fun setupStrategiesRecyclerView() {
@@ -423,19 +460,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             db.collection("users").document(id).get()
                 .addOnSuccessListener { document ->
                     if (document.exists()) {
-                        userAlias = document.getString("alias")
-                        avatarUrl = document.getString("avatarUrl") // URL subida
-                        userAvatarName = document.getString("avatarName") // Nombre del avatar local
+                        // Obtener datos del usuario desde Firestore
+                        val newAlias = document.getString("alias") ?: "Anónimo"
+                        val newAvatarUrl = document.getString("avatarUrl")
+                        val newAvatarName = document.getString("avatarName") ?: "default_avatar"
+                        userAlias = newAlias
+                        avatarUrl = newAvatarUrl
+                        userAvatarName = newAvatarName
                         userTradingStyle = document.getString("trading_style")
                         userPsico = document.getString("psico")
                         userEmotion = document.getString("emotion")
 
-                        // Actualizar imágenes de avatar y otros elementos
+                        // Actualizar imágenes de avatar y otros elementos visuales
                         setAvatarImage(avatarUrl, userAvatarName)
                         setTradingStyleImage(userTradingStyle)
                         setPsicoImage(userPsico)
                         setEmotionImage(userEmotion)
 
+                        // Actualizar las estrategias del usuario con el nuevo alias, avatar URL y avatar name
+                        updateUserStrategies(newAlias, newAvatarUrl, newAvatarName)
+
+                        // Actualizar el NavigationView con los nuevos datos
                         updateNavigationView(avatarUrl, userAvatarName)
                     } else {
                         println("El documento del usuario no existe.")
@@ -447,6 +492,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
         }
     }
+
 
 
     private fun updateNavigationView(avatarUrl: String?, avatarName: String?) {
@@ -575,27 +621,26 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun setAvatarImage(avatarUrl: String?, avatarName: String?) {
         if (!avatarUrl.isNullOrEmpty() && avatarUrl.startsWith("https://")) {
-            // Es una URL subida al Firebase Storage
             Glide.with(this)
                 .load(avatarUrl)
-                .placeholder(R.drawable.interrogacion) // Imagen mientras se carga
-                .error(R.drawable.interrogacion) // Imagen si falla la carga
+                .placeholder(R.drawable.interrogacion)
+                .error(R.drawable.interrogacion)
+                .circleCrop()
                 .into(avatarImage)
         } else if (!avatarName.isNullOrEmpty()) {
-            // Es un recurso local (por nombre)
             val avatarResource = getAvatarImageResource(avatarName)
             if (avatarResource != null) {
-                avatarImage.setImageResource(avatarResource)
+                Glide.with(this)
+                    .load(avatarResource)
+                    .circleCrop()
+                    .into(avatarImage)
             } else {
-                // Si el nombre no coincide con un recurso válido
                 avatarImage.setImageResource(R.drawable.interrogacion)
             }
         } else {
-            // Caso predeterminado: ninguna opción disponible
             avatarImage.setImageResource(R.drawable.interrogacion)
         }
     }
-
 
 
 
@@ -626,6 +671,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             else -> null
         }
     }
+
 
     private fun getTradingStyleImageResource(tradingStyle: String?): Int? {
         return when (tradingStyle) {

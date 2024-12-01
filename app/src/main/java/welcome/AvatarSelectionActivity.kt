@@ -239,9 +239,15 @@ class AvatarSelectionActivity : AppCompatActivity() {
             db.collection("users").document(userId!!).set(userData, SetOptions.merge())
                 .addOnSuccessListener {
                     Toast.makeText(this, "Datos guardados correctamente", Toast.LENGTH_SHORT).show()
+
+                    // Retrasar la transición visual a MainActivity
                     val intent = Intent(this, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivityWithFade(intent)
+
+                    // Retrasar el inicio de la actividad para garantizar fluidez
+                    findViewById<Button>(R.id.buttonLogin).postDelayed({
+                        startActivityWithFade(intent)
+                    }, 300) // Retraso de 300ms, ajustable según sea necesario
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(this, "Error al guardar: ${e.message}", Toast.LENGTH_SHORT)

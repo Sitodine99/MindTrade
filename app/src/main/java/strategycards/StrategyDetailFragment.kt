@@ -30,6 +30,8 @@ class StrategyDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Mostrar el shimmer inicialmente
+
         val avatarImageView: ImageView = view.findViewById(R.id.avatarImageView)
         val strategyTitleTextView: TextView = view.findViewById(R.id.strategyTitleTextView)
         val strategyAuthorTextView: TextView = view.findViewById(R.id.strategyAuthorTextView)
@@ -37,78 +39,90 @@ class StrategyDetailFragment : Fragment() {
         val tabLayout: TabLayout = view.findViewById(R.id.tabLayout)
         val viewPager: ViewPager2 = view.findViewById(R.id.viewPager)
 
-
         val args = arguments
-        val strategyId = args?.getString("strategyId") ?: "" // Extraer el ID de la estrategia
-        val strategyTitle = args?.getString("strategyTitle") ?: "Sin título"
-        val strategyDescription = args?.getString("strategyDescription") ?: "Sin descripción"
-        val strategyAuthor = args?.getString("strategyAuthor") ?: "Anónimo"
-        val strategyAvatarName = args?.getString("strategyAvatarName") ?: "default_avatar"
-        val strategyAvatarUrl = args?.getString("strategyAvatarUrl")
-        val strategyIndicators = args?.getStringArray("strategyIndicators") ?: arrayOf("Sin indicadores")
-        val strategyTimeframes = args?.getStringArray("strategyTimeframes") ?: arrayOf("Sin temporalidades")
-        val tradingStyles = args?.getStringArray("tradingStyles") ?: arrayOf("Sin estilos")
-        val strategyRating = args?.getDouble("strategyRating") ?: 0.0
-        val algorithmCode = args?.getString("algorithmCode") ?: "" // Extraer algorithmCode
-        val strategySymbols = args?.getStringArray("strategySymbols") ?: arrayOf("Sin símbolos")
+        val strategyId = args?.getString("strategyId") ?: ""
 
+        // Cargar datos desde Firebase
+        val db = FirebaseFirestore.getInstance()
+        db.collection("strategies").document(strategyId).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val strategyTitle = document.getString("title") ?: "Sin título"
+                    val strategyDescription = document.getString("description") ?: "Sin descripción"
+                    val strategyAuthor = document.getString("authorAlias") ?: "Anónimo"
+                    val strategyAvatarName = document.getString("avatarName") ?: "default_avatar"
+                    val strategyAvatarUrl = document.getString("avatarUrl")
+                    val strategyIndicators = (document.get("indicators") as? List<*>)?.filterIsInstance<String>()?.toTypedArray() ?: arrayOf("Sin indicadores")
+                    val strategyTimeframes = (document.get("timeframes") as? List<*>)?.filterIsInstance<String>()?.toTypedArray() ?: arrayOf("Sin temporalidades")
+                    val tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>()?.toTypedArray() ?: arrayOf("Sin estilos")
+                    val strategyRating = document.getDouble("rating") ?: 0.0
+                    val algorithmCode = document.getString("algorithmCode") ?: ""
+                    val strategySymbols = (document.get("symbols") as? List<*>)?.filterIsInstance<String>()?.toTypedArray() ?: arrayOf("Sin símbolos")
 
-        strategyTitleTextView.text = strategyTitle
-        strategyAuthorTextView.text = "Por: $strategyAuthor"
+                    // Actualizar vistas con datos obtenidos de Firebase
+                    strategyTitleTextView.text = strategyTitle
+                    strategyAuthorTextView.text = "Por: $strategyAuthor"
+                    loadAvatar(strategyAvatarUrl, strategyAvatarName, avatarImageView)
 
-        loadAvatar(strategyAvatarUrl, strategyAvatarName, avatarImageView)
+                    // Configurar el adapter del ViewPager con los datos actualizados
+                    val adapter = StrategyPagerAdapter(requireActivity())
 
-        val adapter = StrategyPagerAdapter(requireActivity())
+                    // Añade pestaña Datos generales
+                    adapter.addFragment(GeneralFragment().apply {
+                        arguments = Bundle().apply {
+                            putString("strategyId", strategyId)
+                            putStringArray("tradingStyles", tradingStyles)
+                            putStringArray("indicators", strategyIndicators)
+                            putStringArray("timeframes", strategyTimeframes)
+                            putFloat("rating", strategyRating.toFloat())
+                            putStringArray("symbols", strategySymbols)
+                        }
+                    }, "General")
 
-        //Añade pestaña Datos generales
-        adapter.addFragment(GeneralFragment().apply {
-            arguments = Bundle().apply {
-                putString("strategyId", strategyId)
-                putStringArray("tradingStyles", tradingStyles)
-                putStringArray("indicators", strategyIndicators)
-                putStringArray("timeframes", strategyTimeframes)
-                putFloat("rating", strategyRating.toFloat())
-                putStringArray("symbols", strategySymbols)
-            }
-        }, "General")
+                    // Añade pestaña descripción
+                    adapter.addFragment(DescriptionFragment().apply {
+                        arguments = Bundle().apply {
+                            putString("description", strategyDescription)
+                        }
+                    }, "Descripción")
 
-        //Añade pestaña descripción
-        adapter.addFragment(DescriptionFragment().apply {
-            arguments = Bundle().apply {
-                putString("description", strategyDescription)
-            }
-        }, "Descripción")
+                    // Añade pestaña foro
+                    adapter.addFragment(ForumFragment().apply {
+                        arguments = Bundle().apply {
+                            putString("strategyId", strategyId)
+                        }
+                    }, "Foro")
 
-        //Añade pestaña foro
-        adapter.addFragment(ForumFragment().apply {
-            arguments = Bundle().apply {
-                putString("strategyId", strategyId)
-            }
-        }, "Foro")
+                    // Añade pestaña "Registros"
+                    adapter.addFragment(RecordsFragment(), "Registros")
 
-        // Añade pestaña "Registros"
-        adapter.addFragment(RecordsFragment(), "Registros")
+                    // Añade la pestaña "Trading Algorítmico" solo si el campo no está vacío
+                    if (algorithmCode.isNotBlank()) {
+                        adapter.addFragment(AlgorithmFragment().apply {
+                            arguments = Bundle().apply {
+                                putString("algorithmCode", algorithmCode)
+                            }
+                        }, "Bot")
+                    }
 
-        // Añade la pestaña "Trading Algorítmico" solo si el campo no está vacío
-        if (algorithmCode.isNotBlank()) {
-            adapter.addFragment(AlgorithmFragment().apply {
-                arguments = Bundle().apply {
-                    putString("algorithmCode", algorithmCode)
+                    viewPager.adapter = adapter
+                    viewPager.offscreenPageLimit = adapter.itemCount
+
+                    TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+                        tab.text = adapter.getPageTitle(position)
+                    }.attach()
+                } else {
+                    Toast.makeText(requireContext(), "La estrategia no existe.", Toast.LENGTH_SHORT).show()
                 }
-            }, "Bot")
-        }
-
-        viewPager.adapter = adapter
-        viewPager.offscreenPageLimit = adapter.itemCount
-
-
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            tab.text = adapter.getPageTitle(position)
-        }.attach()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(requireContext(), "Error al cargar estrategia: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
 
         // Manejar favoritos
         initializeFavoriteButton(strategyId, favoriteIcon)
     }
+
 
 
     private fun loadAvatar(avatarUrl: String?, avatarName: String, imageView: ImageView) {
@@ -118,26 +132,45 @@ class StrategyDetailFragment : Fragment() {
                 .load(avatarUrl)
                 .placeholder(R.drawable.interrogacion) // Imagen de carga
                 .error(R.drawable.interrogacion) // Imagen de error
-                .circleCrop() // Recorte circular
-                .into(imageView)
-        } else {
-            // Cargar desde recursos locales
-            val avatarResId = when (avatarName) {
-                "avatar_hombre" -> R.drawable.avatarhombre
-                "avatar_mujer" -> R.drawable.avatarmujer
-                "avatar_bebe" -> R.drawable.avatarbebe
-                "avatar_alien" -> R.drawable.avataralien
-                "avatar_frankenstein" -> R.drawable.avatarfrankenstein
-                "avatar_lobo" -> R.drawable.avatarlobo
-                "avatar_vampira" -> R.drawable.avatarvampira
-                else -> R.drawable.ic_placeholder
-            }
-            Glide.with(this)
-                .load(avatarResId)
                 .circleCrop()
                 .into(imageView)
+        } else {
+            // Intentar cargar desde recursos locales
+            val avatarResId = getAvatarImageResource(avatarName)
+            if (avatarResId != null) {
+                Glide.with(this)
+                    .load(avatarResId) // Recurso local
+                    .circleCrop()
+                    .into(imageView)
+            } else {
+                // Usar imagen predeterminada si no se encuentra el recurso local
+                Toast.makeText(requireContext(), "Avatar local no encontrado, usando predeterminado", Toast.LENGTH_SHORT).show()
+                Glide.with(this)
+                    .load(R.drawable.interrogacion)
+                    .circleCrop()
+                    .into(imageView)
+            }
         }
     }
+
+    private fun getAvatarImageResource(avatarName: String?): Int? {
+        return when (avatarName) {
+            "avatar_alien" -> R.drawable.avataralien
+            "avatar_bebe" -> R.drawable.avatarbebe
+            "avatar_hombre" -> R.drawable.avatarhombre
+            "avatar_mujer" -> R.drawable.avatarmujer
+            "avatar_frankenstein" -> R.drawable.avatarfrankenstein
+            "avatar_lobo" -> R.drawable.avatarlobo
+            "avatar_vampira" -> R.drawable.avatarvampira
+            else -> {
+                // Log para depuración si el nombre no coincide
+                println("Nombre de avatar no reconocido: $avatarName")
+                null
+            }
+        }
+    }
+
+
 
     private fun initializeFavoriteButton(strategyId: String, favoriteIcon: ImageView) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -195,7 +228,9 @@ class StrategyDetailFragment : Fragment() {
 
 
     private fun updateFavoriteIcon(isFavorite: Boolean, favoriteIcon: ImageView) {
-            val iconRes = if (isFavorite) R.drawable.ic_heart_filled else R.drawable.ic_heart_empty
-            favoriteIcon.setImageResource(iconRes)
-        }
+        val iconRes = if (isFavorite) R.drawable.ic_heart_filled else R.drawable.ic_heart_empty
+        favoriteIcon.setImageResource(iconRes)
     }
+
+
+}

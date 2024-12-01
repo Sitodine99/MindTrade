@@ -60,6 +60,7 @@ class StrategyAdapter(
     }
 
 
+
     // Mapea avatarName a recursos drawable
     private fun getAvatarResource(avatarName: String): Int {
         return when (avatarName) {

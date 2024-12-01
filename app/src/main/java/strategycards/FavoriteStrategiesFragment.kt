@@ -2,12 +2,12 @@ package strategycards
 
 import adapters.FavoriteStrategyAdapter
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentContainerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mindtrade.R
@@ -34,29 +34,7 @@ class FavoriteStrategiesFragment : Fragment() {
 
         // Inicializar el adaptador
         adapter = FavoriteStrategyAdapter(strategies) { strategy ->
-
-            // Navegar al detalle de la estrategia (opcional)
-            val fragment = StrategyDetailFragment().apply {
-                arguments = Bundle().apply {
-                    putString("strategyId", strategy.id)
-                    putString("strategyTitle", strategy.title)
-                    putString("strategyDescription", strategy.description)
-                    putString("strategyAuthor", strategy.author)
-                    putString("strategyAvatarName", strategy.avatarName)
-                    putString("strategyAvatarUrl", strategy.avatarUrl)
-                    putStringArray("strategyIndicators", strategy.indicators.toTypedArray())
-                    putStringArray("strategyTimeframes", strategy.timeframes.toTypedArray())
-                    putStringArray("tradingStyles", strategy.tradingStyles.toTypedArray())
-                    putDouble("strategyRating", strategy.rating)
-                    putString("algorithmCode", strategy.algorithmCode) // Pasar el campo algorithmCode
-                    putStringArray("strategySymbols", strategy.symbols.toTypedArray())
-                }
-            }
-
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, fragment)
-                .addToBackStack(null)
-                .commit()
+            openStrategyDetailFragment(strategy) // Llamar al método para abrir el detalle
         }
 
         recyclerView.adapter = adapter
@@ -67,6 +45,48 @@ class FavoriteStrategiesFragment : Fragment() {
         return view
     }
 
+    private fun openStrategyDetailFragment(strategy: Strategy) {
+        // Ocultar el contenedor de fragmentos inicialmente
+        val activity = requireActivity()
+        val fragmentContainer = activity.findViewById<FragmentContainerView>(R.id.fragmentContainer)
+        fragmentContainer?.visibility = View.INVISIBLE // Mantener invisible inicialmente
+
+        // Crear el fragmento de detalle
+        val fragment = StrategyDetailFragment().apply {
+            arguments = Bundle().apply {
+                putString("strategyId", strategy.id)
+                putString("strategyTitle", strategy.title)
+                putString("strategyDescription", strategy.description)
+                putString("strategyAuthor", strategy.author)
+                putString("strategyAvatarName", strategy.avatarName)
+                putString("strategyAvatarUrl", strategy.avatarUrl)
+                putStringArray("strategyIndicators", strategy.indicators.toTypedArray())
+                putStringArray("strategyTimeframes", strategy.timeframes.toTypedArray())
+                putStringArray("tradingStyles", strategy.tradingStyles.toTypedArray())
+                putDouble("strategyRating", strategy.rating)
+                putString("algorithmCode", strategy.algorithmCode) // Pasar el campo algorithmCode
+                putStringArray("strategySymbols", strategy.symbols.toTypedArray())
+            }
+        }
+
+        // Añadir el fragmento a la pila pero sin mostrarlo inmediatamente
+        activity.supportFragmentManager.beginTransaction()
+            .setCustomAnimations(
+                R.anim.fade_in, // Animación de entrada
+                R.anim.fade_out, // Animación de salida
+                R.anim.fade_in, // Animación al retroceder (popEnter)
+                R.anim.fade_out  // Animación al salir (popExit)
+            )
+            .replace(R.id.fragmentContainer, fragment)
+            .addToBackStack(null) // Agregar el fragmento a la pila de retroceso
+            .commit()
+
+        // Retrasar la visibilidad del contenedor hasta que el fragmento esté cargado
+        fragmentContainer?.postDelayed({
+            fragmentContainer.visibility = View.VISIBLE // Mostrar el fragmento cargado
+        }, 300) // Ajustar el retraso (300ms) según sea necesario
+    }
+
     private fun loadFavoriteStrategies() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
 
@@ -75,14 +95,14 @@ class FavoriteStrategiesFragment : Fragment() {
             return
         }
 
+        // Ocultar el RecyclerView inicialmente
+        recyclerView.visibility = View.INVISIBLE
+
         db.collection("strategies")
             .whereArrayContains("favoritedBy", userId)
             .get()
             .addOnSuccessListener { result ->
                 strategies.clear()
-                for (document in result) {
-                    Log.d("FavoriteStrategies", "Documento: ${document.data}")
-                }
                 strategies.addAll(result.map { document ->
                     Strategy(
                         id = document.id,
@@ -96,15 +116,19 @@ class FavoriteStrategiesFragment : Fragment() {
                         indicators = (document.get("indicators") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
                         timeframes = (document.get("timeframes") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
                         tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
-                        symbols = (document.get("symbols") as? List<*>)?.filterIsInstance<kotlin.String>() ?: emptyList(),
+                        symbols = (document.get("symbols") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
                         algorithmCode = document.getString("algorithmCode") ?: ""
                     )
                 })
                 adapter.notifyDataSetChanged()
+
+                // Retrasar la visibilidad del RecyclerView para una transición suave
+                recyclerView.postDelayed({
+                    recyclerView.visibility = View.VISIBLE
+                }, 300) // Retraso de 300ms (ajustable)
             }
             .addOnFailureListener { e ->
                 Toast.makeText(requireContext(), "Error al cargar estrategias favoritas", Toast.LENGTH_SHORT).show()
-                Log.e("FavoriteStrategies", "Error: ${e.message}")
             }
     }
 }
