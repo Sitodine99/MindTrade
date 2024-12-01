@@ -544,7 +544,18 @@
                 android:id="@+id/strategyImageView"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:contentDescription="Vista previa de la imagen"
+                android:contentDescription="Vista previa de la imagen_01"
+                android:src="@drawable/ic_placeholder"
+                android:scaleType="centerCrop"
+                android:background="@drawable/code_editor_background"
+                android:layout_marginStart="16dp" />
+
+            <!-- Vista previa de la imagen -->
+            <ImageView
+                android:id="@+id/strategyImageView02"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:contentDescription="Vista previa de la imagen_02"
                 android:src="@drawable/ic_placeholder"
                 android:scaleType="centerCrop"
                 android:background="@drawable/code_editor_background"

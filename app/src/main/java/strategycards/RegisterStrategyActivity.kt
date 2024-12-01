@@ -1,10 +1,13 @@
 package strategycards
 
+import android.app.AlertDialog
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.core.view.children
 import com.example.mindtrade.R
 import com.example.mindtrade.finishWithFade
@@ -12,6 +15,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 
 
 class RegisterStrategyActivity : AppCompatActivity() {
@@ -47,12 +51,23 @@ class RegisterStrategyActivity : AppCompatActivity() {
     private lateinit var addSymbolEditText: EditText
     private lateinit var addSymbolButton: Button
 
+    private lateinit var strategyImageView01: ImageView
+    private lateinit var strategyImageView02: ImageView
+
+
     private val db = FirebaseFirestore.getInstance()
     private val currentUser = FirebaseAuth.getInstance().currentUser
+
+    private var entryImageUrl: String? = null
+    private var exitImageUrl: String? = null
+    private var selectedImageType: String = "" // "entry" o "exit"
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register_strategy)
+        strategyImageView01 = findViewById(R.id.strategyImageView)
+        strategyImageView02 = findViewById(R.id.strategyImageView02)
 
         // Referenciar elementos del diseño
         titleEditText = findViewById(R.id.strategyTitle)
@@ -82,6 +97,13 @@ class RegisterStrategyActivity : AppCompatActivity() {
         addSymbolEditText = findViewById(R.id.addSymbolEditText)
         addSymbolButton = findViewById(R.id.addSymbolButton)
 
+        //Botón para abrir un diálogo donde el usuario pueda elegir qué tipo de imagen gestionar:
+        val uploadImageButton: ImageButton = findViewById(R.id.uploadImageButton)
+        uploadImageButton.setOnClickListener {
+            showImageManagementDialog()
+        }
+
+
         // Cargar datos de estrategia si es modo edición
         val strategyId = intent.getStringExtra("strategyId")
         if (strategyId != null) {
@@ -110,6 +132,14 @@ class RegisterStrategyActivity : AppCompatActivity() {
 
         // Configurar chips para símbolos
         setupPredefinedSymbols()
+
+        // Imagen gestión
+        findViewById<ImageButton>(R.id.uploadImageButton).setOnClickListener {
+            showImageManagementDialog()
+        }
+
+        // Cargar datos si es edición
+        intent.getStringExtra("strategyId")?.let { loadStrategyData(it) }
     }
 
     fun toggleGroupVisibility(view: View) {
@@ -494,6 +524,7 @@ class RegisterStrategyActivity : AppCompatActivity() {
             return
         }
 
+
         // Recoger los indicadores seleccionados
         val indicators = mutableListOf<String>()
         for (i in 0 until chipGroup.childCount) {
@@ -564,7 +595,7 @@ class RegisterStrategyActivity : AppCompatActivity() {
                 val avatarName = userDoc.getString("avatarName") ?: "default_avatar"
                 val avatarUrl = userDoc.getString("avatarUrl") ?: ""
 
-                val strategy = hashMapOf(
+                val strategy = hashMapOf<String, Any>(
                     "title" to title,
                     "createdBy" to userId,
                     "authorAlias" to alias,
@@ -574,14 +605,19 @@ class RegisterStrategyActivity : AppCompatActivity() {
                     "tradingStyles" to tradingStyles,
                     "indicators" to indicators,
                     "timeframes" to timeFrames,
-                    "symbols" to selectedSymbols, // Guardar los símbolos
+                    "symbols" to selectedSymbols,
                     "algorithmCode" to algorithmCode,
                     "favoritedBy" to emptyList<String>(),
                     "userRatings" to emptyMap<String, Double>(),
                     "rating" to 0.0,
                     "totalVotes" to 0,
                     "timestamp" to System.currentTimeMillis()
-                )
+                ).apply {
+                    entryImageUrl?.let { put("entryConditionImageUrl", it) }
+                    exitImageUrl?.let { put("exitConditionImageUrl", it) }
+                }
+
+
 
                 db.collection("strategies").add(strategy).addOnSuccessListener { documentRef ->
                     Toast.makeText(this, "Estrategia guardada exitosamente", Toast.LENGTH_SHORT)
@@ -616,6 +652,20 @@ class RegisterStrategyActivity : AppCompatActivity() {
                 if (document.exists()) {
                     // Prellenar el campo de título
                     titleEditText.setText(document.getString("title"))
+
+                    entryImageUrl = document.getString("entryConditionImageUrl")
+                    if (!entryImageUrl.isNullOrEmpty()) {
+                        strategyImageView01.setImageURI(Uri.parse(entryImageUrl))
+                    } else {
+                        strategyImageView01.setImageResource(R.drawable.ic_placeholder) // Imagen por defecto
+                    }
+
+                    exitImageUrl = document.getString("exitConditionImageUrl")
+                    if (!exitImageUrl.isNullOrEmpty()) {
+                        strategyImageView02.setImageURI(Uri.parse(exitImageUrl))
+                    } else {
+                        strategyImageView02.setImageResource(R.drawable.ic_placeholder) // Imagen por defecto
+                    }
 
                     // Analizar y dividir el campo de descripción
                     val description = document.getString("description") ?: ""
@@ -696,6 +746,84 @@ class RegisterStrategyActivity : AppCompatActivity() {
             // Devolver solo el contenido de esta sección
             description.substring(sectionStart + sectionHeader.length, sectionEnd).trim()
         }
+    }
+
+    //Crea el Diálogo para Gestionar Imágenes
+    private fun showImageManagementDialog() {
+        val options = arrayOf("Imagen de Entrada", "Imagen de Salida")
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Seleccionar imagen a gestionar")
+        builder.setItems(options) { _, which ->
+            selectedImageType = if (which == 0) "entry" else "exit"
+            openImagePicker()
+        }
+        builder.show()
+    }
+
+    // Permite al usuario seleccionar una imagen de la galería
+    private fun openImagePicker() {
+        val intent = Intent(Intent.ACTION_PICK).apply {
+            type = "image/*"
+        }
+        startActivityForResult(intent, REQUEST_CODE_IMAGE_PICKER)
+    }
+
+    companion object {
+        private const val REQUEST_CODE_IMAGE_PICKER = 1001
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_IMAGE_PICKER && resultCode == RESULT_OK) {
+            val imageUri = data?.data
+            if (imageUri != null) {
+                // Subir la imagen seleccionada a Firebase Storage
+                uploadImageToFirebase(imageUri) { uploadedUrl ->
+                    if (uploadedUrl != null) {
+                        if (selectedImageType == "entry") {
+                            entryImageUrl = uploadedUrl
+                            strategyImageView01.setImageURI(imageUri) // Mostrar la imagen seleccionada
+                            Toast.makeText(
+                                this,
+                                "Imagen de entrada subida exitosamente",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else if (selectedImageType == "exit") {
+                            exitImageUrl = uploadedUrl
+                            strategyImageView02.setImageURI(imageUri) // Mostrar la imagen seleccionada
+                            Toast.makeText(
+                                this,
+                                "Imagen de salida subida exitosamente",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    } else {
+                        Toast.makeText(this, "Error al subir la imagen", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } else {
+                Toast.makeText(this, "No se seleccionó ninguna imagen", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    // Función para subir la imagen a Firebase Storage
+    private fun uploadImageToFirebase(imageUri: Uri, callback: (String?) -> Unit) {
+        val storageRef = FirebaseStorage.getInstance().reference.child("images/${System.currentTimeMillis()}.jpg")
+
+        storageRef.putFile(imageUri)
+            .addOnSuccessListener {
+                storageRef.downloadUrl.addOnSuccessListener { uri ->
+                    callback(uri.toString()) // Devuelve la URL pública de la imagen
+                }.addOnFailureListener {
+                    Toast.makeText(this, "Error al obtener la URL de la imagen", Toast.LENGTH_SHORT).show()
+                    callback(null) // Devuelve null si falla al obtener la URL
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error al subir la imagen: ${e.message}", Toast.LENGTH_SHORT).show()
+                callback(null) // Devuelve null si falla la subida
+            }
     }
 }
 

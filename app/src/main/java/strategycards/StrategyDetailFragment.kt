@@ -58,6 +58,9 @@ class StrategyDetailFragment : Fragment() {
                     val strategyRating = document.getDouble("rating") ?: 0.0
                     val algorithmCode = document.getString("algorithmCode") ?: ""
                     val strategySymbols = (document.get("symbols") as? List<*>)?.filterIsInstance<String>()?.toTypedArray() ?: arrayOf("Sin símbolos")
+                    val entryImageUrl = document.getString("entryConditionImageUrl") ?: ""
+                    val exitImageUrl = document.getString("exitConditionImageUrl") ?: ""
+
 
                     // Actualizar vistas con datos obtenidos de Firebase
                     strategyTitleTextView.text = strategyTitle
@@ -83,6 +86,8 @@ class StrategyDetailFragment : Fragment() {
                     adapter.addFragment(DescriptionFragment().apply {
                         arguments = Bundle().apply {
                             putString("description", strategyDescription)
+                            putString("entryConditionImageUrl", entryImageUrl)
+                            putString("exitConditionImageUrl", exitImageUrl)
                         }
                     }, "Descripción")
 
