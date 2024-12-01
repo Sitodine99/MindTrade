@@ -31,6 +31,7 @@ import com.google.firebase.firestore.ListenerRegistration
 import strategycards.FavoriteStrategiesFragment
 import strategycards.RegisterStrategyActivity
 import strategycards.StrategyDetailFragment
+import welcome.AvatarSelectionActivity
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyStrategiesFragment.OnStrategyDeletedListener {
 
@@ -64,10 +65,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setContentView(R.layout.activity_main)
         FirebaseFirestore.setLoggingEnabled(true)
 
-
+        // Configurar la barra de herramientas
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
+        // Configurar el drawer layout y la navegación
         drawerLayout = findViewById(R.id.drawer_layout)
         val navigationView: NavigationView = findViewById(R.id.navigationView)
         val toggle = ActionBarDrawerToggle(
@@ -81,14 +83,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toggle.syncState()
         navigationView.setNavigationItemSelectedListener(this)
 
+        // Referencias a las vistas principales
         avatarImage = findViewById(R.id.userAvatar)
         tradingStyleImage = findViewById(R.id.tradingStyleImage)
         psicoImage = findViewById(R.id.psicoImage)
         emotionImage = findViewById(R.id.emotionImage)
         accountsRecyclerView = findViewById(R.id.accountsRecyclerView)
         strategiesRecyclerView = findViewById(R.id.strategiesRecyclerView)
-        addStrategyButton = findViewById(R.id.addStrategyButton) // Inicializar botón
+        addStrategyButton = findViewById(R.id.addStrategyButton)
 
+        // Referencias a las vistas del header del menú de navegación
         val headerView = navigationView.getHeaderView(0)
         navAvatarImage = headerView.findViewById(R.id.navAvatarImage)
         navUserNameText = headerView.findViewById(R.id.navUserNameText)
@@ -96,6 +100,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navPsicoStateText = headerView.findViewById(R.id.navPsicoState)
         navEmotionText = headerView.findViewById(R.id.navEmotion)
 
+        // Obtener el usuario actual de Firebase Authentication
         val currentUser = FirebaseAuth.getInstance().currentUser
         userId = currentUser?.uid
 
@@ -107,6 +112,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             return
         }
 
+        // Configurar el lanzador para la actividad de registrar estrategias
         registerStrategyLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
@@ -119,13 +125,49 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
 
-
+        // Configurar RecyclerViews y otros listeners
         setupAccountsRecyclerView()
         setupStrategiesRecyclerView()
         setupImageClickListeners()
         setupAddStrategyButton() // Configurar botón "Añadir Estrategia"
+
+        // Cargar datos del usuario desde Firestore
         loadUserData()
+
+        // Configurar el listener en la imagen del avatar del header para abrir AvatarSelectionActivity
+        navAvatarImage.setOnClickListener {
+            db.collection("users").document(userId!!).get()
+                .addOnSuccessListener { document ->
+                    val avatarUrl = document.getString("avatarUrl") ?: ""
+                    val avatarName = document.getString("avatarName") ?: "default_avatar"
+                    val alias = document.getString("alias") ?: "Sin alias"
+                    val dateOfBirth = document.getString("dateOfBirth") ?: ""
+
+                    val intent = Intent(this, AvatarSelectionActivity::class.java).apply {
+                        putExtra("avatarUrl", avatarUrl)
+                        putExtra("avatarName", avatarName)
+                        putExtra("alias", alias)
+                        putExtra("dateOfBirth", dateOfBirth)
+                    }
+                    startActivityWithFade(intent)
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error al cargar datos: ${e.message}", Toast.LENGTH_SHORT)
+                        .show()
+                }
+        }
     }
+
+
+        private fun getUserDateOfBirthFromFirestore(): String? {
+        // Devuelve la fecha de nacimiento en el formato que uses en Firestore (por ejemplo, "dd/MM/yyyy")
+        // Este valor debe haberse extraído previamente en loadUserData si existe en Firestore
+        return db.collection("users").document(userId!!).get()
+            .result
+            ?.getString("dateOfBirth")
+    }
+
+
 
     private fun setupAccountsRecyclerView() {
         val accountsList = listOf("Cuenta 1", "Cuenta 2", "Cuenta 3", "Cuenta 4", "Cuenta 5")

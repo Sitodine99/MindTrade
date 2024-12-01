@@ -38,12 +38,13 @@ class AvatarSelectionActivity : AppCompatActivity() {
     private var selectedAvatarUri: Uri? = null
     private var selectedAvatarName: String = "default_avatar"
 
-    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        if (uri != null) {
-            selectedAvatarUri = uri
-            Glide.with(this).load(uri).circleCrop().into(avatarImage)
+    private val pickImageLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            if (uri != null) {
+                selectedAvatarUri = uri
+                Glide.with(this).load(uri).circleCrop().into(avatarImage)
+            }
         }
-    }
 
     private fun getUserIdFromPreferences(): String? {
         val sharedPreferences = getSharedPreferences("MindTradePrefs", MODE_PRIVATE)
@@ -68,6 +69,36 @@ class AvatarSelectionActivity : AppCompatActivity() {
         dobPicker = findViewById(R.id.dobPicker)
         continueButton = findViewById(R.id.buttonLogin)
 
+        // Leer los datos actuales pasados desde MainActivity
+        val currentAvatarUrl = intent.getStringExtra("avatarUrl")
+        val currentAvatarName = intent.getStringExtra("avatarName")
+        val currentAlias = intent.getStringExtra("alias")
+        val currentDateOfBirth = intent.getStringExtra("dateOfBirth")
+
+        // Configurar el avatar actual
+        if (!currentAvatarUrl.isNullOrEmpty() && currentAvatarUrl.startsWith("https://")) {
+            Glide.with(this).load(currentAvatarUrl).circleCrop().into(avatarImage)
+        } else if (!currentAvatarName.isNullOrEmpty()) {
+            val avatarResId = getAvatarImageResource(currentAvatarName)
+            avatarResId?.let { avatarImage.setImageResource(it) }
+        }
+
+        // Configurar el alias actual
+        if (!currentAlias.isNullOrEmpty()) {
+            aliasInput.setText(currentAlias)
+        }
+
+        // Configurar la fecha de nacimiento actual
+        if (!currentDateOfBirth.isNullOrEmpty()) {
+            val parts = currentDateOfBirth.split("/")
+            if (parts.size == 3) {
+                val day = parts[0].toIntOrNull() ?: 1
+                val month = (parts[1].toIntOrNull() ?: 1) - 1
+                val year = parts[2].toIntOrNull() ?: 2000
+                dobPicker.updateDate(year, month, day)
+            }
+        }
+
         avatarImage.setOnClickListener {
             openAvatarSelectionDialog()
         }
@@ -81,8 +112,23 @@ class AvatarSelectionActivity : AppCompatActivity() {
             } else if (dateOfBirth.isEmpty()) {
                 Toast.makeText(this, "Por favor, selecciona tu fecha de nacimiento", Toast.LENGTH_SHORT).show()
             } else {
-                uploadAvatarToFirebase { avatarUrl ->
-                    saveUserData(avatarUrl, alias, dateOfBirth)
+                when {
+                    selectedAvatarUri != null -> {
+                        // Caso 1: El usuario subió una imagen
+                        uploadAvatarToFirebase { avatarUrl ->
+                            saveUserData(avatarUrl, "default_avatar", alias, dateOfBirth)
+                        }
+                    }
+                    selectedAvatarName != "default_avatar" -> {
+                        // Caso 2: El usuario seleccionó un avatar local
+                        saveUserData("default_avatar_url", selectedAvatarName, alias, dateOfBirth)
+                    }
+                    else -> {
+                        // Caso 3: El usuario no hizo cambios
+                        val currentAvatarUrl = intent.getStringExtra("avatarUrl") ?: "default_avatar_url"
+                        val currentAvatarName = intent.getStringExtra("avatarName") ?: "default_avatar"
+                        saveUserData(currentAvatarUrl, currentAvatarName, alias, dateOfBirth)
+                    }
                 }
             }
         }
@@ -93,6 +139,21 @@ class AvatarSelectionActivity : AppCompatActivity() {
             }
         })
     }
+
+    // Método para obtener el recurso de avatar local
+    private fun getAvatarImageResource(avatarName: String?): Int? {
+        return when (avatarName) {
+            "avatar_alien" -> R.drawable.avataralien
+            "avatar_bebe" -> R.drawable.avatarbebe
+            "avatar_hombre" -> R.drawable.avatarhombre
+            "avatar_mujer" -> R.drawable.avatarmujer
+            "avatar_frankenstein" -> R.drawable.avatarfrankenstein
+            "avatar_lobo" -> R.drawable.avatarlobo
+            "avatar_vampira" -> R.drawable.avatarvampira
+            else -> null
+        }
+    }
+
 
     private fun openAvatarSelectionDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_avatar_selection, null)
@@ -159,11 +220,16 @@ class AvatarSelectionActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveUserData(avatarUrl: String, alias: String, dateOfBirth: String) {
+    private fun saveUserData(
+        avatarUrl: String,
+        avatarName: String,
+        alias: String,
+        dateOfBirth: String
+    ) {
         if (userId != null) {
             val userData = mapOf(
                 "avatarUrl" to avatarUrl,
-                "avatarName" to selectedAvatarName,
+                "avatarName" to avatarName,
                 "alias" to alias,
                 "dateOfBirth" to dateOfBirth,
                 "registration_progress" to "avatar_selection",
@@ -178,7 +244,8 @@ class AvatarSelectionActivity : AppCompatActivity() {
                     startActivityWithFade(intent)
                 }
                 .addOnFailureListener { e ->
-                    Toast.makeText(this, "Error al guardar: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Error al guardar: ${e.message}", Toast.LENGTH_SHORT)
+                        .show()
                 }
         } else {
             Toast.makeText(this, "Error: ID de usuario no encontrado", Toast.LENGTH_SHORT).show()
