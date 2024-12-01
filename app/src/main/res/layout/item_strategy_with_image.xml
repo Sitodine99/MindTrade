@@ -1,0 +1,72 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/strategiesWithImagesRecyclerView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="?attr/selectableItemBackground">
+
+    <!-- Encabezado con la imagen del avatar y el título -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Imagen del avatar -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/avatarImageView"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_placeholder"
+            android:scaleType="centerCrop"
+            android:padding="4dp"
+            android:layout_marginEnd="16dp"
+            app:shapeAppearanceOverlay="@style/CircularImage"
+            app:strokeColor="@android:color/black"
+            app:strokeWidth="1dp" />
+
+        <!-- Título y autor -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/strategyTitleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Título de la Estrategia"
+                android:textStyle="bold"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/strategyAuthorTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Por: Autor"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Imagen grande de la estrategia -->
+    <ImageView
+        android:id="@+id/strategyImageView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginTop="16dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_placeholder" />
+
+    <!-- Barra de valoración -->
+    <RatingBar
+        android:id="@+id/strategyRatingBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:numStars="5"
+        android:stepSize="0.5"
+        android:isIndicator="true" />
+</LinearLayout>

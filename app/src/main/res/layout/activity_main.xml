@@ -172,6 +172,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tradingStrategiesSummary" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/strategiesWithImagesRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/strategiesRecyclerView" />
+
+
+
         <Button
             android:id="@+id/addStrategyButton"
             android:layout_width="wrap_content"
@@ -180,7 +191,7 @@
             android:backgroundTint="@color/black"
             android:textColor="#FFFFFF"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/strategiesRecyclerView"
+            app:layout_constraintTop_toBottomOf="@id/strategiesWithImagesRecyclerView"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp" />
 

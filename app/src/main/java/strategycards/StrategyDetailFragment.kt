@@ -30,7 +30,6 @@ class StrategyDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Mostrar el shimmer inicialmente
 
         val avatarImageView: ImageView = view.findViewById(R.id.avatarImageView)
         val strategyTitleTextView: TextView = view.findViewById(R.id.strategyTitleTextView)
@@ -42,7 +41,9 @@ class StrategyDetailFragment : Fragment() {
         val args = arguments
         val strategyId = args?.getString("strategyId") ?: ""
 
-        // Cargar datos desde Firebase
+
+
+            // Cargar datos desde Firebase
         val db = FirebaseFirestore.getInstance()
         db.collection("strategies").document(strategyId).get()
             .addOnSuccessListener { document ->
@@ -126,6 +127,7 @@ class StrategyDetailFragment : Fragment() {
 
         // Manejar favoritos
         initializeFavoriteButton(strategyId, favoriteIcon)
+
     }
 
 

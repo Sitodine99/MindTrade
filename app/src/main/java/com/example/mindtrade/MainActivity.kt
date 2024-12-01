@@ -1,5 +1,6 @@
 package com.example.mindtrade
 
+import StrategyWithImageAdapter
 import adapters.AccountAdapter
 import android.content.Intent
 import android.os.Bundle
@@ -42,6 +43,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var emotionImage: ShapeableImageView
     private lateinit var accountsRecyclerView: RecyclerView
     private lateinit var strategiesRecyclerView: RecyclerView
+    private lateinit var strategiesWithImagesRecyclerView: RecyclerView
+
     private lateinit var addStrategyButton: Button // Nuevo botón para añadir estrategia
     private lateinit var navAvatarImage: ImageView
     private lateinit var navUserNameText: TextView
@@ -63,6 +66,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         FirebaseFirestore.setLoggingEnabled(true)
 
         // Configurar la barra de herramientas
@@ -90,6 +94,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         emotionImage = findViewById(R.id.emotionImage)
         accountsRecyclerView = findViewById(R.id.accountsRecyclerView)
         strategiesRecyclerView = findViewById(R.id.strategiesRecyclerView)
+        strategiesWithImagesRecyclerView = findViewById(R.id.strategiesWithImagesRecyclerView)
+
         addStrategyButton = findViewById(R.id.addStrategyButton)
 
         // Referencias a las vistas del header del menú de navegación
@@ -119,7 +125,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     val newStrategyId = result.data?.getStringExtra("newStrategyId")
                     if (newStrategyId != null) {
                         // Recargar las estrategias y resaltar la nueva
-                        setupStrategiesRecyclerView()
+                        setupRecyclerViews()
                         Toast.makeText(this, "Nueva estrategia añadida", Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -127,7 +133,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         // Configurar RecyclerViews y otros listeners
         setupAccountsRecyclerView()
-        setupStrategiesRecyclerView()
+        setupRecyclerViews()
         setupImageClickListeners()
         setupAddStrategyButton() // Configurar botón "Añadir Estrategia"
 
@@ -198,7 +204,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         accountsRecyclerView.adapter = AccountAdapter(accountsList)
     }
 
-    private fun startAutoScroll(itemCount: Int) {
+    private fun startAutoScroll(recyclerView: RecyclerView, itemCount: Int) {
+        if (itemCount <= 1) return // Si no hay suficientes elementos, no iniciar el scroll
+
         val handler = android.os.Handler()
         val inactivityHandler = android.os.Handler() // Handler para la inactividad
         var currentIndex = 0
@@ -206,11 +214,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val runnable = object : Runnable {
             override fun run() {
                 if (currentIndex < itemCount) {
-                    strategiesRecyclerView.smoothScrollToPosition(currentIndex)
+                    recyclerView.smoothScrollToPosition(currentIndex)
                     currentIndex++
                 } else {
                     currentIndex = 0 // Reiniciar al inicio cuando lleguemos al final
-                    strategiesRecyclerView.smoothScrollToPosition(currentIndex)
+                    recyclerView.smoothScrollToPosition(currentIndex)
                 }
                 handler.postDelayed(this, 3000) // Cambiar cada 3 segundos
             }
@@ -222,7 +230,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val INACTIVITY_DELAY = 5000L
 
         // Opción para detener el scroll si el usuario interactúa
-        strategiesRecyclerView.setOnTouchListener { _, _ ->
+        recyclerView.setOnTouchListener { _, _ ->
             handler.removeCallbacks(runnable) // Detener el scroll automático
             inactivityHandler.removeCallbacksAndMessages(null) // Cancelar reinicios previos
 
@@ -233,13 +241,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             false // Permitir que el RecyclerView maneje el evento táctil
         }
-
-
-// Sobrescribir el performClick en el RecyclerView
-        strategiesRecyclerView.setOnClickListener {
-            strategiesRecyclerView.performClick()
-        }
     }
+
 
     private fun openStrategyDetailFragment(strategy: Strategy) {
         // Retrasar la transición hasta que los datos estén listos (aunque ya los tienes)
@@ -251,6 +254,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.GONE
             findViewById<TextView>(R.id.accountsSummary).visibility = View.GONE
             findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.GONE
+            findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility = View.GONE
             findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.GONE
             findViewById<Button>(R.id.addStrategyButton).visibility = View.GONE
 
@@ -299,26 +303,33 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
 
-    private fun setupStrategiesRecyclerView() {
+    private fun setupRecyclerViews() {
+        // Configurar LayoutManagers
         strategiesRecyclerView.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        strategiesWithImagesRecyclerView.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
-        // Lista local para almacenar estrategias
-        val strategies = mutableListOf<Strategy>()
+        // Listas locales para almacenar estrategias
+        val strategiesWithImages = mutableListOf<Strategy>()
+        val strategiesWithoutImages = mutableListOf<Strategy>()
 
-        // Configurar el adaptador
-        val adapter = StrategyAdapter(strategies) { strategy ->
+        // Configurar adaptadores
+        val withImagesAdapter = StrategyWithImageAdapter(strategiesWithImages) { strategy ->
             openStrategyDetailFragment(strategy)
         }
-        strategiesRecyclerView.adapter = adapter
+        strategiesWithImagesRecyclerView.adapter = withImagesAdapter
+
+        val withoutImagesAdapter = StrategyAdapter(strategiesWithoutImages) { strategy ->
+            openStrategyDetailFragment(strategy)
+        }
+        strategiesRecyclerView.adapter = withoutImagesAdapter
 
         // Escucha en tiempo real desde Firestore
         db.collection("strategies")
             .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
-            .limit(10)
             .addSnapshotListener { snapshots, error ->
                 if (error != null) {
-                    // Validar que el usuario sigue autenticado antes de mostrar el Toast
                     if (FirebaseAuth.getInstance().currentUser != null) {
                         Toast.makeText(
                             this,
@@ -330,38 +341,56 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
 
                 if (snapshots != null) {
-                    strategies.clear() // Limpiar la lista para reflejar cambios
-                    for (document in snapshots) {
-                        strategies.add(
-                            Strategy(
-                                id = document.id,
-                                title = document.getString("title") ?: "Sin título",
-                                description = document.getString("description")
-                                    ?: "Sin descripción",
-                                author = document.getString("authorAlias") ?: "Anónimo",
-                                avatarName = document.getString("avatarName"),
-                                avatarUrl = document.getString("avatarUrl"),
-                                rating = document.getDouble("rating") ?: 0.0,
-                                createdBy = document.getString("createdBy") ?: "",
-                                indicators = (document.get("indicators") as? List<*>)?.filterIsInstance<String>()
-                                    ?: emptyList(),
-                                timeframes = (document.get("timeframes") as? List<*>)?.filterIsInstance<String>()
-                                    ?: emptyList(),
-                                tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>()
-                                    ?: emptyList(),
-                                symbols = (document.get("symbols") as? List<*>)?.filterIsInstance<String>()
-                                    ?: emptyList(),
-                                algorithmCode = document.getString("algorithmCode") ?: ""
-                            )
-                        )
-                    }
-                    adapter.notifyDataSetChanged() // Actualizar la UI con los nuevos datos
+                    // Limpiar las listas para reflejar los cambios
+                    strategiesWithImages.clear()
+                    strategiesWithoutImages.clear()
 
-                    // Iniciar scroll automático
-                    startAutoScroll(strategies.size)
+                    for (document in snapshots) {
+                        // Crear el objeto Strategy a partir de los datos del documento
+                        val strategy = Strategy(
+                            id = document.id,
+                            title = document.getString("title") ?: "Sin título",
+                            description = document.getString("description") ?: "Sin descripción",
+                            author = document.getString("authorAlias") ?: "Anónimo",
+                            avatarName = document.getString("avatarName"),
+                            avatarUrl = document.getString("avatarUrl"),
+                            rating = document.getDouble("rating") ?: 0.0,
+                            createdBy = document.getString("createdBy") ?: "",
+                            indicators = (document.get("indicators") as? List<*>)?.filterIsInstance<String>()
+                                ?: emptyList(),
+                            timeframes = (document.get("timeframes") as? List<*>)?.filterIsInstance<String>()
+                                ?: emptyList(),
+                            tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>()
+                                ?: emptyList(),
+                            symbols = (document.get("symbols") as? List<*>)?.filterIsInstance<String>()
+                                ?: emptyList(),
+                            algorithmCode = document.getString("algorithmCode") ?: "",
+                            entryConditionImageUrl = document.getString("entryConditionImageUrl"),
+                            exitConditionImageUrl = document.getString("exitConditionImageUrl")
+                        )
+
+                        // Clasificar estrategias
+                        if (!strategy.entryConditionImageUrl.isNullOrEmpty() || !strategy.exitConditionImageUrl.isNullOrEmpty()) {
+                            strategiesWithImages.add(strategy) // Con imágenes
+                        } else {
+                            strategiesWithoutImages.add(strategy) // Sin imágenes
+                        }
+                    }
+
+                    // Actualizar adaptadores
+                    withImagesAdapter.notifyDataSetChanged()
+                    withoutImagesAdapter.notifyDataSetChanged()
+
+                    // Llamar al autoscroll después de actualizar los adaptadores
+                    startAutoScroll(strategiesWithImagesRecyclerView, strategiesWithImages.size)
+                    startAutoScroll(strategiesRecyclerView, strategiesWithoutImages.size)
                 }
             }
     }
+
+
+
+
 
 
     private fun setupImageClickListeners() {
@@ -725,6 +754,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.VISIBLE
         findViewById<TextView>(R.id.accountsSummary).visibility = View.VISIBLE
         findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.VISIBLE
+        findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility = View.VISIBLE
         findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.VISIBLE
         findViewById<Button>(R.id.addStrategyButton).visibility = View.VISIBLE
 
@@ -749,6 +779,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.GONE
                 findViewById<TextView>(R.id.accountsSummary).visibility = View.GONE
                 findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.GONE
+                findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility = View.GONE
                 findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.GONE
                 findViewById<Button>(R.id.addStrategyButton).visibility = View.GONE
 
@@ -767,6 +798,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.GONE
                 findViewById<TextView>(R.id.accountsSummary).visibility = View.GONE
                 findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.GONE
+                findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility = View.GONE
                 findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.GONE
                 findViewById<Button>(R.id.addStrategyButton).visibility = View.GONE
 
@@ -787,6 +819,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.VISIBLE
                 findViewById<TextView>(R.id.accountsSummary).visibility = View.VISIBLE
                 findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.VISIBLE
+                findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility = View.VISIBLE
                 findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.VISIBLE
                 findViewById<Button>(R.id.addStrategyButton).visibility = View.VISIBLE
                 findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility = View.GONE
@@ -826,13 +859,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onStrategyDeleted() {
         // Recargar el RecyclerView de estrategias
-        setupStrategiesRecyclerView()
+        setupRecyclerViews()
     }
 
     override fun onResume() {
         super.onResume()
         // Actualizar el RecyclerView de estrategias al volver al MainActivity
-        setupStrategiesRecyclerView()
+        setupRecyclerViews()
     }
 
     // Método para eliminar la escucha al cerrar sesión
