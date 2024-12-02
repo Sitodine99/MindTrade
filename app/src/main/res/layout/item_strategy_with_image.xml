@@ -51,14 +51,15 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Imagen grande de la estrategia -->
-    <ImageView
+    <!-- Imagen grande de la estrategia con esquinas redondeadas -->
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/strategyImageView"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_marginTop="16dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_placeholder" />
+        android:src="@drawable/ic_placeholder"
+        app:shapeAppearanceOverlay="@style/RoundedImage" />
 
     <!-- Barra de valoración -->
     <RatingBar

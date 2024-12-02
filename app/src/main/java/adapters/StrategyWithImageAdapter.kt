@@ -44,7 +44,11 @@ class StrategyWithImageAdapter(
                 .circleCrop()
                 .into(holder.avatarImageView)
         } else {
-            holder.avatarImageView.setImageResource(R.drawable.ic_placeholder)
+            val avatarResId = getAvatarResource(strategy.avatarName ?: "default_avatar")
+            Glide.with(holder.avatarImageView.context)
+                .load(avatarResId)
+                .circleCrop()
+                .into(holder.avatarImageView)
         }
 
         // Cargar la imagen grande de la estrategia (entry o exit)
@@ -68,6 +72,20 @@ class StrategyWithImageAdapter(
         // Manejar clic en el elemento
         holder.itemView.setOnClickListener {
             onItemClick(strategy)
+        }
+    }
+
+    // Mapea avatarName a recursos drawable
+    private fun getAvatarResource(avatarName: String): Int {
+        return when (avatarName) {
+            "avatar_hombre" -> R.drawable.avatarhombre
+            "avatar_mujer" -> R.drawable.avatarmujer
+            "avatar_bebe" -> R.drawable.avatarbebe
+            "avatar_alien" -> R.drawable.avataralien
+            "avatar_frankenstein" -> R.drawable.avatarfrankenstein
+            "avatar_lobo" -> R.drawable.avatarlobo
+            "avatar_vampira" -> R.drawable.avatarvampira
+            else -> R.drawable.ic_placeholder
         }
     }
 
