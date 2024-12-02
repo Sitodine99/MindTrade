@@ -132,8 +132,6 @@
         </LinearLayout>
 
 
-
-
         <!-- Indicadores -->
         <TextView
             android:id="@+id/indicatorHeader"
@@ -148,7 +146,7 @@
             android:background="?attr/selectableItemBackground"
             android:onClick="toggleGroupVisibility" />
 
-        <!-- Grupo para los chips dinámicos -->
+        <!-- Grupo donde se añaden los indicadores selecciondos-->
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/indicatorChipGroup"
             android:layout_width="match_parent"
@@ -156,6 +154,7 @@
             app:chipSpacing="8dp"
             app:singleLine="false" />
 
+        <!-- Grupo de indicadores predefinidos -->
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/predefinedIndicatorChipGroup"
             android:layout_width="match_parent"
@@ -180,6 +179,7 @@
             android:backgroundTint="@color/black"
             android:textColor="#FFFFFF"
             android:layout_marginTop="8dp" />
+
 
 
         <!-- Grupo de símbolos -->

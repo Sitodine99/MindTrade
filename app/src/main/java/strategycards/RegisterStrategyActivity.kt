@@ -177,41 +177,17 @@ class RegisterStrategyActivity : AppCompatActivity() {
 
     private fun setupPredefinedIndicators() {
         val predefinedIndicators = listOf(
-            "EMA21",
-            "EMA50",
-            "EMA200",
-            "SMA21",
-            "SMA50",
-            "SMA200",
-            "MACD",
-            "RSI",
-            "Bollinger Bands",
-            "ADX",
-            "Ichimoku",
-            "Volume",
-            "Fibonacci Retracements",
-            "Pivot Points",
+            "EMA21", "EMA50", "EMA200", "SMA21", "SMA50", "SMA200",
+            "MACD", "RSI", "Bollinger Bands", "ADX", "Ichimoku",
+            "Volume", "Fibonacci Retracements", "Pivot Points"
         )
 
         for (indicator in predefinedIndicators) {
             val chip = Chip(this).apply {
                 text = indicator
-                isCheckable = true
+                isCheckable = false // Los chips no son seleccionables en este grupo
                 setOnClickListener {
-                    if (!isChipDuplicate(indicator)) {
-                        val selectedChip = Chip(this@RegisterStrategyActivity).apply {
-                            text = indicator
-                            isCloseIconVisible = true
-                            setOnCloseIconClickListener { chipGroup.removeView(this) }
-                        }
-                        chipGroup.addView(selectedChip)
-                    } else {
-                        Toast.makeText(
-                            this@RegisterStrategyActivity,
-                            "El indicador ya existe",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                    addIndicatorToChipGroup(indicator)
                 }
             }
             predefinedIndicatorsChipGroup.addView(chip)
@@ -398,21 +374,13 @@ class RegisterStrategyActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Evitar duplicados
-            if (isChipDuplicate(indicatorText)) {
-                Toast.makeText(this, "El indicador ya existe", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+            // Usa la función centralizada para añadir el indicador
+            addIndicatorToChipGroup(indicatorText)
 
-            // Crear un nuevo chip dinámico
-            val chip = Chip(this).apply {
-                text = indicatorText
-                isCloseIconVisible = true
-                setOnCloseIconClickListener { chipGroup.removeView(this) }
-            }
-            chipGroup.addView(chip)
-            addIndicatorEditText.text.clear() // Limpiar el campo de texto
+            // Limpia el campo de texto solo si la operación fue exitosa
+            addIndicatorEditText.text.clear()
         }
+
 
         // Botón de cancelar
         cancelButton.setOnClickListener {
@@ -457,6 +425,28 @@ class RegisterStrategyActivity : AppCompatActivity() {
 
     }
 
+    private fun addIndicatorToChipGroup(indicator: String) {
+        // Verificar si el indicador ya existe en el ChipGroup
+        val existingIndicators = chipGroup.children
+            .filterIsInstance<Chip>()
+            .map { it.text.toString() }
+            .toSet() // Usar un Set para evitar duplicados
+
+        if (existingIndicators.contains(indicator)) {
+            Toast.makeText(this, "El indicador ya existe", Toast.LENGTH_SHORT).show()
+            return // No hacer nada si ya existe
+        }
+
+        // Crear y añadir un nuevo chip si no existe
+        val chip = Chip(this).apply {
+            text = indicator
+            isCloseIconVisible = true
+            setOnCloseIconClickListener { chipGroup.removeView(this) }
+        }
+
+        chipGroup.addView(chip)
+    }
+
 
 
     private fun isChipDuplicate(text: String): Boolean {
@@ -497,6 +487,12 @@ class RegisterStrategyActivity : AppCompatActivity() {
 
         val tradingStyles = mutableListOf<String>()
         val strategyId = intent.getStringExtra("strategyId")
+        val indicators = chipGroup.children
+            .filterIsInstance<Chip>()
+            .map { it.text.toString() }
+            .distinct()
+            .toList() // Asegurar que es una lista válida
+
 
         if (dayTradingCheckBox.isChecked) tradingStyles.add("Day Trading")
         if (scalpingCheckBox.isChecked) tradingStyles.add("Scalping")
@@ -519,6 +515,12 @@ class RegisterStrategyActivity : AppCompatActivity() {
             return
         }
 
+        if (indicators.isEmpty()) {
+            Toast.makeText(this, "Añade al menos un indicador", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+
         // Validar temporalidades
         val timeFrames = timeFramesCheckBoxes.filter { it.isChecked }.map { it.text.toString() }
         if (timeFrames.isEmpty()) {
@@ -527,13 +529,6 @@ class RegisterStrategyActivity : AppCompatActivity() {
             return
         }
 
-
-        // Recoger los indicadores seleccionados
-        val indicators = mutableListOf<String>()
-        for (i in 0 until chipGroup.childCount) {
-            val chip = chipGroup.getChildAt(i) as Chip
-            indicators.add(chip.text.toString())
-        }
 
         // Recoger los símbolos seleccionados
         val selectedSymbols = mutableListOf<String>()
@@ -700,15 +695,22 @@ class RegisterStrategyActivity : AppCompatActivity() {
                     swingTradingCheckBox.isChecked =
                         tradingStyles?.contains("Swing Trading") == true
 
-                    // Prellenar indicadores
+                    /// Prellenar indicadores
                     val indicators = document.get("indicators") as? List<*>
                     indicators?.forEach { indicator ->
-                        val chip = Chip(this).apply {
-                            text = indicator.toString()
-                            isCloseIconVisible = true
-                            setOnCloseIconClickListener { chipGroup.removeView(this) }
+                        val indicatorText = indicator.toString()
+                        val existingIndicators = chipGroup.children
+                            .filterIsInstance<Chip>()
+                            .map { it.text.toString() }
+
+                        if (!existingIndicators.contains(indicatorText)) {
+                            val chip = Chip(this).apply {
+                                text = indicatorText
+                                isCloseIconVisible = true
+                                setOnCloseIconClickListener { chipGroup.removeView(this) }
+                            }
+                            chipGroup.addView(chip)
                         }
-                        chipGroup.addView(chip)
                     }
 
                     // Prellenar temporalidades
@@ -840,4 +842,3 @@ class RegisterStrategyActivity : AppCompatActivity() {
             }
     }
 }
-
