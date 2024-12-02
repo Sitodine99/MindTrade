@@ -9,7 +9,9 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.core.view.children
+import com.bumptech.glide.Glide
 import com.example.mindtrade.R
+import com.example.mindtrade.databinding.ActivityRegisterStrategyBinding
 import com.example.mindtrade.finishWithFade
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
@@ -51,8 +53,8 @@ class RegisterStrategyActivity : AppCompatActivity() {
     private lateinit var addSymbolEditText: EditText
     private lateinit var addSymbolButton: Button
 
-    private lateinit var strategyImageView01: ImageView
-    private lateinit var strategyImageView02: ImageView
+    private lateinit var entryImageView: ImageView
+    private lateinit var exitImageView: ImageView
 
 
     private val db = FirebaseFirestore.getInstance()
@@ -61,13 +63,14 @@ class RegisterStrategyActivity : AppCompatActivity() {
     private var entryImageUrl: String? = null
     private var exitImageUrl: String? = null
     private var selectedImageType: String = "" // "entry" o "exit"
+    private lateinit var binding: ActivityRegisterStrategyBinding
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register_strategy)
-        strategyImageView01 = findViewById(R.id.strategyImageView)
-        strategyImageView02 = findViewById(R.id.strategyImageView02)
+        entryImageView = findViewById(R.id.entryImageView)
+        exitImageView = findViewById(R.id.exitImageView)
 
         // Referenciar elementos del diseño
         titleEditText = findViewById(R.id.strategyTitle)
@@ -578,7 +581,9 @@ class RegisterStrategyActivity : AppCompatActivity() {
                     "timeframes" to timeFrames,
                     "symbols" to selectedSymbols, // Guardar los símbolos
                     "algorithmCode" to algorithmCode,
-                    "timestamp" to System.currentTimeMillis()
+                    "timestamp" to System.currentTimeMillis(),
+                    "entryConditionImageUrl" to (entryImageUrl ?: ""),
+                    "exitConditionImageUrl" to (exitImageUrl ?: "")
                 )
             ).addOnSuccessListener {
                 Toast.makeText(this, "Estrategia actualizada", Toast.LENGTH_SHORT).show()
@@ -611,11 +616,10 @@ class RegisterStrategyActivity : AppCompatActivity() {
                     "userRatings" to emptyMap<String, Double>(),
                     "rating" to 0.0,
                     "totalVotes" to 0,
-                    "timestamp" to System.currentTimeMillis()
-                ).apply {
-                    entryImageUrl?.let { put("entryConditionImageUrl", it) }
-                    exitImageUrl?.let { put("exitConditionImageUrl", it) }
-                }
+                    "timestamp" to System.currentTimeMillis(),
+                    "entryConditionImageUrl" to (entryImageUrl ?: ""), // Aquí usas la URL de entrada local
+                    "exitConditionImageUrl" to (exitImageUrl ?: "")    // Aquí usas la URL de salida local
+                )
 
 
 
@@ -653,18 +657,28 @@ class RegisterStrategyActivity : AppCompatActivity() {
                     // Prellenar el campo de título
                     titleEditText.setText(document.getString("title"))
 
+                    // Cargar la imagen de entrada
                     entryImageUrl = document.getString("entryConditionImageUrl")
                     if (!entryImageUrl.isNullOrEmpty()) {
-                        strategyImageView01.setImageURI(Uri.parse(entryImageUrl))
+                        Glide.with(this)
+                            .load(entryImageUrl)
+                            .placeholder(R.drawable.ic_placeholder) // Mientras carga
+                            .error(R.drawable.ic_placeholder)       // Si falla
+                            .into(entryImageView)
                     } else {
-                        strategyImageView01.setImageResource(R.drawable.ic_placeholder) // Imagen por defecto
+                        entryImageView.setImageResource(R.drawable.ic_placeholder) // Imagen por defecto
                     }
 
+                    // Cargar la imagen de salida
                     exitImageUrl = document.getString("exitConditionImageUrl")
                     if (!exitImageUrl.isNullOrEmpty()) {
-                        strategyImageView02.setImageURI(Uri.parse(exitImageUrl))
+                        Glide.with(this)
+                            .load(exitImageUrl)
+                            .placeholder(R.drawable.ic_placeholder) // Mientras carga
+                            .error(R.drawable.ic_placeholder)       // Si falla
+                            .into(exitImageView)
                     } else {
-                        strategyImageView02.setImageResource(R.drawable.ic_placeholder) // Imagen por defecto
+                        exitImageView.setImageResource(R.drawable.ic_placeholder) // Imagen por defecto
                     }
 
                     // Analizar y dividir el campo de descripción
@@ -782,7 +796,7 @@ class RegisterStrategyActivity : AppCompatActivity() {
                     if (uploadedUrl != null) {
                         if (selectedImageType == "entry") {
                             entryImageUrl = uploadedUrl
-                            strategyImageView01.setImageURI(imageUri) // Mostrar la imagen seleccionada
+                            entryImageView.setImageURI(imageUri) // Mostrar la imagen seleccionada
                             Toast.makeText(
                                 this,
                                 "Imagen de entrada subida exitosamente",
@@ -790,7 +804,7 @@ class RegisterStrategyActivity : AppCompatActivity() {
                             ).show()
                         } else if (selectedImageType == "exit") {
                             exitImageUrl = uploadedUrl
-                            strategyImageView02.setImageURI(imageUri) // Mostrar la imagen seleccionada
+                            exitImageView.setImageURI(imageUri) // Mostrar la imagen seleccionada
                             Toast.makeText(
                                 this,
                                 "Imagen de salida subida exitosamente",
@@ -826,5 +840,4 @@ class RegisterStrategyActivity : AppCompatActivity() {
             }
     }
 }
-
 

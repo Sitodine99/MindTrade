@@ -541,7 +541,7 @@
 
             <!-- Vista previa de la imagen -->
             <ImageView
-                android:id="@+id/strategyImageView"
+                android:id="@+id/entryImageView"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:contentDescription="Vista previa de la imagen_01"
@@ -552,7 +552,7 @@
 
             <!-- Vista previa de la imagen -->
             <ImageView
-                android:id="@+id/strategyImageView02"
+                android:id="@+id/exitImageView"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:contentDescription="Vista previa de la imagen_02"

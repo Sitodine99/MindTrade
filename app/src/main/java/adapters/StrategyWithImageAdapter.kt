@@ -48,16 +48,22 @@ class StrategyWithImageAdapter(
         }
 
         // Cargar la imagen grande de la estrategia (entry o exit)
-        val imageUrl = strategy.entryConditionImageUrl ?: strategy.exitConditionImageUrl
+        val imageUrl = if (!strategy.entryConditionImageUrl.isNullOrEmpty()) {
+            strategy.entryConditionImageUrl
+        } else {
+            strategy.exitConditionImageUrl
+        }
+
         if (!imageUrl.isNullOrEmpty()) {
             Glide.with(holder.strategyImageView.context)
                 .load(imageUrl)
-                .placeholder(R.drawable.ic_placeholder)
-                .error(R.drawable.ic_placeholder)
+                .placeholder(R.drawable.ic_placeholder) // Placeholder mientras carga
+                .error(R.drawable.ic_placeholder) // Placeholder si falla
                 .into(holder.strategyImageView)
         } else {
-            holder.strategyImageView.setImageResource(R.drawable.ic_placeholder)
+            holder.strategyImageView.setImageResource(R.drawable.ic_placeholder) // Imagen por defecto
         }
+
 
         // Manejar clic en el elemento
         holder.itemView.setOnClickListener {

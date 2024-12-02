@@ -369,15 +369,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             exitConditionImageUrl = document.getString("exitConditionImageUrl")
                         )
 
-                        // Clasificar estrategias
-                        if (!strategy.entryConditionImageUrl.isNullOrEmpty() || !strategy.exitConditionImageUrl.isNullOrEmpty()) {
-                            strategiesWithImages.add(strategy) // Con imágenes
+                        if (!strategy.entryConditionImageUrl.isNullOrEmpty()) {
+                            strategiesWithImages.add(strategy) // Imagen de entrada presente
+                        } else if (!strategy.exitConditionImageUrl.isNullOrEmpty()) {
+                            strategiesWithImages.add(strategy) // Solo imagen de salida presente
                         } else {
                             strategiesWithoutImages.add(strategy) // Sin imágenes
                         }
                     }
 
-                    // Actualizar adaptadores
+
+                        // Actualizar adaptadores
                     withImagesAdapter.notifyDataSetChanged()
                     withoutImagesAdapter.notifyDataSetChanged()
 
@@ -387,10 +389,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
     }
-
-
-
-
 
 
     private fun setupImageClickListeners() {

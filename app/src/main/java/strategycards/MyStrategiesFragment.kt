@@ -88,6 +88,7 @@ class MyStrategiesFragment : Fragment() {
                         author = userAlias,
                         avatarName = document.getString("avatarName"),
                         avatarUrl = document.getString("avatarUrl"),
+
                         rating = document.getDouble("rating") ?: 0.0,
                         createdBy = document.getString("createdBy") ?: "",
                         indicators = (document.get("indicators") as? List<*>)?.filterIsInstance<String>()
@@ -190,6 +191,8 @@ class MyStrategiesFragment : Fragment() {
             putExtra("strategyTimeframes", strategy.timeframes.toTypedArray())
             putExtra("strategySymbols", strategy.symbols.toTypedArray())
             putExtra("algorithmCode", strategy.algorithmCode)
+            putExtra("entryConditionImageUrl", strategy.entryConditionImageUrl)
+            putExtra("exitConditionImageUrl", strategy.exitConditionImageUrl)
         }
         // Iniciar la actividad con una animación personalizada
         startActivity(intent)
