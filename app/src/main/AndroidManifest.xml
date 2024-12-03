@@ -72,6 +72,8 @@
             android:exported="true"
             android:theme="@style/Theme.MindTrade" />
 
+        <activity android:name=".CreateAccountActivity" />
+
 
 
     </application>

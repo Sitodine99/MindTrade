@@ -15,11 +15,11 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mindtrade.R
-import com.example.mindtrade.model.Comment
 import com.example.mindtrade.model.Strategy
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import model.Comment
 import java.util.*
 
 class ForumFragment : Fragment() {

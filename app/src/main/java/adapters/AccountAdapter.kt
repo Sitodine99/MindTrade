@@ -1,28 +1,30 @@
-package adapters
-
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mindtrade.R
+import com.example.mindtrade.model.Account
 
-class AccountAdapter(private val items: List<String>) : RecyclerView.Adapter<AccountAdapter.ViewHolder>() {
+class AccountAdapter(private val accounts: List<Account>) :
+    RecyclerView.Adapter<AccountAdapter.AccountViewHolder>() {
 
-    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val accountName: TextView = view.findViewById(R.id.accountName)
+    class AccountViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val accountName: TextView = itemView.findViewById(R.id.accountName)
+        val accountBalance: TextView = itemView.findViewById(R.id.accountBalance)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.account_item, parent, false)
-        return ViewHolder(view)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AccountViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_account, parent, false)
+        return AccountViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.accountName.text = items[position]
+    override fun onBindViewHolder(holder: AccountViewHolder, position: Int) {
+        val account = accounts[position]
+        holder.accountName.text = account.name
+        holder.accountBalance.text = "Balance: $${account.balance}"
     }
 
-    override fun getItemCount(): Int {
-        return items.size
-    }
+    override fun getItemCount(): Int = accounts.size
 }

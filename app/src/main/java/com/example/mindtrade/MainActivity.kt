@@ -1,7 +1,7 @@
 package com.example.mindtrade
 
+import AccountAdapter
 import StrategyWithImageAdapter
-import adapters.AccountAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
@@ -33,6 +33,9 @@ import strategycards.MyStrategiesFragment
 import strategycards.RegisterStrategyActivity
 import strategycards.StrategyDetailFragment
 import welcome.AvatarSelectionActivity
+import com.example.mindtrade.CreateAccountActivity
+import com.example.mindtrade.model.Account
+
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyStrategiesFragment.OnStrategyDeletedListener {
 
@@ -45,6 +48,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var strategiesRecyclerView: RecyclerView
     private lateinit var strategiesWithImagesRecyclerView: RecyclerView
 
+    private lateinit var addAccountButton: Button
     private lateinit var addStrategyButton: Button // Nuevo botón para añadir estrategia
     private lateinit var navAvatarImage: ImageView
     private lateinit var navUserNameText: TextView
@@ -72,6 +76,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Configurar la barra de herramientas
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+        // Inicializar referencias
+        addAccountButton = findViewById(R.id.addAccountButton)
+
+        // Llama al método para obtener cuentas
+        fetchAccounts()
+
+        // Configurar listener para el botón
+        addAccountButton.setOnClickListener {
+            val intent = Intent(this, CreateAccountActivity::class.java)
+            startActivity(intent)
+        }
+
 
         // Configurar el drawer layout y la navegación
         drawerLayout = findViewById(R.id.drawer_layout)
@@ -132,7 +149,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
 
         // Configurar RecyclerViews y otros listeners
-        setupAccountsRecyclerView()
+        fetchAccounts()
         setupRecyclerViews()
         setupImageClickListeners()
         setupAddStrategyButton() // Configurar botón "Añadir Estrategia"
@@ -195,14 +212,31 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    private fun fetchAccounts() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId == null) {
+            Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        db.collection("accounts").whereEqualTo("userId", userId).get()
+            .addOnSuccessListener { documents ->
+                val accounts = documents.map { doc -> doc.toObject(Account::class.java) }
+                setupAccountsRecyclerView(accounts)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error al obtener cuentas: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
 
 
-    private fun setupAccountsRecyclerView() {
-        val accountsList = listOf("Cuenta 1", "Cuenta 2", "Cuenta 3", "Cuenta 4", "Cuenta 5")
+    private fun setupAccountsRecyclerView(accounts: List<Account>) {
+        val accountsRecyclerView = findViewById<RecyclerView>(R.id.accountsRecyclerView)
         accountsRecyclerView.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        accountsRecyclerView.adapter = AccountAdapter(accountsList)
+        accountsRecyclerView.adapter = AccountAdapter(accounts)
     }
+
 
     private fun startAutoScroll(recyclerView: RecyclerView, itemCount: Int) {
         if (itemCount <= 1) return // Si no hay suficientes elementos, no iniciar el scroll
@@ -379,7 +413,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }
 
 
-                        // Actualizar adaptadores
+                    // Actualizar adaptadores
                     withImagesAdapter.notifyDataSetChanged()
                     withoutImagesAdapter.notifyDataSetChanged()
 

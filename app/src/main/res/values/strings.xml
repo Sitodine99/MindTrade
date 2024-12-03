@@ -115,6 +115,13 @@
     <string name="delete_icon">Borrar</string>
     <string name="add_to_favorites">Añadir afavoritas</string>
 
+    <string-array name="currencies_array">
+        <item>USD</item>
+        <item>EUR</item>
+        <item>GBP</item>
+    </string-array>
+
+
 
 
 
