@@ -21,206 +21,244 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <!-- AppBarLayout para la Toolbar fija -->
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbarLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        android:elevation="4dp">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        <!-- AppBarLayout para la Toolbar fija -->
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appbarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/black"
-            app:contentInsetStart="16dp"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:titleTextColor="@android:color/white">
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            android:elevation="4dp">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/black"
+                app:contentInsetStart="16dp"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:titleTextColor="@android:color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <!-- Iconos con Avatar -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <!-- Avatar -->
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/userAvatar"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_marginEnd="16dp"
+                            android:contentDescription="Avatar principal"
+                            android:src="@drawable/interrogacion"
+                            app:shapeAppearanceOverlay="@style/CircularImage"
+                            app:strokeColor="@android:color/white"
+                            app:strokeWidth="1dp"
+                            android:padding="2dp"
+                            android:scaleType="fitCenter" />
+
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/tradingStyleImage"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_marginEnd="16dp"
+                            android:contentDescription="Estilo de trading"
+                            android:src="@drawable/interrogacion"
+                            app:shapeAppearanceOverlay="@style/CircularImage"
+                            app:strokeColor="@android:color/white"
+                            app:strokeWidth="1dp"
+                            android:padding="2dp"
+                            android:scaleType="fitCenter" />
+
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/psicoImage"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_marginEnd="16dp"
+                            android:contentDescription="Estado psico"
+                            android:src="@drawable/interrogacion"
+                            app:shapeAppearanceOverlay="@style/CircularImage"
+                            app:strokeColor="@android:color/white"
+                            app:strokeWidth="1dp"
+                            android:padding="2dp"
+                            android:scaleType="fitCenter" />
+
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/emotionImage"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:contentDescription="Emoción"
+                            android:src="@drawable/interrogacion"
+                            app:shapeAppearanceOverlay="@style/CircularImage"
+                            app:strokeColor="@android:color/white"
+                            app:strokeWidth="1dp"
+                            android:padding="2dp"
+                            android:scaleType="fitCenter" />
+                    </LinearLayout>
+
+                    <!-- Botón de Notificación -->
+                    <ImageButton
+                        android:id="@+id/notificationButton"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="8dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Notificaciones"
+                        android:src="@drawable/ic_notifications" />
+
+                </LinearLayout>
+            </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <!-- Contenido desplazable -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="8dp">
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <!-- Iconos con Avatar -->
-                <LinearLayout
-                    android:layout_width="0dp"
+                <!-- FragmentContainerView -->
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/fragmentContainer"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:visibility="gone" />
+
+                <!-- Contenido principal -->
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginBottom="20dp"
                     android:orientation="horizontal"
-                    android:gravity="center">
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    app:layout_constraintTop_toBottomOf="@id/appbarLayout">
 
-                    <!-- Avatar -->
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/userAvatar"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_marginEnd="16dp"
-                        android:contentDescription="Avatar principal"
-                        android:src="@drawable/interrogacion"
-                        app:shapeAppearanceOverlay="@style/CircularImage"
-                        app:strokeColor="@android:color/white"
-                        app:strokeWidth="1dp"
-                        android:padding="2dp"
-                        android:scaleType="fitCenter" />
+                    <TextView
+                        android:id="@+id/accountsSummary"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:text="Mis Cuentas"
+                        android:textColor="@color/black"
+                        android:textSize="25sp"
+                        android:textStyle="bold" />
 
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/tradingStyleImage"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_marginEnd="16dp"
-                        android:contentDescription="Estilo de trading"
-                        android:src="@drawable/interrogacion"
-                        app:shapeAppearanceOverlay="@style/CircularImage"
-                        app:strokeColor="@android:color/white"
-                        app:strokeWidth="1dp"
-                        android:padding="2dp"
-                        android:scaleType="fitCenter" />
+                    <ImageButton
+                        android:id="@+id/addAccountButton"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/ic_add"
+                        android:backgroundTint="#000000"
+                        android:backgroundTintMode="src_in"
+                        android:contentDescription="Añadir Cuenta" />
 
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/psicoImage"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_marginEnd="16dp"
-                        android:contentDescription="Estado psico"
-                        android:src="@drawable/interrogacion"
-                        app:shapeAppearanceOverlay="@style/CircularImage"
-                        app:strokeColor="@android:color/white"
-                        app:strokeWidth="1dp"
-                        android:padding="2dp"
-                        android:scaleType="fitCenter" />
 
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/emotionImage"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:contentDescription="Emoción"
-                        android:src="@drawable/interrogacion"
-                        app:shapeAppearanceOverlay="@style/CircularImage"
-                        app:strokeColor="@android:color/white"
-                        app:strokeWidth="1dp"
-                        android:padding="2dp"
-                        android:scaleType="fitCenter" />
                 </LinearLayout>
 
-                <!-- Botón de Notificación -->
-                <ImageButton
-                    android:id="@+id/notificationButton"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginStart="8dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Notificaciones"
-                    android:src="@drawable/ic_notifications" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/accountsRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/accountsSummary" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="0dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    app:layout_constraintTop_toBottomOf="@id/accountsRecyclerView">
+
+                    <!-- Texto de Estrategias -->
+                    <TextView
+                        android:id="@+id/tradingStrategiesSummary"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="Estrategias"
+                        android:textSize="25sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:gravity="center_vertical"
+                        android:minHeight="48dp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="14sp"
+                        android:autoSizeMaxTextSize="25sp"
+                        android:autoSizeStepGranularity="1sp" />
+
+                    <!-- Botón de Buscar -->
+                    <ImageButton
+                        android:id="@+id/searchStrategyButton"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_marginEnd="40dp"
+                        android:background="@drawable/ic_search"
+                        android:backgroundTintMode="src_in"
+                        android:backgroundTint="#000000"
+                        android:contentDescription="Buscar estrategia" />
+
+                    <!-- Botón de Añadir Estrategias -->
+                    <ImageButton
+                        android:id="@+id/addStrategyButton"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/ic_add"
+                        android:backgroundTintMode="src_in"
+                        android:backgroundTint="#000000"
+                        android:contentDescription="Añadir estrategia" />
+                </LinearLayout>
+
+
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/strategiesWithImagesRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/strategiesRecyclerView" />
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/strategiesRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tradingStrategiesSummary" />
+
 
             </LinearLayout>
-        </androidx.appcompat.widget.Toolbar>
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <!-- Contenido desplazable -->
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/nestedScrollView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <!-- FragmentContainerView -->
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/fragmentContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
-
-            <!-- Contenido principal -->
-            <TextView
-                android:id="@+id/accountsSummary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Mis Cuentas"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="16dp"
-                app:layout_constraintTop_toBottomOf="@id/appbarLayout" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/accountsRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/accountsSummary" />
-
-            <TextView
-                android:id="@+id/tradingStrategiesSummary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginStart="16dp"
-                android:text="Últimas Estrategias"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/accountsRecyclerView"
-                app:layout_constraintEnd_toStartOf="@id/addAccountButton" />
-
-            <Button
-                android:id="@+id/addAccountButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="16dp"
-                android:backgroundTint="@color/black"
-                android:text="Añadir Cuenta"
-                android:textColor="#FFFFFF"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/tradingStrategiesSummary"
-                app:layout_constraintStart_toEndOf="@id/tradingStrategiesSummary" />
-
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/strategiesRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollbars="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tradingStrategiesSummary" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/strategiesWithImagesRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollbars="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/strategiesRecyclerView" />
-
-
-
-            <Button
-                android:id="@+id/addStrategyButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Añadir Estrategia"
-                android:backgroundTint="@color/black"
-                android:textColor="#FFFFFF"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/strategiesWithImagesRecyclerView"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp" />
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <!-- Menú Lateral -->
     <com.google.android.material.navigation.NavigationView
@@ -233,7 +271,6 @@
         app:menu="@menu/nav_menu" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
-
 
 
 

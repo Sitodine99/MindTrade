@@ -21,7 +21,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import auth.LoginActivity
 import adapters.StrategyAdapter
+import android.graphics.Color
 import android.view.View
+import android.widget.ImageButton
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentContainerView
 import com.bumptech.glide.Glide
 import com.example.mindtrade.model.Strategy
@@ -49,9 +52,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var accountsRecyclerView: RecyclerView
     private lateinit var strategiesRecyclerView: RecyclerView
     private lateinit var strategiesWithImagesRecyclerView: RecyclerView
+    private lateinit var addStrategyButton: ImageButton
+    private lateinit var searchStrategyButton: ImageButton
 
-    private lateinit var addAccountButton: Button
-    private lateinit var addStrategyButton: Button // Nuevo botón para añadir estrategia
+
     private lateinit var navAvatarImage: ImageView
     private lateinit var navUserNameText: TextView
     private lateinit var navTradingStyleText: TextView
@@ -79,11 +83,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        // Inicializar referencias
-        addAccountButton = findViewById(R.id.addAccountButton)
 
         // Llama al método para obtener cuentas
         fetchAccounts()
+
+        // Inicializar el ImageButton
+        val addAccountButton: ImageButton = findViewById(R.id.addAccountButton)
+
+        // Inicializar el ImageButton
+        addStrategyButton = findViewById(R.id.addStrategyButton)
 
         // Configurar listener para el botón
         addAccountButton.setOnClickListener {
@@ -91,6 +99,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             startActivity(intent)
         }
 
+        // Configurar listener para el ImageButton
+        addStrategyButton.setOnClickListener {
+            val intent = Intent(this, RegisterStrategyActivity::class.java)
+            registerStrategyLauncher.launch(intent)
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        }
 
         // Configurar el drawer layout y la navegación
         drawerLayout = findViewById(R.id.drawerLayout)
@@ -115,7 +129,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         strategiesRecyclerView = findViewById(R.id.strategiesRecyclerView)
         strategiesWithImagesRecyclerView = findViewById(R.id.strategiesWithImagesRecyclerView)
 
-        addStrategyButton = findViewById(R.id.addStrategyButton)
 
         // Referencias a las vistas del header del menú de navegación
         val headerView = navigationView.getHeaderView(0)
@@ -534,6 +547,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
+
     private fun openImageDetail(imageResId: Int?, imageName: String) {
         val intent = Intent(this, ImageDetailActivity::class.java)
         intent.putExtra("imageResId", imageResId ?: 0)
@@ -813,8 +827,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.VISIBLE
         findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility = View.VISIBLE
         findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.VISIBLE
-        findViewById<Button>(R.id.addStrategyButton).visibility = View.VISIBLE
-        findViewById<Button>(R.id.addAccountButton).visibility = View.VISIBLE
+        findViewById<ImageButton>(R.id.addStrategyButton).visibility = View.VISIBLE
+        findViewById<ImageButton>(R.id.addAccountButton).visibility = View.VISIBLE
+        findViewById<ImageButton>(R.id.searchStrategyButton).visibility = View.VISIBLE
+
+
 
         // Ocultar el contenedor de fragmentos
         findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility = View.GONE
@@ -839,8 +856,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.GONE
                 findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility = View.GONE
                 findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.GONE
-                findViewById<Button>(R.id.addStrategyButton).visibility = View.GONE
-                findViewById<Button>(R.id.addAccountButton).visibility = View.GONE
+                findViewById<ImageButton>(R.id.addStrategyButton).visibility = View.GONE
+                findViewById<ImageButton>(R.id.addAccountButton).visibility = View.GONE
+                findViewById<ImageButton>(R.id.searchStrategyButton).visibility = View.GONE
+
+
 
                 // Mostrar contenedor de fragmentos
                 findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility = View.VISIBLE
@@ -859,8 +879,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.GONE
                 findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility = View.GONE
                 findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.GONE
-                findViewById<Button>(R.id.addStrategyButton).visibility = View.GONE
-                findViewById<Button>(R.id.addAccountButton).visibility = View.GONE
+                findViewById<ImageButton>(R.id.addStrategyButton).visibility = View.GONE
+                findViewById<ImageButton>(R.id.addAccountButton).visibility = View.GONE
+                findViewById<ImageButton>(R.id.searchStrategyButton).visibility = View.GONE
+
+
 
                 // Mostrar contenedor de fragmentos
                 findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility = View.VISIBLE
@@ -881,8 +904,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.GONE
                 findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility = View.GONE
                 findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.GONE
-                findViewById<Button>(R.id.addStrategyButton).visibility = View.GONE
-                findViewById<Button>(R.id.addAccountButton).visibility = View.GONE
+                findViewById<ImageButton>(R.id.addStrategyButton).visibility = View.GONE
+                findViewById<ImageButton>(R.id.addAccountButton).visibility = View.GONE
+                findViewById<ImageButton>(R.id.searchStrategyButton).visibility = View.GONE
+
+
 
                 // Asegurarte de que el contenedor de fragmentos esté visible
                 findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility = View.VISIBLE
