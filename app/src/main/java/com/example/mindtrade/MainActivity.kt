@@ -23,6 +23,7 @@ import auth.LoginActivity
 import adapters.StrategyAdapter
 import android.app.Dialog
 import android.graphics.Color
+import android.text.InputFilter
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -109,7 +110,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         // Configurar el drawer layout y la navegación
-        drawerLayout = findViewById(R.id.drawerLayout)
+        drawerLayout = findViewById(R.id.drawer_layout)
         val navigationView: NavigationView = findViewById(R.id.navigationView)
         val toggle = ActionBarDrawerToggle(
             this,
@@ -335,8 +336,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.GONE
             findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility = View.GONE
             findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.GONE
-            findViewById<Button>(R.id.addStrategyButton).visibility = View.GONE
-            findViewById<Button>(R.id.addAccountButton).visibility = View.GONE
+            findViewById<ImageButton>(R.id.addStrategyButton).visibility = View.GONE
+            findViewById<ImageButton>(R.id.addAccountButton).visibility = View.GONE
+            findViewById<ImageButton>(R.id.searchStrategyButton).visibility = View.GONE
 
             // Mostrar el contenedor de fragmentos pero inicialmente invisible
             val fragmentContainer = findViewById<FragmentContainerView>(R.id.fragmentContainer)
@@ -1009,6 +1011,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val saveAccountButton: Button = dialog.findViewById(R.id.saveAccountButton)
         val cancelButton: Button = dialog.findViewById(R.id.cancelButton)
 
+        // Establecer filtro para el máximo de 10 caracteres en el nombre de la cuenta
+        accountNameInput.filters = arrayOf(InputFilter.LengthFilter(10))
+
+        // Establecer filtro para el balance: máximo 8 dígitos numéricos
+        accountBalanceInput.filters = arrayOf(
+            InputFilter.LengthFilter(8),
+            InputFilter { source, _, _, _, _, _ ->
+                if (source.matches(Regex("[0-9]*"))) source else ""
+            }
+        )
+
+        // Establecer filtro para la pérdida máxima diaria: máximo 8 dígitos numéricos
+        maxDailyLossInput.filters = arrayOf(
+            InputFilter.LengthFilter(8),
+            InputFilter { source, _, _, _, _, _ ->
+                if (source.matches(Regex("[0-9]*"))) source else ""
+            }
+        )
+
         // Configurar Spinner (si es necesario)
         val adapter = ArrayAdapter.createFromResource(
             this, R.array.currencies_array, android.R.layout.simple_spinner_item
@@ -1021,11 +1042,31 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val name = accountNameInput.text.toString()
             val balance = accountBalanceInput.text.toString().toDoubleOrNull() ?: 0.0
             val currency = currencySpinner.selectedItem.toString()
-            val profitTarget = profitTargetInput.text.toString().toDoubleOrNull()
-            val maxDailyLoss = maxDailyLossInput.text.toString().toDoubleOrNull()
+            val profitTarget = profitTargetInput.text.toString().toDoubleOrNull() ?: 0.0
+            val maxDailyLoss = maxDailyLossInput.text.toString().toDoubleOrNull() ?: 0.0
 
             if (name.isEmpty()) {
                 Toast.makeText(this, "El nombre de la cuenta es obligatorio", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (balance.toString().length > 8) {
+                Toast.makeText(this, "El balance debe tener como máximo 8 dígitos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (maxDailyLoss.toString().length > 8) {
+                Toast.makeText(this, "La pérdida máxima diaria debe tener como máximo 8 dígitos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (maxDailyLoss > balance) {
+                Toast.makeText(this, "La pérdida máxima diaria no puede ser mayor que el balance", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (profitTarget < balance) {
+                Toast.makeText(this, "El objetivo de beneficio no puede ser menor que el balance", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -1065,6 +1106,5 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Mostrar el diálogo
         dialog.show()
     }
-
 
 }

@@ -59,7 +59,8 @@ class MyAccountsFragment : Fragment() {
                 accountsRecyclerView.adapter = myAccountsAdapter
             }
             .addOnFailureListener { e ->
-                Toast.makeText(context, "Error al cargar cuentas: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Error al cargar cuentas: ${e.message}", Toast.LENGTH_SHORT)
+                    .show()
             }
     }
 
@@ -69,14 +70,35 @@ class MyAccountsFragment : Fragment() {
     }
 
     private fun deleteAccount(account: Account) {
-        db.collection("accounts").document(account.id).delete()
-            .addOnSuccessListener {
-                Toast.makeText(context, "Cuenta eliminada", Toast.LENGTH_SHORT).show()
-                fetchAccounts()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(context, "Error al eliminar cuenta: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+        // Crear el AlertDialog
+        val builder = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        builder.setTitle("Eliminar Cuenta")
+        builder.setMessage("¿Deseas eliminar la cuenta \"${account.name}\"?.")
+
+        // Botón para confirmar la eliminación
+        builder.setPositiveButton("Aceptar") { _, _ ->
+            db.collection("accounts").document(account.id).delete()
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Cuenta eliminada", Toast.LENGTH_SHORT).show()
+                    fetchAccounts() // Actualizar las cuentas después de eliminar
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(
+                        context,
+                        "Error al eliminar cuenta: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+        }
+
+        // Botón para cancelar
+        builder.setNegativeButton("Cancelar") { dialog, _ ->
+            dialog.dismiss() // Cerrar el diálogo
+        }
+
+        // Mostrar el diálogo
+        builder.create().show()
     }
 }
+
 

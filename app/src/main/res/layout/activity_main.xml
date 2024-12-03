@@ -2,7 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawerLayout"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
@@ -15,19 +15,18 @@
         android:scaleType="centerCrop"
         app:srcCompat="@drawable/torosyosos" />
 
-    <!-- Contenido principal -->
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/coordinatorLayout"
+    <!-- Contenido Principal -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/mainContentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- AppBarLayout para la Toolbar fija -->
+        <!-- Barra Superior -->
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appbarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            android:elevation="4dp">
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -38,6 +37,7 @@
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:titleTextColor="@android:color/white">
 
+                <!-- Contenedor Principal -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -47,7 +47,7 @@
 
                     <!-- Iconos con Avatar -->
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="1dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="horizontal"
@@ -104,6 +104,7 @@
                             app:strokeWidth="1dp"
                             android:padding="2dp"
                             android:scaleType="fitCenter" />
+
                     </LinearLayout>
 
                     <!-- Botón de Notificación -->
@@ -115,150 +116,133 @@
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="Notificaciones"
                         android:src="@drawable/ic_notifications" />
-
                 </LinearLayout>
             </androidx.appcompat.widget.Toolbar>
         </com.google.android.material.appbar.AppBarLayout>
 
-        <!-- Contenido desplazable -->
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/nestedScrollView"
+        <!-- Contenedor de Fragmentos -->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragmentContainer"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/appbarLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+        <!-- RecyclerView y Botón (solo en MainActivity, no en fragmentos) -->
+        <LinearLayout
+            android:id="@+id/accountHeaderLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical"
+            app:layout_constraintTop_toBottomOf="@id/appbarLayout" >
 
-                <!-- FragmentContainerView -->
-                <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/fragmentContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone" />
+            <TextView
+                android:id="@+id/accountsSummary"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="Mis Cuentas"
+                android:textColor="@color/black"
+                android:textSize="25sp"
+                android:textStyle="bold" />
 
-                <!-- Contenido principal -->
-
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="0dp"
-                    android:layout_marginBottom="20dp"
-                    android:orientation="horizontal"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    app:layout_constraintTop_toBottomOf="@id/appbarLayout">
-
-                    <TextView
-                        android:id="@+id/accountsSummary"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:text="Mis Cuentas"
-                        android:textColor="@color/black"
-                        android:textSize="25sp"
-                        android:textStyle="bold" />
-
-                    <ImageButton
-                        android:id="@+id/addAccountButton"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:background="@drawable/ic_add"
-                        android:backgroundTint="#000000"
-                        android:backgroundTintMode="src_in"
-                        android:contentDescription="Añadir Cuenta" />
+            <ImageButton
+                android:id="@+id/addAccountButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/ic_add"
+                android:backgroundTint="#000000"
+                android:backgroundTintMode="src_in"
+                android:contentDescription="Añadir Cuenta" />
+        </LinearLayout>
 
 
-                </LinearLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/accountsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/accountHeaderLayout" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/accountsRecyclerView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/accountsSummary" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginBottom="0dp"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    app:layout_constraintTop_toBottomOf="@id/accountsRecyclerView">
+        <LinearLayout
+            android:id="@+id/strategyHeaderLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical"
+            android:layout_marginTop="10dp"
+            app:layout_constraintTop_toBottomOf="@+id/accountsRecyclerView">
 
-                    <!-- Texto de Estrategias -->
-                    <TextView
-                        android:id="@+id/tradingStrategiesSummary"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:text="Estrategias"
-                        android:textSize="25sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/black"
-                        android:gravity="center_vertical"
-                        android:minHeight="48dp"
-                        android:autoSizeTextType="uniform"
-                        android:autoSizeMinTextSize="14sp"
-                        android:autoSizeMaxTextSize="25sp"
-                        android:autoSizeStepGranularity="1sp" />
+            <TextView
+                android:id="@+id/tradingStrategiesSummary"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Estrategias"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:gravity="center_vertical"
+                android:minHeight="48dp"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="25sp"
+                android:autoSizeStepGranularity="1sp" />
 
-                    <!-- Botón de Buscar -->
-                    <ImageButton
-                        android:id="@+id/searchStrategyButton"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_marginEnd="40dp"
-                        android:background="@drawable/ic_search"
-                        android:backgroundTintMode="src_in"
-                        android:backgroundTint="#000000"
-                        android:contentDescription="Buscar estrategia" />
+            <!-- Botón de Buscar -->
+            <ImageButton
+                android:id="@+id/searchStrategyButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="40dp"
+                android:background="@drawable/ic_search"
+                android:backgroundTintMode="src_in"
+                android:backgroundTint="#000000"
+                android:contentDescription="Buscar estrategia" />
 
-                    <!-- Botón de Añadir Estrategias -->
-                    <ImageButton
-                        android:id="@+id/addStrategyButton"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:background="@drawable/ic_add"
-                        android:backgroundTintMode="src_in"
-                        android:backgroundTint="#000000"
-                        android:contentDescription="Añadir estrategia" />
-                </LinearLayout>
+            <!-- Botón de Añadir Estrategias -->
+            <ImageButton
+                android:id="@+id/addStrategyButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/ic_add"
+                android:backgroundTintMode="src_in"
+                android:backgroundTint="#000000"
+                android:contentDescription="Añadir estrategia" />
+        </LinearLayout>
 
 
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/strategiesWithImagesRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/strategyHeaderLayout" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/strategiesWithImagesRecyclerView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:scrollbars="horizontal"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/strategiesRecyclerView" />
-
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/strategiesRecyclerView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:scrollbars="horizontal"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tradingStrategiesSummary" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/strategiesRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/strategiesWithImagesRecyclerView" />
 
 
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Menú Lateral -->
     <com.google.android.material.navigation.NavigationView
@@ -269,7 +253,6 @@
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/nav_menu" />
-
 </androidx.drawerlayout.widget.DrawerLayout>
 
 

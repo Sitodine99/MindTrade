@@ -18,12 +18,6 @@
         android:theme="@style/Theme.MindTrade"
         tools:targetApi="31">
         <activity
-            android:name="strategycards.GeneralFragment"
-            android:exported="false" />
-        <activity
-            android:name="strategycards.StrategyDetailActivity"
-            android:exported="false" />
-        <activity
             android:name="strategycards.RegisterStrategyActivity"
             android:exported="false" />
         <activity
@@ -71,9 +65,6 @@
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.MindTrade" />
-
-
-
 
     </application>
 
