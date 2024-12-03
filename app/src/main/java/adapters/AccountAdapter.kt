@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mindtrade.R
 import com.example.mindtrade.model.Account
 
-class AccountAdapter(private val accounts: List<Account>) :
+class AccountAdapter(private var accounts: List<Account>) :
     RecyclerView.Adapter<AccountAdapter.AccountViewHolder>() {
 
     class AccountViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -16,7 +16,7 @@ class AccountAdapter(private val accounts: List<Account>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AccountViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_account, parent, false)
+            .inflate(R.layout.item_account, parent, false) // Usa item_account como diseño
         return AccountViewHolder(view)
     }
 
@@ -27,4 +27,9 @@ class AccountAdapter(private val accounts: List<Account>) :
     }
 
     override fun getItemCount(): Int = accounts.size
+
+    fun updateAccounts(newAccounts: List<Account>) {
+        accounts = newAccounts
+        notifyDataSetChanged() // Refresca los datos
+    }
 }

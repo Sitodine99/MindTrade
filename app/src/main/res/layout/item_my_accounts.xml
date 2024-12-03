@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:background="?attr/selectableItemBackground">
+
+    <!-- Contenedor principal horizontal -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Nombre de la cuenta -->
+        <TextView
+            android:id="@+id/accountTitleTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Nombre de la Cuenta"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_gravity="center_vertical" />
+
+        <!-- Botón de edición -->
+        <ImageView
+            android:id="@+id/editIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_edit"
+            android:contentDescription="@string/edit_icon"
+            android:layout_marginEnd="16dp"
+            android:layout_gravity="center_vertical" />
+
+        <!-- Botón de eliminación -->
+        <ImageView
+            android:id="@+id/deleteIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_delete"
+            android:contentDescription="@string/delete_icon"
+            android:layout_gravity="center_vertical" />
+    </LinearLayout>
+
+    <!-- Detalles adicionales de la cuenta -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="4dp">
+
+        <!-- Fecha de creación -->
+        <TextView
+            android:id="@+id/accountCreationDateTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fecha de creación: 01/01/2024"
+            android:textSize="14sp" />
+
+        <!-- Rentabilidad -->
+        <TextView
+            android:id="@+id/accountProfitabilityTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rentabilidad: 0%"
+            android:textSize="14sp" />
+
+        <!-- Número de operaciones -->
+        <TextView
+            android:id="@+id/accountOperationsCountTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Operaciones: "
+            android:textSize="14sp" />
+    </LinearLayout>
+</LinearLayout>

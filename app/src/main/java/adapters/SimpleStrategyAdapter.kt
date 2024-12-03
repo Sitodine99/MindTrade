@@ -24,7 +24,7 @@ class SimpleStrategyAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_simple_strategy, parent, false)
+            .inflate(R.layout.item_my_strategies, parent, false)
         return ViewHolder(view)
     }
 

@@ -1,6 +1,8 @@
 package com.example.mindtrade
 
 import AccountAdapter
+import MyAccountsAdapter
+import MyAccountsFragment
 import StrategyWithImageAdapter
 import android.content.Intent
 import android.os.Bundle
@@ -91,7 +93,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
         // Configurar el drawer layout y la navegación
-        drawerLayout = findViewById(R.id.drawer_layout)
+        drawerLayout = findViewById(R.id.drawerLayout)
         val navigationView: NavigationView = findViewById(R.id.navigationView)
         val toggle = ActionBarDrawerToggle(
             this,
@@ -222,7 +224,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         db.collection("accounts").whereEqualTo("userId", userId).get()
             .addOnSuccessListener { documents ->
                 val accounts = documents.map { doc -> doc.toObject(Account::class.java) }
-                setupAccountsRecyclerView(accounts)
+                setupAccountsRecyclerView(accounts) // Llama al método correcto
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Error al obtener cuentas: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -230,12 +232,34 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
+
+
     private fun setupAccountsRecyclerView(accounts: List<Account>) {
         val accountsRecyclerView = findViewById<RecyclerView>(R.id.accountsRecyclerView)
-        accountsRecyclerView.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        accountsRecyclerView.adapter = AccountAdapter(accounts)
+        val adapter = accountsRecyclerView.adapter
+
+        if (adapter is AccountAdapter) {
+            // Actualiza los datos si ya existe un adaptador
+            adapter.updateAccounts(accounts)
+        } else {
+            // Configura un nuevo AccountAdapter
+            accountsRecyclerView.layoutManager =
+                LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+            accountsRecyclerView.adapter = AccountAdapter(accounts)
+        }
     }
+
+
+    private fun handleEditAccount(account: Account) {
+        // Implementar la lógica para editar cuentas aquí
+    }
+
+    private fun handleDeleteAccount(account: Account) {
+        // Implementar la lógica para eliminar cuentas aquí
+    }
+
+
+
 
 
     private fun startAutoScroll(recyclerView: RecyclerView, itemCount: Int) {
@@ -291,6 +315,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility = View.GONE
             findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.GONE
             findViewById<Button>(R.id.addStrategyButton).visibility = View.GONE
+            findViewById<Button>(R.id.addAccountButton).visibility = View.GONE
 
             // Mostrar el contenedor de fragmentos pero inicialmente invisible
             val fragmentContainer = findViewById<FragmentContainerView>(R.id.fragmentContainer)
@@ -789,6 +814,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility = View.VISIBLE
         findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.VISIBLE
         findViewById<Button>(R.id.addStrategyButton).visibility = View.VISIBLE
+        findViewById<Button>(R.id.addAccountButton).visibility = View.VISIBLE
 
         // Ocultar el contenedor de fragmentos
         findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility = View.GONE
@@ -814,6 +840,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility = View.GONE
                 findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.GONE
                 findViewById<Button>(R.id.addStrategyButton).visibility = View.GONE
+                findViewById<Button>(R.id.addAccountButton).visibility = View.GONE
 
                 // Mostrar contenedor de fragmentos
                 findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility = View.VISIBLE
@@ -833,6 +860,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility = View.GONE
                 findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.GONE
                 findViewById<Button>(R.id.addStrategyButton).visibility = View.GONE
+                findViewById<Button>(R.id.addAccountButton).visibility = View.GONE
 
                 // Mostrar contenedor de fragmentos
                 findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility = View.VISIBLE
@@ -847,15 +875,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
             R.id.nav_accounts -> {
-                // Restaurar vistas principales y ocultar el contenedor de fragmentos
-                findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.VISIBLE
-                findViewById<TextView>(R.id.accountsSummary).visibility = View.VISIBLE
-                findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.VISIBLE
-                findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility = View.VISIBLE
-                findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.VISIBLE
-                findViewById<Button>(R.id.addStrategyButton).visibility = View.VISIBLE
-                findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility = View.GONE
+                // Ocultar las vistas principales del MainActivity
+                findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.GONE
+                findViewById<TextView>(R.id.accountsSummary).visibility = View.GONE
+                findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.GONE
+                findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility = View.GONE
+                findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.GONE
+                findViewById<Button>(R.id.addStrategyButton).visibility = View.GONE
+                findViewById<Button>(R.id.addAccountButton).visibility = View.GONE
+
+                // Asegurarte de que el contenedor de fragmentos esté visible
+                findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility = View.VISIBLE
+
+                // Reemplazar el contenido del contenedor con el fragmento MyAccountsFragment
+                val fragment = MyAccountsFragment()
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainer, fragment)
+                    .addToBackStack(null) // Agrega el fragmento a la pila para navegación
+                    .commit()
             }
+
+
 
             R.id.nav_logout -> {
                 FirebaseAuth.getInstance().signOut()
