@@ -1,0 +1,73 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/accountNameInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nombre de la Cuenta"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/accountBalanceInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Balance Inicial"
+        android:inputType="numberDecimal" />
+
+    <TextView
+        android:id="@+id/currencyLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Elige la divisa de la cuenta"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="8dp" />
+
+    <Spinner
+        android:id="@+id/currencySpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/currencies_array" />
+
+    <EditText
+        android:id="@+id/profitTargetInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Objetivo de Beneficio"
+        android:inputType="numberDecimal" />
+
+    <EditText
+        android:id="@+id/maxDailyLossInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Pérdida Máxima Diaria"
+        android:inputType="numberDecimal" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="16dp">
+
+        <Button
+            android:id="@+id/cancelButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/black"
+            android:text="Cancelar"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/saveAccountButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Guardar"
+            android:backgroundTint="@color/black"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+</LinearLayout>

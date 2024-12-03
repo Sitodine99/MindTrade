@@ -21,9 +21,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import auth.LoginActivity
 import adapters.StrategyAdapter
+import android.app.Dialog
 import android.graphics.Color
 import android.view.View
+import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.Spinner
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentContainerView
 import com.bumptech.glide.Glide
@@ -38,7 +42,6 @@ import strategycards.MyStrategiesFragment
 import strategycards.RegisterStrategyActivity
 import strategycards.StrategyDetailFragment
 import welcome.AvatarSelectionActivity
-import com.example.mindtrade.CreateAccountActivity
 import com.example.mindtrade.model.Account
 
 
@@ -95,8 +98,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         // Configurar listener para el botón
         addAccountButton.setOnClickListener {
-            val intent = Intent(this, CreateAccountActivity::class.java)
-            startActivity(intent)
+            showCreateAccountDialog()
         }
 
         // Configurar listener para el ImageButton
@@ -234,13 +236,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             return
         }
 
-        db.collection("accounts").whereEqualTo("userId", userId).get()
-            .addOnSuccessListener { documents ->
-                val accounts = documents.map { doc -> doc.toObject(Account::class.java) }
-                setupAccountsRecyclerView(accounts) // Llama al método correcto
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Error al obtener cuentas: ${e.message}", Toast.LENGTH_SHORT).show()
+        db.collection("accounts").whereEqualTo("userId", userId)
+            .addSnapshotListener { documents, error ->
+                if (error != null) {
+                    Toast.makeText(this, "Error al obtener cuentas: ${error.message}", Toast.LENGTH_SHORT).show()
+                    return@addSnapshotListener
+                }
+
+                if (documents != null) {
+                    val accounts = documents.map { doc -> doc.toObject(Account::class.java) }
+                    setupAccountsRecyclerView(accounts) // Actualiza el RecyclerView
+                }
             }
     }
 
@@ -261,6 +267,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             accountsRecyclerView.adapter = AccountAdapter(accounts)
         }
     }
+
+
 
 
     private fun handleEditAccount(account: Account) {
@@ -986,5 +994,77 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         startActivity(intent)
         finish()
     }
+
+    private fun showCreateAccountDialog() {
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.dialog_create_account)
+        dialog.setCancelable(true)
+
+        // Inicializar vistas del diálogo
+        val accountNameInput: EditText = dialog.findViewById(R.id.accountNameInput)
+        val accountBalanceInput: EditText = dialog.findViewById(R.id.accountBalanceInput)
+        val currencySpinner: Spinner = dialog.findViewById(R.id.currencySpinner)
+        val profitTargetInput: EditText = dialog.findViewById(R.id.profitTargetInput)
+        val maxDailyLossInput: EditText = dialog.findViewById(R.id.maxDailyLossInput)
+        val saveAccountButton: Button = dialog.findViewById(R.id.saveAccountButton)
+        val cancelButton: Button = dialog.findViewById(R.id.cancelButton)
+
+        // Configurar Spinner (si es necesario)
+        val adapter = ArrayAdapter.createFromResource(
+            this, R.array.currencies_array, android.R.layout.simple_spinner_item
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        currencySpinner.adapter = adapter
+
+        // Botón Guardar
+        saveAccountButton.setOnClickListener {
+            val name = accountNameInput.text.toString()
+            val balance = accountBalanceInput.text.toString().toDoubleOrNull() ?: 0.0
+            val currency = currencySpinner.selectedItem.toString()
+            val profitTarget = profitTargetInput.text.toString().toDoubleOrNull()
+            val maxDailyLoss = maxDailyLossInput.text.toString().toDoubleOrNull()
+
+            if (name.isEmpty()) {
+                Toast.makeText(this, "El nombre de la cuenta es obligatorio", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Guardar en Firestore
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId != null) {
+                val account = Account(
+                    id = FirebaseFirestore.getInstance().collection("accounts").document().id,
+                    userId = userId,
+                    name = name,
+                    balance = balance,
+                    currency = currency,
+                    profitTarget = profitTarget,
+                    maxDailyLoss = maxDailyLoss,
+                    createdAt = System.currentTimeMillis(),
+                    movements = emptyList()
+                )
+                FirebaseFirestore.getInstance().collection("accounts").document(account.id)
+                    .set(account)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Cuenta creada con éxito", Toast.LENGTH_SHORT).show()
+                        dialog.dismiss() // Cierra el diálogo
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Error al guardar la cuenta: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+            } else {
+                Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // Botón Cancelar
+        cancelButton.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        // Mostrar el diálogo
+        dialog.show()
+    }
+
 
 }
