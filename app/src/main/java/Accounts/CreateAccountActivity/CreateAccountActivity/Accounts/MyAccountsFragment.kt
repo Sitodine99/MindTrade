@@ -65,9 +65,50 @@ class MyAccountsFragment : Fragment() {
     }
 
     private fun editAccount(account: Account) {
-        Toast.makeText(context, "Editar cuenta: ${account.name}", Toast.LENGTH_SHORT).show()
-        // Agrega lógica para editar
+        // Crear un AlertDialog para editar el nombre de la cuenta
+        val builder = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        builder.setTitle("Editar Cuenta")
+
+        // Agregar un EditText al diálogo con un filtro de longitud
+        val input = android.widget.EditText(requireContext())
+        input.hint = "Nuevo nombre de la cuenta"
+        input.setText(account.name) // Mostrar el nombre actual
+        input.filters = arrayOf(android.text.InputFilter.LengthFilter(10)) // Limitar a 10 caracteres
+        builder.setView(input)
+
+        // Botón de Confirmar
+        builder.setPositiveButton("Guardar") { _, _ ->
+            val newName = input.text.toString().trim()
+            if (newName.isNotEmpty()) {
+                // Actualizar el nombre en Firestore
+                db.collection("accounts").document(account.id)
+                    .update("name", newName)
+                    .addOnSuccessListener {
+                        Toast.makeText(context, "Nombre actualizado", Toast.LENGTH_SHORT).show()
+                        fetchAccounts() // Actualizar el RecyclerView
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(
+                            context,
+                            "Error al actualizar el nombre: ${e.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+            } else {
+                Toast.makeText(context, "El nombre no puede estar vacío", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // Botón de Cancelar
+        builder.setNegativeButton("Cancelar") { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        // Mostrar el diálogo
+        builder.create().show()
     }
+
+
 
     private fun deleteAccount(account: Account) {
         // Crear el AlertDialog
