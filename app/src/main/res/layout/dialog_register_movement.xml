@@ -1,0 +1,244 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <!-- Selección de Símbolo -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Selecciona un símbolo"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Chips de símbolos -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/symbolChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:chipSpacing="8dp"
+            app:singleLine="false" />
+
+        <!-- Agregar símbolo -->
+        <EditText
+            android:id="@+id/addSymbolEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nuevo símbolo"
+            android:layout_marginTop="8dp" />
+
+        <Button
+            android:id="@+id/addSymbolButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Añadir símbolo"
+            android:layout_marginTop="8dp" />
+
+        <!-- Tipo de Operación -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tipo de Operación"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/operationTypeSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <!-- Precio de Entrada -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Precio de Entrada"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/entryPriceEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Introduce el precio de entrada"
+            android:inputType="numberDecimal" />
+
+        <!-- Precio de Salida -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Precio de Salida"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/exitPriceEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Introduce el precio de salida"
+            android:inputType="numberDecimal" />
+
+        <!-- Swap -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Swap"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/swapEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Introduce el valor de swap"
+            android:inputType="numberDecimal" />
+
+        <!-- Comisión -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Comisión"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/commissionEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Introduce el valor de la comisión"
+            android:inputType="numberDecimal" />
+
+        <Button
+            android:id="@+id/entryDateButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Seleccionar Fecha de Entrada"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="?attr/colorPrimary"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/exitDateButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Seleccionar Fecha de Salida"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="?attr/colorPrimary"
+            android:textColor="@android:color/white" />
+
+
+
+        <!-- Selección de Estrategia -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Selecciona una estrategia"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/strategySpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <!-- Estado Emocional -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Selecciona un estado emocional"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/emotionalStateSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <!-- Selección de Emoción -->
+        <TextView
+            android:id="@+id/emotionLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Selecciona una emoción"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/emotionSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <!-- Comentarios -->
+        <EditText
+            android:id="@+id/commentsEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Comentarios"
+            android:layout_marginTop="16dp"
+            android:inputType="textMultiLine"
+            android:minLines="3" />
+
+        <!-- Subir Fotos -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="16dp">
+
+            <!-- Botón de subir imagen -->
+            <ImageButton
+                android:id="@+id/uploadImageButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:contentDescription="Subir Imagen"
+                android:src="@drawable/ic_upload"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_marginEnd="16dp" />
+
+            <!-- Vista previa de la imagen -->
+            <ImageView
+                android:id="@+id/entryImageView"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:contentDescription="Vista previa de la imagen_01"
+                android:src="@drawable/ic_placeholder"
+                android:scaleType="centerCrop"
+                android:background="@drawable/code_editor_background"
+                android:layout_marginStart="16dp" />
+
+            <!-- Vista previa de la imagen -->
+            <ImageView
+                android:id="@+id/exitImageView"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:contentDescription="Vista previa de la imagen_02"
+                android:src="@drawable/ic_placeholder"
+                android:scaleType="centerCrop"
+                android:background="@drawable/code_editor_background"
+                android:layout_marginStart="16dp" />
+        </LinearLayout>
+
+        <!-- Botón Registrar -->
+        <Button
+            android:id="@+id/registerButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Registrar Movimiento"
+            android:layout_marginTop="16dp" />
+    </LinearLayout>
+</ScrollView>

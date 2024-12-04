@@ -19,6 +19,8 @@
             android:textStyle="bold"
             android:layout_marginBottom="8dp" />
 
+
+
         <!-- Número de movimientos -->
         <TextView
             android:id="@+id/accountMovementsCountTextView"
@@ -27,6 +29,17 @@
             android:text="Movimientos: 0"
             android:textSize="16sp"
             android:layout_marginBottom="8dp" />
+
+        <ImageButton
+            android:id="@+id/addMovementButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:src="@drawable/ic_add"
+            android:contentDescription="Añadir Movimiento"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:backgroundTintMode="src_in"
+            android:layout_margin="8dp" />
 
         <!-- RecyclerView para los movimientos -->
         <androidx.recyclerview.widget.RecyclerView

@@ -1,18 +1,24 @@
 package com.example.mindtrade.model
 
 data class Movement(
-    val id: String = "", // ID del movimiento
+    val id: String = "", // ID único del movimiento
     val accountId: String = "", // ID de la cuenta asociada
-    val userId: String = "", // Usuario que registra el movimiento
-    val alias: String = "", // Alias del usuario que registra
-    val symbol: String = "", // Activo (e.g., EUR/USD)
-    val type: String = "buy", // Tipo de operación: buy o sell
+    val symbol: String = "", // Símbolo del activo
+    val type: String = "Buy", // Tipo de operación (Buy/Sell)
     val entryPrice: Double = 0.0, // Precio de entrada
-    val exitPrice: Double? = null, // Precio de salida (opcional)
-    val entryTime: Long = System.currentTimeMillis(), // Fecha y hora de entrada
-    val exitTime: Long? = null, // Fecha y hora de salida (opcional)
-    val commission: Double = 0.0, // Comisión
+    val exitPrice: Double = 0.0, // Precio de salida
+    val entryTime: Long, // Agregado
+    val exitTime: Long?, // Agregado
     val swap: Double = 0.0, // Swap
-    val strategyId: String? = null, // ID de la estrategia utilizada (puede ser "ninguna")
-    val profit: Double? = null // Beneficio de la operación (opcional)
+    val commission: Double = 0.0, // Comisión
+    val profit: Double? = null, // Beneficio
+    val createdAt: Long = System.currentTimeMillis(), // Fecha de creación
+    val strategyId: String? = null, // Estrategia asociada
+    val emotionalState: String?,
+    val emotion: String? = null, // Emoción asociada
+    val tradingStyle: String, // Agregado
+    val comments: String?,// Comentarios
+    val photos: List<String>? // Agregado
 )
+
+

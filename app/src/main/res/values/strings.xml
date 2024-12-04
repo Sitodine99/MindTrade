@@ -121,6 +121,12 @@
         <item>GBP</item>
     </string-array>
 
+    <string-array name="emotional_states">
+        <item>Psico+</item>
+        <item>Psico-</item>
+    </string-array>
+
+
 
 
 
