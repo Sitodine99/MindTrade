@@ -65,13 +65,18 @@ class MyAccountsFragment : Fragment() {
     private fun openAccountMovementsActivity(account: Account) {
         val intent = Intent(requireContext(), AccountMovementsActivity::class.java).apply {
             putExtra("accountName", account.name)
-            putExtra("accountBalance", account.balance)
-            putExtra("accountId", account.id) // Enviar también el ID si es necesario
-            putExtra("accountCreationDate", account.createdAt)
-            putExtra("accountCurrency", account.currency)
+            putExtra("accountId", account.id) // ID único de la cuenta
+            putExtra("accountBalance", account.balance) // Balance inicial
+            putExtra("accountCurrency", account.currency) // Divisa asociada
+            putExtra("accountProfitTarget", account.profitTarget ?: 0.0) // Objetivo de beneficio (opcional)
+            putExtra("accountMaxDailyLoss", account.maxDailyLoss ?: 0.0) // Pérdida diaria máxima (opcional)
+            putExtra("accountCreatedAt", account.createdAt) // Fecha de creación
+            putStringArrayListExtra("accountMovements", ArrayList(account.movements)) // Movimientos asociados
+            putExtra("accountIsActive", account.isActive) // Estado de la cuenta (activa/inactiva)
         }
         startActivity(intent)
     }
+
 
     private fun editAccount(account: Account) {
         // Crear un AlertDialog para editar el nombre de la cuenta

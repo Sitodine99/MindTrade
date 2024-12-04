@@ -296,10 +296,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 // Abrir la nueva actividad
                 val intent = Intent(this, AccountMovementsActivity::class.java).apply {
                     putExtra("accountName", selectedAccount.name)
+                    putExtra("accountCreatedAt", selectedAccount.createdAt)
                     putExtra("accountBalance", selectedAccount.balance)
                     putExtra("accountId", selectedAccount.id) // Enviar también el ID si es necesario
                     putExtra("accountCreationDate", selectedAccount.createdAt)
                     putExtra("accountCurrency", selectedAccount.currency)
+                    putExtra("accountProfitTarget", selectedAccount.profitTarget ?: 0.0)
+                    putExtra("accountMaxDailyLoss", selectedAccount.maxDailyLoss ?: 0.0)
+                    putStringArrayListExtra("accountMovements", ArrayList(selectedAccount.movements))
+                    putExtra("accountIsActive", selectedAccount.isActive)
                 }
                 startActivity(intent)
             }
