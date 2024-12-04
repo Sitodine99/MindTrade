@@ -29,6 +29,7 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ListView
 import android.widget.Spinner
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentContainerView
@@ -304,12 +305,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         findViewById<View>(R.id.changeAccountsButton)?.setOnClickListener {
             val accountNames = allAccounts.map { it.name }.toTypedArray()
             val selectedIndices = mutableListOf<Int>() // Almacena las cuentas seleccionadas
+            val selectedItems = BooleanArray(accountNames.size) // Estados seleccionados para el diálogo
 
-            AlertDialog.Builder(this)
+            val builder = AlertDialog.Builder(this)
                 .setTitle("Seleccionar cuentas")
-                .setMultiChoiceItems(accountNames, null) { _, index, isChecked ->
-                    if (isChecked) selectedIndices.add(index) else selectedIndices.remove(index)
+
+            // Crear y almacenar una referencia explícita al AlertDialog
+            val dialog = builder.setMultiChoiceItems(accountNames, selectedItems) { dialogInterface, index, isChecked ->
+                val alertDialog = dialogInterface as AlertDialog // Cast explícito
+                if (isChecked) {
+                    if (selectedIndices.size < 2) {
+                        selectedIndices.add(index)
+                    } else {
+                        // Si ya hay 2 seleccionadas, desmarcamos visualmente y mostramos mensaje
+                        selectedItems[index] = false
+                        alertDialog.listView.setItemChecked(index, false) // Desmarcamos visualmente
+                        Toast.makeText(this, "Solo puedes seleccionar un máximo de dos cuentas", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    selectedIndices.remove(index)
                 }
+            }
                 .setPositiveButton("OK") { _, _ ->
                     // Tomamos solo las primeras dos cuentas seleccionadas
                     val selectedAccounts = selectedIndices.map { allAccounts[it] }.take(2)
@@ -321,38 +337,45 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }
                 }
                 .setNegativeButton("Cancelar", null)
-                .show()
+                .create()
+
+            dialog.show()
         }
     }
 
     fun showAccountSelectionDialog(allAccounts: List<Account>, onSelectionDone: (List<Account>) -> Unit) {
         val accountNames = allAccounts.map { it.name }.toTypedArray()
         val selectedIndices = mutableListOf<Int>() // Almacena las cuentas seleccionadas
+        val selectedItems = BooleanArray(accountNames.size) // Estados seleccionados para el diálogo
 
-        AlertDialog.Builder(this)
+        val builder = AlertDialog.Builder(this)
             .setTitle("Seleccionar cuentas")
-            .setMultiChoiceItems(accountNames, null) { _, index, isChecked ->
-                if (isChecked) selectedIndices.add(index) else selectedIndices.remove(index)
+
+        // Crear y almacenar una referencia explícita al AlertDialog
+        val dialog = builder.setMultiChoiceItems(accountNames, selectedItems) { dialogInterface, index, isChecked ->
+            val alertDialog = dialogInterface as AlertDialog // Cast explícito
+            if (isChecked) {
+                if (selectedIndices.size < 2) {
+                    selectedIndices.add(index)
+                } else {
+                    // Si ya hay 2 seleccionadas, desmarcamos visualmente y mostramos mensaje
+                    selectedItems[index] = false
+                    alertDialog.listView.setItemChecked(index, false) // Desmarcamos visualmente
+                    Toast.makeText(this, "Solo puedes seleccionar un máximo de dos cuentas", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                selectedIndices.remove(index)
             }
+        }
             .setPositiveButton("OK") { _, _ ->
-                val selectedAccounts = selectedIndices.map { allAccounts[it] }.take(2)
+                // Tomamos solo las cuentas seleccionadas
+                val selectedAccounts = selectedIndices.map { allAccounts[it] }
                 onSelectionDone(selectedAccounts)
             }
             .setNegativeButton("Cancelar", null)
-            .show()
+            .create()
 
-    }
-
-
-
-
-
-    private fun handleEditAccount(account: Account) {
-        // Implementar la lógica para editar cuentas aquí
-    }
-
-    private fun handleDeleteAccount(account: Account) {
-        // Implementar la lógica para eliminar cuentas aquí
+        dialog.show()
     }
 
 
@@ -414,6 +437,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             findViewById<ImageButton>(R.id.addStrategyButton).visibility = View.GONE
             findViewById<ImageButton>(R.id.addAccountButton).visibility = View.GONE
             findViewById<ImageButton>(R.id.searchStrategyButton).visibility = View.GONE
+            findViewById<ImageButton>(R.id.changeAccountsButton).visibility = View.GONE
 
             // Mostrar el contenedor de fragmentos pero inicialmente invisible
             val fragmentContainer = findViewById<FragmentContainerView>(R.id.fragmentContainer)
@@ -915,6 +939,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         findViewById<ImageButton>(R.id.addStrategyButton).visibility = View.VISIBLE
         findViewById<ImageButton>(R.id.addAccountButton).visibility = View.VISIBLE
         findViewById<ImageButton>(R.id.searchStrategyButton).visibility = View.VISIBLE
+        findViewById<ImageButton>(R.id.changeAccountsButton).visibility = View.VISIBLE
 
 
 
@@ -944,6 +969,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 findViewById<ImageButton>(R.id.addStrategyButton).visibility = View.GONE
                 findViewById<ImageButton>(R.id.addAccountButton).visibility = View.GONE
                 findViewById<ImageButton>(R.id.searchStrategyButton).visibility = View.GONE
+                findViewById<ImageButton>(R.id.changeAccountsButton).visibility = View.GONE
 
 
 
@@ -967,6 +993,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 findViewById<ImageButton>(R.id.addStrategyButton).visibility = View.GONE
                 findViewById<ImageButton>(R.id.addAccountButton).visibility = View.GONE
                 findViewById<ImageButton>(R.id.searchStrategyButton).visibility = View.GONE
+                findViewById<ImageButton>(R.id.changeAccountsButton).visibility = View.GONE
 
 
 
@@ -992,6 +1019,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 findViewById<ImageButton>(R.id.addStrategyButton).visibility = View.GONE
                 findViewById<ImageButton>(R.id.addAccountButton).visibility = View.GONE
                 findViewById<ImageButton>(R.id.searchStrategyButton).visibility = View.GONE
+                findViewById<ImageButton>(R.id.changeAccountsButton).visibility = View.GONE
 
 
 
@@ -1125,13 +1153,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 return@setOnClickListener
             }
 
-            if (balance.toString().length > 8) {
-                Toast.makeText(this, "El balance debe tener como máximo 8 dígitos", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (maxDailyLoss.toString().length > 8) {
-                Toast.makeText(this, "La pérdida máxima diaria debe tener como máximo 8 dígitos", Toast.LENGTH_SHORT).show()
+            if (balance <= 0) {
+                Toast.makeText(this, "El balance debe ser mayor a 0", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -1181,5 +1204,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Mostrar el diálogo
         dialog.show()
     }
+
 
 }
