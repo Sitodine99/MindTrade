@@ -60,7 +60,10 @@
         android:layout_marginTop="16dp"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_placeholder"
-        app:shapeAppearanceOverlay="@style/RoundedImage" />
+        app:shapeAppearanceOverlay="@style/RoundedImage"
+        app:strokeColor="@android:color/black"
+        app:strokeWidth="0dp"
+        />
 
     <!-- Barra de valoración -->
     <RatingBar

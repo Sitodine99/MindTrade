@@ -4,8 +4,11 @@ import MovementsAdapter
 import ScreenPagerAdapter
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -66,9 +69,6 @@ class AccountMovementsActivity : AppCompatActivity() {
         // Formatea la fecha de creación
         val formattedDate = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
             .format(java.util.Date(accountCreatedAt))
-
-        // Llenar los grupos de chips con los símbolos predefinidos
-
 
 
         // Escuchar los cambios de página del ViewPager2 para actualizar las vistas
@@ -174,32 +174,160 @@ class AccountMovementsActivity : AppCompatActivity() {
     private fun showMovementDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_register_movement, null)
 
-
-        // Configuración del formulario
-
-        val operationTypeSpinner = dialogView.findViewById<Spinner>(R.id.operationTypeSpinner)
+        // Referencias a los elementos de la vista
+        val symbolsSpinner = dialogView.findViewById<Spinner>(R.id.symbolsSpinner)
+        val addSymbolEditText = dialogView.findViewById<EditText>(R.id.addSymbolEditText)
+        val addSymbolButton = dialogView.findViewById<Button>(R.id.addSymbolButton)
+        val customSymbolsChipGroup = dialogView.findViewById<ChipGroup>(R.id.customSymbolsChipGroup)
+        val entryDateButton = dialogView.findViewById<Button>(R.id.entryDateButton)
+        val exitDateButton = dialogView.findViewById<Button>(R.id.exitDateButton)
         val entryPriceEditText = dialogView.findViewById<EditText>(R.id.entryPriceEditText)
         val exitPriceEditText = dialogView.findViewById<EditText>(R.id.exitPriceEditText)
         val swapEditText = dialogView.findViewById<EditText>(R.id.swapEditText)
         val commissionEditText = dialogView.findViewById<EditText>(R.id.commissionEditText)
+        val operationTypeSpinner = dialogView.findViewById<Spinner>(R.id.operationTypeSpinner)
         val strategySpinner = dialogView.findViewById<Spinner>(R.id.strategySpinner)
         val emotionSpinner = dialogView.findViewById<Spinner>(R.id.emotionSpinner)
         val emotionalStateSpinner = dialogView.findViewById<Spinner>(R.id.emotionalStateSpinner)
         val commentsEditText = dialogView.findViewById<EditText>(R.id.commentsEditText)
-        val entryDateButton = dialogView.findViewById<Button>(R.id.entryDateButton)
-        val exitDateButton = dialogView.findViewById<Button>(R.id.exitDateButton)
 
         var entryDateTime: Long? = null
         var exitDateTime: Long? = null
 
-        // Configuración de selección de fecha y hora
+        // Grupos de símbolos
+        val symbolGroups = mapOf(
+            "Forex" to listOf(
+                "EUR/USD",
+                "USD/JPY",
+                "GBP/USD",
+                "USD/CHF",
+                "AUD/USD",
+                "USD/CAD",
+                "NZD/USD"
+            ),
+            "Exotics" to listOf("USD/SEK", "USD/NOK", "USD/ZAR", "EUR/TRY"),
+            "Metals" to listOf("XAU/USD", "XAG/USD", "XPT/USD", "XPD/USD"),
+            "Crypto" to listOf("BTC/USD", "ETH/USD", "LTC/USD", "XRP/USD", "ADA/USD", "DOT/USD"),
+            "Cash CFD" to listOf(
+                "US30.cash", "SPX500.cash", "NAS100.cash",
+                "GER30.cash", "FRA40.cash", "UK100.cash", "ESP35.cash",
+                "JPN225.cash", "AUS200.cash"
+            ),
+            "Commodities" to listOf(
+                "SOYBEAN",
+                "WHEAT",
+                "CORN",
+                "COFFEE",
+                "COCOA",
+                "USOIL",
+                "NATGAS"
+            ),
+            "Equities" to listOf("AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "META", "NFLX", "NVDA")
+        )
+
+        // Crear lista de símbolos con cabeceras
+        val symbolsWithHeaders = mutableListOf<String>().apply {
+            add("Selecciona un Activo")
+            symbolGroups.forEach { (header, symbols) ->
+                add("**$header**") // Header
+                addAll(symbols)    // Symbols
+            }
+        }
+
+        // Adaptador para el Spinner
+        val spinnerAdapter = object :
+            ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, symbolsWithHeaders) {
+            override fun isEnabled(position: Int): Boolean {
+                return !symbolsWithHeaders[position].startsWith("**") && position != 0
+            }
+
+            override fun getDropDownView(
+                position: Int,
+                convertView: View?,
+                parent: ViewGroup
+            ): View {
+                val view = super.getDropDownView(position, convertView, parent)
+                val textView = view as TextView
+                if (symbolsWithHeaders[position].startsWith("**") || position == 0) {
+                    textView.setTextColor(Color.GRAY)
+                    textView.setTypeface(null, Typeface.BOLD)
+                } else {
+                    textView.setTextColor(Color.BLACK)
+                    textView.setTypeface(null, Typeface.NORMAL)
+                }
+                return view
+            }
+        }
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        symbolsSpinner.adapter = spinnerAdapter
+
+        // Selección del Spinner
+        var selectedSymbol: String? = null
+        symbolsSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                val symbol = symbolsWithHeaders[position]
+                if (!symbol.startsWith("**") && position != 0) {
+                    selectedSymbol = symbol
+                    addSymbolEditText.isEnabled = false
+                    addSymbolButton.isEnabled = false
+                    customSymbolsChipGroup.removeAllViews()
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        // Agregar símbolo personalizado
+        addSymbolButton.setOnClickListener {
+            val newSymbol = addSymbolEditText.text.toString().trim()
+            if (newSymbol.isNotEmpty()) {
+                if (customSymbolsChipGroup.childCount == 0) { // Permitir solo un chip
+                    // Crear un chip con el nuevo símbolo
+                    val chip = Chip(this).apply {
+                        text = newSymbol
+                        isCloseIconVisible = true
+                        setOnCloseIconClickListener {
+                            customSymbolsChipGroup.removeView(this)
+                            // Habilitar el Spinner y los elementos de entrada al eliminar el chip
+                            symbolsSpinner.isEnabled = true
+                            addSymbolEditText.isEnabled = true
+                            addSymbolButton.isEnabled = true
+                        }
+                    }
+                    // Añadir el chip al ChipGroup
+                    customSymbolsChipGroup.addView(chip)
+
+                    // Limpiar el campo de texto
+                    addSymbolEditText.text.clear()
+
+                    // Deshabilitar el Spinner y los elementos de entrada ya que se ha añadido un chip
+                    symbolsSpinner.isEnabled = false
+                    addSymbolEditText.isEnabled = false
+                    addSymbolButton.isEnabled = false
+                } else {
+                    Toast.makeText(this, "Solo puedes añadir un símbolo personalizado", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                // Mostrar un mensaje si el campo de texto está vacío
+                Toast.makeText(this, "Introduce un símbolo válido", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
+
+
+        // Configuración de fechas
         entryDateButton.setOnClickListener {
             showDateTimePicker { selectedDateTime ->
                 entryDateTime = selectedDateTime
                 entryDateButton.text = "Fecha Entrada: ${formatDate(selectedDateTime)}"
             }
         }
-
         exitDateButton.setOnClickListener {
             showDateTimePicker { selectedDateTime ->
                 exitDateTime = selectedDateTime
@@ -207,59 +335,55 @@ class AccountMovementsActivity : AppCompatActivity() {
             }
         }
 
-
-        // Adaptador para el estado emocional
-        val emotionalStateAdapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_item,
-            listOf("Psico+", "Psico-")
-        )
-        emotionalStateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        emotionalStateSpinner.adapter = emotionalStateAdapter
-
-        // Configurar spinners
-        operationTypeSpinner.adapter = ArrayAdapter(
-            this, android.R.layout.simple_spinner_dropdown_item, listOf("Buy", "Sell")
-        )
-
         // Mostrar diálogo
         val dialog = AlertDialog.Builder(this)
             .setTitle("Registrar Movimiento")
             .setView(dialogView)
             .setNegativeButton("Cancelar", null)
             .setPositiveButton("Registrar") { _, _ ->
-                // Obtener los valores del formulario
-
-                val operationType = operationTypeSpinner.selectedItem.toString()
-                val entryPrice = entryPriceEditText.text.toString().toDoubleOrNull() ?: 0.0
-                val exitPrice = exitPriceEditText.text.toString().toDoubleOrNull() ?: 0.0
-                val swap = swapEditText.text.toString().toDoubleOrNull() ?: 0.0
-                val commission = commissionEditText.text.toString().toDoubleOrNull() ?: 0.0
-                val strategy = strategySpinner.selectedItem.toString()
-                val emotion = emotionSpinner.selectedItem.toString()
-                val comments = commentsEditText.text.toString()
-
-                // Validaciones
-                if (entryDateTime == null || exitDateTime == null) {
+                if (selectedSymbol == null && customSymbolsChipGroup.childCount == 0) {
                     Toast.makeText(
                         this,
-                        "Por favor selecciona fecha de entrada y salida",
+                        "Por favor selecciona o añade un símbolo",
                         Toast.LENGTH_SHORT
                     ).show()
                     return@setPositiveButton
                 }
 
-                // Determinar estilo de trading al registrar
+                val finalSymbol = if (symbolsSpinner.isEnabled) selectedSymbol else {
+                    val customChip = customSymbolsChipGroup.getChildAt(0) as Chip
+                    customChip.text.toString()
+                }
+
+                // Verifica que finalSymbol no sea nulo
+                if (finalSymbol.isNullOrBlank()) {
+                    Toast.makeText(
+                        this,
+                        "Error: No se ha seleccionado un símbolo válido",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@setPositiveButton
+                }
+
+                val entryPrice = entryPriceEditText.text.toString().toDoubleOrNull() ?: 0.0
+                val exitPrice = exitPriceEditText.text.toString().toDoubleOrNull() ?: 0.0
+                val swap = swapEditText.text.toString().toDoubleOrNull() ?: 0.0
+                val commission = commissionEditText.text.toString().toDoubleOrNull() ?: 0.0
+                val operationType = operationTypeSpinner.selectedItem.toString()
+                val strategy = strategySpinner.selectedItem.toString()
+                val emotion = emotionSpinner.selectedItem.toString()
+                val comments = commentsEditText.text.toString()
+
+                // Calcular beneficios y estilo de trading
+                val profit = exitPrice - entryPrice - commission - swap
                 val tradingStyle = if (entryDateTime != null && exitDateTime != null) {
-                    val durationInMinutes = (exitDateTime!! - entryDateTime!!) / (1000 * 60)
+                    val duration = (exitDateTime!! - entryDateTime!!) / (1000 * 60)
                     when {
-                        durationInMinutes < 10 -> "Scalping"
-                        durationInMinutes < 1440 -> "Intradia"
+                        duration < 10 -> "Scalping"
+                        duration < 1440 -> "Intradia"
                         else -> "Swing Trading"
                     }
-                } else {
-                    "Desconocido" // Si no hay tiempo de salida, establece un valor por defecto
-                }
+                } else "Desconocido"
 
                 // Determinar estado emocional
                 val positiveEmotions = listOf(
@@ -274,16 +398,10 @@ class AccountMovementsActivity : AppCompatActivity() {
                 )
                 val emotionalState = if (positiveEmotions.contains(emotion)) "Psico+" else "Psico-"
 
-                // Calcular beneficio
-                val profit =
-                    if (exitPrice != null) (exitPrice - entryPrice - commission - swap) else null
-
-                // Crear el objeto Movement
-                val movementId = UUID.randomUUID().toString()
-                val newMovement = Movement(
-                    id = movementId,
-                    accountId = "account_id", // Cambia por el ID real de la cuenta
-                    //symbol = selectedSymbolChip?.text.toString(),
+                val movement = Movement(
+                    id = UUID.randomUUID().toString(),
+                    accountId = "account_id",
+                    symbol = finalSymbol,
                     type = operationType,
                     entryPrice = entryPrice,
                     exitPrice = exitPrice,
@@ -292,23 +410,28 @@ class AccountMovementsActivity : AppCompatActivity() {
                     profit = profit,
                     strategyId = strategy,
                     emotionalState = emotionalState,
-                    entryTime = entryDateTime!!,
-                    exitTime = exitDateTime,
-                    photos = listOf(), // Inicialmente vacío
+                    entryTime = entryDateTime ?: 0L,
+                    exitTime = exitDateTime ?: 0L,
+                    photos = listOf(),
                     tradingStyle = tradingStyle,
                     comments = comments
                 )
 
-                // Guardar en Firebase
-                saveMovementToFirebase(newMovement)
+                // Llamar al método para guardar el movimiento en Firebase
+                saveMovementToFirebase(movement)
+
+                Toast.makeText(
+                    this,
+                    "Movimiento registrado: $finalSymbol, Profit: $profit",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
             .create()
-
         dialog.show()
     }
 
 
-    private fun saveMovementToFirebase(movement: Movement) {
+        private fun saveMovementToFirebase(movement: Movement) {
         val db = Firebase.firestore // Instancia de Firestore
 
         val movementData = hashMapOf(

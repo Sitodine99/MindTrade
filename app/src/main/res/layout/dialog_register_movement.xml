@@ -10,23 +10,26 @@
         android:orientation="vertical"
         android:padding="8dp">
 
-        <!-- Selección de Símbolo -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Selecciona un símbolo"
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
-
-        <!-- Chips de símbolos -->
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/symbolChipGroup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:chipSpacing="8dp"
-            app:singleLine="false" />
-
         <!-- Agregar símbolo -->
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/customSymbolsChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:singleLine="true"
+            app:chipSpacing="8dp" />
+
+
+        <Spinner
+            android:id="@+id/symbolsSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:spinnerMode="dropdown" />
+
+
+
         <EditText
             android:id="@+id/addSymbolEditText"
             android:layout_width="match_parent"
@@ -40,6 +43,7 @@
             android:layout_height="wrap_content"
             android:text="Añadir símbolo"
             android:layout_marginTop="8dp" />
+
 
         <!-- Tipo de Operación -->
         <TextView
