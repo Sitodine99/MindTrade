@@ -1,0 +1,84 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:id="@+id/detailsScrollView"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Cabecera -->
+        <TextView
+            android:id="@+id/accountNameTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nombre de la cuenta"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:paddingBottom="8dp" />
+
+        <!-- Detalles de la cuenta -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="16dp">
+
+            <!-- Balance -->
+            <TextView
+                android:id="@+id/accountBalanceTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Balance: $0.00"
+                android:textSize="16sp"
+                android:layout_marginBottom="4dp" />
+
+            <!-- Divisa -->
+            <TextView
+                android:id="@+id/accountCurrencyTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Divisa: USD"
+                android:textSize="16sp"
+                android:layout_marginBottom="4dp" />
+
+            <!-- Objetivo de beneficio -->
+            <TextView
+                android:id="@+id/accountProfitTargetTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Objetivo: $0.00"
+                android:textSize="16sp"
+                android:layout_marginBottom="4dp" />
+
+            <!-- Máxima pérdida diaria -->
+            <TextView
+                android:id="@+id/accountMaxDailyLossTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Máx pérdida diaria: $0.00"
+                android:textSize="16sp"
+                android:layout_marginBottom="4dp" />
+
+            <!-- Fecha de creación -->
+            <TextView
+                android:id="@+id/accountCreationDateTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Creada el: 01/01/2024"
+                android:textSize="16sp"
+                android:layout_marginBottom="4dp" />
+        </LinearLayout>
+
+        <!-- Gráfico -->
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/balanceChart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginTop="16dp" />
+    </LinearLayout>
+</ScrollView>

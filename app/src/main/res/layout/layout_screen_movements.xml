@@ -1,0 +1,37 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:id="@+id/movementsScrollView">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Título -->
+        <TextView
+            android:id="@+id/movementsTitleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Movimientos"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Número de movimientos -->
+        <TextView
+            android:id="@+id/accountMovementsCountTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Movimientos: 0"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp" />
+
+        <!-- RecyclerView para los movimientos -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/movementsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</ScrollView>

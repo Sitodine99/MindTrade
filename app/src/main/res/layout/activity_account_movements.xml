@@ -1,134 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
     android:background="@color/white">
 
-    <LinearLayout
+    <!-- ViewPager2 para manejar las pantallas -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent" />
 
-        <!-- Cabecera con el nombre de la cuenta y fecha -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="16dp">
+</androidx.constraintlayout.widget.ConstraintLayout>
 
-            <TextView
-                android:id="@+id/accountNameTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Nombre de la cuenta"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:paddingBottom="8dp" />
 
-            <TextView
-                android:id="@+id/accountCreationDateTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Creado: 01/01/2024"
-                android:textSize="16sp"
-                android:gravity="center"
-                android:paddingBottom="8dp" />
-        </LinearLayout>
-
-        <!-- Detalles de la cuenta -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2"
-            android:paddingBottom="16dp">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/accountBalanceTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Balance: $0.00"
-                    android:textSize="16sp"
-                    android:layout_marginBottom="4dp" />
-
-                <TextView
-                    android:id="@+id/accountProfitTargetTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Objetivo: $0.00"
-                    android:textSize="16sp"
-                    android:layout_marginBottom="4dp" />
-
-                <TextView
-                    android:id="@+id/accountMaxDailyLossTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Máx pérdida: $0.00"
-                    android:textSize="16sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/accountCurrencyTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Divisa: USD"
-                    android:textSize="16sp"
-                    android:layout_marginBottom="4dp" />
-
-                <TextView
-                    android:id="@+id/accountMovementsCountTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Movimientos: 0"
-                    android:textSize="16sp" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- Gráfico -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:background="@android:color/darker_gray"
-            android:gravity="center"
-            android:layout_marginBottom="16dp">
-
-            <TextView
-                android:id="@+id/chartPlaceholder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Gráfico: Balance vs Operaciones"
-                android:textSize="16sp"
-                android:textColor="@android:color/white" />
-        </LinearLayout>
-
-        <!-- Movimientos -->
-        <TextView
-            android:id="@+id/movementsSectionTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Movimientos"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/movementsRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
-    </LinearLayout>
-</ScrollView>
