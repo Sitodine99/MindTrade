@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import auth.LoginActivity
 import adapters.StrategyAdapter
+import android.app.AlertDialog
 import android.app.Dialog
 import android.graphics.Color
 import android.text.InputFilter
@@ -44,6 +45,8 @@ import strategycards.RegisterStrategyActivity
 import strategycards.StrategyDetailFragment
 import welcome.AvatarSelectionActivity
 import com.example.mindtrade.model.Account
+
+
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyStrategiesFragment.OnStrategyDeletedListener {
@@ -81,6 +84,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Habilitar logs de Firestore (opcional para depuración)
         FirebaseFirestore.setLoggingEnabled(true)
 
         // Configurar la barra de herramientas
@@ -89,25 +93,42 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
         // Llama al método para obtener cuentas
-        fetchAccounts()
+        fetchAccounts { accounts ->
+            setupAccountsRecyclerView(accounts)
+        }
 
-        // Inicializar el ImageButton
+
+
+        // Inicializar botones principales
         val addAccountButton: ImageButton = findViewById(R.id.addAccountButton)
-
-        // Inicializar el ImageButton
         addStrategyButton = findViewById(R.id.addStrategyButton)
+        val changeAccountsButton: ImageButton = findViewById(R.id.changeAccountsButton)
 
         // Configurar listener para el botón
         addAccountButton.setOnClickListener {
             showCreateAccountDialog()
         }
 
-        // Configurar listener para el ImageButton
+        // Listener para añadir estrategias
         addStrategyButton.setOnClickListener {
             val intent = Intent(this, RegisterStrategyActivity::class.java)
             registerStrategyLauncher.launch(intent)
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
+
+        // Listener para cambiar las cuentas visibles en el RecyclerView
+        changeAccountsButton.setOnClickListener {
+            fetchAccounts { allAccounts ->
+                showAccountSelectionDialog(allAccounts) { selectedAccounts ->
+                    val accountsRecyclerView = findViewById<RecyclerView>(R.id.accountsRecyclerView)
+                    val adapter = accountsRecyclerView.adapter
+                    if (adapter is AccountAdapter) {
+                        adapter.updateAccounts(selectedAccounts)
+                    }
+                }
+            }
+        }
+
 
         // Configurar el drawer layout y la navegación
         drawerLayout = findViewById(R.id.drawer_layout)
@@ -167,7 +188,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
 
         // Configurar RecyclerViews y otros listeners
-        fetchAccounts()
+        fetchAccounts { accounts ->
+            setupAccountsRecyclerView(accounts)
+        }
+
         setupRecyclerViews()
         setupImageClickListeners()
         setupAddStrategyButton() // Configurar botón "Añadir Estrategia"
@@ -230,7 +254,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    private fun fetchAccounts() {
+    private fun fetchAccounts(onAccountsLoaded: (List<Account>) -> Unit) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId == null) {
             Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
@@ -246,7 +270,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 if (documents != null) {
                     val accounts = documents.map { doc -> doc.toObject(Account::class.java) }
-                    setupAccountsRecyclerView(accounts) // Actualiza el RecyclerView
+                    onAccountsLoaded(accounts)
                 }
             }
     }
@@ -254,20 +278,71 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
 
-    private fun setupAccountsRecyclerView(accounts: List<Account>) {
+
+    private fun setupAccountsRecyclerView(allAccounts: List<Account>) {
         val accountsRecyclerView = findViewById<RecyclerView>(R.id.accountsRecyclerView)
+        val selectedAccounts = allAccounts.take(2) // Por defecto, tomamos las primeras 2 cuentas
         val adapter = accountsRecyclerView.adapter
 
         if (adapter is AccountAdapter) {
             // Actualiza los datos si ya existe un adaptador
-            adapter.updateAccounts(accounts)
+            adapter.updateAccounts(selectedAccounts)
         } else {
             // Configura un nuevo AccountAdapter
             accountsRecyclerView.layoutManager =
                 LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-            accountsRecyclerView.adapter = AccountAdapter(accounts)
+            accountsRecyclerView.adapter = AccountAdapter(selectedAccounts)
+        }
+
+        // Mostrar un diálogo para cambiar las cuentas seleccionadas
+        setupAccountSelectionDialog(allAccounts)
+    }
+
+    private fun setupAccountSelectionDialog(allAccounts: List<Account>) {
+        val accountsRecyclerView = findViewById<RecyclerView>(R.id.accountsRecyclerView)
+
+        findViewById<View>(R.id.changeAccountsButton)?.setOnClickListener {
+            val accountNames = allAccounts.map { it.name }.toTypedArray()
+            val selectedIndices = mutableListOf<Int>() // Almacena las cuentas seleccionadas
+
+            AlertDialog.Builder(this)
+                .setTitle("Seleccionar cuentas")
+                .setMultiChoiceItems(accountNames, null) { _, index, isChecked ->
+                    if (isChecked) selectedIndices.add(index) else selectedIndices.remove(index)
+                }
+                .setPositiveButton("OK") { _, _ ->
+                    // Tomamos solo las primeras dos cuentas seleccionadas
+                    val selectedAccounts = selectedIndices.map { allAccounts[it] }.take(2)
+
+                    // Actualizamos el adapter con las cuentas seleccionadas
+                    val adapter = accountsRecyclerView.adapter
+                    if (adapter is AccountAdapter) {
+                        adapter.updateAccounts(selectedAccounts)
+                    }
+                }
+                .setNegativeButton("Cancelar", null)
+                .show()
         }
     }
+
+    fun showAccountSelectionDialog(allAccounts: List<Account>, onSelectionDone: (List<Account>) -> Unit) {
+        val accountNames = allAccounts.map { it.name }.toTypedArray()
+        val selectedIndices = mutableListOf<Int>() // Almacena las cuentas seleccionadas
+
+        AlertDialog.Builder(this)
+            .setTitle("Seleccionar cuentas")
+            .setMultiChoiceItems(accountNames, null) { _, index, isChecked ->
+                if (isChecked) selectedIndices.add(index) else selectedIndices.remove(index)
+            }
+            .setPositiveButton("OK") { _, _ ->
+                val selectedAccounts = selectedIndices.map { allAccounts[it] }.take(2)
+                onSelectionDone(selectedAccounts)
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+
+    }
+
 
 
 

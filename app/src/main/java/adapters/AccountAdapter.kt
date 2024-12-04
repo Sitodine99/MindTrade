@@ -32,4 +32,10 @@ class AccountAdapter(private var accounts: List<Account>) :
         accounts = newAccounts
         notifyDataSetChanged() // Refresca los datos
     }
+
+    fun updateSelectedAccounts(selectedAccounts: List<Account>) {
+        accounts = selectedAccounts.take(2) // Asegúrate de tomar solo dos cuentas
+        notifyDataSetChanged()
+    }
+
 }

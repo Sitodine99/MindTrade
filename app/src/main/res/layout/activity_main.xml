@@ -131,45 +131,72 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
-        <!-- RecyclerView y Botón (solo en MainActivity, no en fragmentos) -->
         <LinearLayout
             android:id="@+id/accountHeaderLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="16dp"
+            android:padding="8dp"
             android:gravity="center_vertical"
-            app:layout_constraintTop_toBottomOf="@id/appbarLayout" >
+            android:layout_marginTop="10dp"
+            app:layout_constraintTop_toBottomOf="@id/appbarLayout">
 
             <TextView
                 android:id="@+id/accountsSummary"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:gravity="center_vertical"
                 android:text="Mis Cuentas"
-                android:textColor="@color/black"
+                android:layout_marginStart="10dp"
                 android:textSize="25sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:gravity="center_vertical"
+                android:minHeight="48dp"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="25sp"
+                android:autoSizeStepGranularity="1sp" />
 
+            <!-- Botón de Cambiar Cuentas -->
+            <ImageButton
+                android:id="@+id/changeAccountsButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="40dp"
+                android:src="@drawable/ic_change_accounts"
+                android:contentDescription="Cambiar cuentas"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:backgroundTint="#000000"
+                android:scaleType="fitCenter"
+                android:padding="4dp" />
+
+            <!-- Botón de Añadir Cuenta -->
             <ImageButton
                 android:id="@+id/addAccountButton"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="@drawable/ic_add"
-                android:backgroundTint="#000000"
                 android:backgroundTintMode="src_in"
-                android:contentDescription="Añadir Cuenta" />
+                android:backgroundTint="#000000"
+                android:contentDescription="Añadir estrategia"
+                android:scaleType="fitCenter"
+                android:padding="4dp"
+                android:layout_marginEnd="40dp"/>
+
         </LinearLayout>
+
 
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/accountsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/accountHeaderLayout" />
+
 
 
         <LinearLayout
@@ -177,7 +204,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="16dp"
+            android:padding="8dp"
             android:gravity="center_vertical"
             android:layout_marginTop="10dp"
             app:layout_constraintTop_toBottomOf="@+id/accountsRecyclerView">
@@ -187,6 +214,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:layout_marginStart="10dp"
                 android:text="Estrategias"
                 android:textSize="25sp"
                 android:textStyle="bold"
@@ -217,7 +245,10 @@
                 android:background="@drawable/ic_add"
                 android:backgroundTintMode="src_in"
                 android:backgroundTint="#000000"
-                android:contentDescription="Añadir estrategia" />
+                android:contentDescription="Añadir estrategia"
+                android:scaleType="fitCenter"
+                android:padding="4dp"
+                android:layout_marginEnd="40dp"/>
         </LinearLayout>
 
 
@@ -229,6 +260,7 @@
             android:scrollbars="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            android:layout_margin="0dp"
             app:layout_constraintTop_toBottomOf="@+id/strategyHeaderLayout" />
 
         <androidx.recyclerview.widget.RecyclerView
