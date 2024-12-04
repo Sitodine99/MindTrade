@@ -1,3 +1,4 @@
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -6,6 +7,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mindtrade.AccountMovementsActivity
 import com.example.mindtrade.R
 import com.example.mindtrade.model.Account
 import com.google.firebase.auth.FirebaseAuth
@@ -31,7 +33,8 @@ class MyAccountsFragment : Fragment() {
         myAccountsAdapter = MyAccountsAdapter(
             accounts = emptyList(),
             onEditClicked = { account -> editAccount(account) },
-            onDeleteClicked = { account -> deleteAccount(account) }
+            onDeleteClicked = { account -> deleteAccount(account) },
+            onAccountClick = { account -> openAccountMovementsActivity(account) } // Callback para clic en cuenta
         )
         accountsRecyclerView.adapter = myAccountsAdapter
 
@@ -51,17 +54,23 @@ class MyAccountsFragment : Fragment() {
         db.collection("accounts").whereEqualTo("userId", userId).get()
             .addOnSuccessListener { documents ->
                 val accounts = documents.map { it.toObject(Account::class.java) }
-                myAccountsAdapter = MyAccountsAdapter(
-                    accounts = accounts,
-                    onEditClicked = { account -> editAccount(account) },
-                    onDeleteClicked = { account -> deleteAccount(account) }
-                )
-                accountsRecyclerView.adapter = myAccountsAdapter
+                myAccountsAdapter.updateAccounts(accounts)
             }
             .addOnFailureListener { e ->
                 Toast.makeText(context, "Error al cargar cuentas: ${e.message}", Toast.LENGTH_SHORT)
                     .show()
             }
+    }
+
+    private fun openAccountMovementsActivity(account: Account) {
+        val intent = Intent(requireContext(), AccountMovementsActivity::class.java).apply {
+            putExtra("accountName", account.name)
+            putExtra("accountBalance", account.balance)
+            putExtra("accountId", account.id) // Enviar también el ID si es necesario
+            putExtra("accountCreationDate", account.createdAt)
+            putExtra("accountCurrency", account.currency)
+        }
+        startActivity(intent)
     }
 
     private fun editAccount(account: Account) {
@@ -108,8 +117,6 @@ class MyAccountsFragment : Fragment() {
         builder.create().show()
     }
 
-
-
     private fun deleteAccount(account: Account) {
         // Crear el AlertDialog
         val builder = androidx.appcompat.app.AlertDialog.Builder(requireContext())
@@ -141,5 +148,6 @@ class MyAccountsFragment : Fragment() {
         builder.create().show()
     }
 }
+
 
 

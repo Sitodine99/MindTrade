@@ -6,12 +6,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mindtrade.R
 import com.example.mindtrade.model.Account
 
-class AccountAdapter(private var accounts: List<Account>) :
-    RecyclerView.Adapter<AccountAdapter.AccountViewHolder>() {
+class AccountAdapter(
+    private var accounts: List<Account>,
+    private val onAccountClick: (Account) -> Unit // Callback para manejar clics
+) : RecyclerView.Adapter<AccountAdapter.AccountViewHolder>() {
 
     class AccountViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val accountName: TextView = itemView.findViewById(R.id.accountName)
         val accountBalance: TextView = itemView.findViewById(R.id.accountBalance)
+        val accountCreationDate: TextView = itemView.findViewById(R.id.accountCreationDate)
+        val accountProfitability: TextView = itemView.findViewById(R.id.accountProfitability)
+        val accountOperations: TextView = itemView.findViewById(R.id.accountOperations)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AccountViewHolder {
@@ -24,6 +29,23 @@ class AccountAdapter(private var accounts: List<Account>) :
         val account = accounts[position]
         holder.accountName.text = account.name
         holder.accountBalance.text = "Balance: $${account.balance}"
+
+        // Formatear la fecha de creación
+        val creationDate = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+            .format(java.util.Date(account.createdAt))
+        holder.accountCreationDate.text = "Creado: $creationDate"
+
+        // Rentabilidad por defecto es 0%
+        val profitability = calculateProfitability(account)
+        holder.accountProfitability.text = "Rentabilidad: $profitability%"
+
+        // Mostrar número de operaciones
+        holder.accountOperations.text = "Operaciones: ${account.movements.size}"
+
+        // Asignar el listener de clic
+        holder.itemView.setOnClickListener {
+            onAccountClick(account) // Llamar al callback con la cuenta seleccionada
+        }
     }
 
     override fun getItemCount(): Int = accounts.size
@@ -33,9 +55,10 @@ class AccountAdapter(private var accounts: List<Account>) :
         notifyDataSetChanged() // Refresca los datos
     }
 
-    fun updateSelectedAccounts(selectedAccounts: List<Account>) {
-        accounts = selectedAccounts.take(2) // Asegúrate de tomar solo dos cuentas
-        notifyDataSetChanged()
+    private fun calculateProfitability(account: Account): Double {
+        // Simulación: Puedes reemplazar esto con una fórmula real basada en los movimientos
+        return 0.0
     }
-
 }
+
+

@@ -292,12 +292,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             // Configura un nuevo AccountAdapter
             accountsRecyclerView.layoutManager =
                 LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-            accountsRecyclerView.adapter = AccountAdapter(selectedAccounts)
+            accountsRecyclerView.adapter = AccountAdapter(selectedAccounts) { selectedAccount ->
+                // Abrir la nueva actividad
+                val intent = Intent(this, AccountMovementsActivity::class.java).apply {
+                    putExtra("accountName", selectedAccount.name)
+                    putExtra("accountBalance", selectedAccount.balance)
+                    putExtra("accountId", selectedAccount.id) // Enviar también el ID si es necesario
+                    putExtra("accountCreationDate", selectedAccount.createdAt)
+                    putExtra("accountCurrency", selectedAccount.currency)
+                }
+                startActivity(intent)
+            }
         }
 
         // Mostrar un diálogo para cambiar las cuentas seleccionadas
         setupAccountSelectionDialog(allAccounts)
     }
+
 
     private fun setupAccountSelectionDialog(allAccounts: List<Account>) {
         val accountsRecyclerView = findViewById<RecyclerView>(R.id.accountsRecyclerView)
