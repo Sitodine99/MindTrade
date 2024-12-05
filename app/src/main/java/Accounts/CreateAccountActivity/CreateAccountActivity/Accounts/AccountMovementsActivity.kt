@@ -4,8 +4,10 @@ import MovementsAdapter
 import ScreenPagerAdapter
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +16,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.NumberPicker
 import android.widget.ScrollView
 import android.widget.Spinner
@@ -24,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.bumptech.glide.Glide
 import com.example.mindtrade.model.Movement
 import com.example.mindtrade.model.Strategy
 import com.github.mikephil.charting.charts.LineChart
@@ -38,6 +42,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.FirebaseStorage
 import java.util.Calendar
 import java.util.UUID
 
@@ -47,8 +52,34 @@ class AccountMovementsActivity : AppCompatActivity() {
     private lateinit var movementsAdapter: MovementsAdapter
     private val strategies = mutableListOf<Strategy>() // Lista de estrategias disponibles
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    var selectedEmotion: String = "Selecciona un estado emocional"
+    var isEmotionSpinnerInitialized =
+        false // Controlar que el spinner no dispare al abrir el formulario
+    private var movementImageView01: ImageView? = null
+    private var movementImageView02: ImageView? = null
+    private var selectedImageView: ImageView? = null
 
 
+    // Definir las emociones para Psico+ y Psico-
+    private val emotionsPsicoPlus = listOf(
+        "Autocontrol", "Confianza", "Eficiencia", "Optimismo", "Paciencia",
+        "Realización", "Satisfacción", "Seguridad", "Sintonía", "Tranquilidad",
+        "Aceptación", "Afirmación"
+    )
+
+    private val emotionsPsicoMinus = listOf(
+        "Ansiedad", "Impaciencia", "Descontrol", "Avaricia", "Insatisfacción",
+        "Rabia", "Vergüenza", "Confusión", "Miedo", "Fatalismo",
+        "Frustración", "Ineficacia"
+    )
+
+    private var image01Url: String? = null
+    private var image02Url: String? = null
+    private var selectedImageType: String? = null
+
+    companion object {
+        private const val REQUEST_CODE_IMAGE_PICKER = 1001
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -196,8 +227,14 @@ class AccountMovementsActivity : AppCompatActivity() {
         val commissionEditText = dialogView.findViewById<EditText>(R.id.commissionEditText)
         val operationTypeSpinner = dialogView.findViewById<Spinner>(R.id.operationTypeSpinner)
         val strategySpinner = dialogView.findViewById<Spinner>(R.id.strategySpinner)
-        val emotionSpinner = dialogView.findViewById<Spinner>(R.id.emotionSpinner)
+        val emotionalStateSpinner = dialogView.findViewById<Spinner>(R.id.emotionalStateSpinner)
         val commentsEditText = dialogView.findViewById<EditText>(R.id.commentsEditText)
+        val emotionSpinner = dialogView.findViewById<Spinner>(R.id.emotionSpinner)
+        val uploadImageButton = dialogView.findViewById<ImageButton>(R.id.uploadImageButton)
+        // Asocia los ImageView del diálogo
+        val movementImageView01 = dialogView.findViewById<ImageView>(R.id.MovementeImageView01)
+        val movementImageView02 = dialogView.findViewById<ImageView>(R.id.MovementeImageView02)
+
 
         var entryDateTime: Long? = null
         var exitDateTime: Long? = null
@@ -358,10 +395,65 @@ class AccountMovementsActivity : AppCompatActivity() {
             }
         }
 
-// Cargar estrategias del usuario y sus favoritas
+
+        // Actualizar las imágenes si ya hay URLs disponibles
+        image01Url?.let { url ->
+            Glide.with(this)
+                .load(url)
+                .placeholder(R.drawable.ic_placeholder)
+                .error(R.drawable.ic_placeholder)
+                .into(movementImageView01)
+        }
+
+        image02Url?.let { url ->
+            Glide.with(this)
+                .load(url)
+                .placeholder(R.drawable.ic_placeholder)
+                .error(R.drawable.ic_placeholder)
+                .into(movementImageView02)
+        }
+
+
+        // Configurar el botón de subir imagen
+        uploadImageButton.setOnClickListener {
+            showImageManagementDialog(movementImageView01, movementImageView02)
+        }
+
+        // Configuración del Spinner de estado emocional
+        val emotionalStatesAdapter = ArrayAdapter.createFromResource(
+            this,
+            R.array.emotional_states,
+            android.R.layout.simple_spinner_item
+        )
+        emotionalStatesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        emotionalStateSpinner.adapter = emotionalStatesAdapter
+
+        // Configurar el comportamiento del Spinner de emociones
+        emotionalStateSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                val selectedEmotionState = parent?.getItemAtPosition(position).toString()
+                when (selectedEmotionState) {
+                    "Psico+" -> setEmotionSpinnerOptions(emotionSpinner, emotionsPsicoPlus)
+                    "Psico-" -> setEmotionSpinnerOptions(emotionSpinner, emotionsPsicoMinus)
+                    else -> clearEmotionSpinner(emotionSpinner) // Limpiar si no selecciona válido
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                clearEmotionSpinner(emotionSpinner) // Limpiar si no selecciona nada
+            }
+        }
+
+
+        // Cargar estrategias del usuario y sus favoritas
         loadStrategies(userId) { strategies ->
             val strategyTitles = strategies.map { it.title }.toMutableList()
-            //strategyTitles.add(0, "Selecciona una Estrategia") //
+            strategyTitles.add(0, "Selecciona una Estrategia")
 
             val strategyAdapter = ArrayAdapter(
                 this,
@@ -405,6 +497,24 @@ class AccountMovementsActivity : AppCompatActivity() {
                     return@setPositiveButton
                 }
 
+                if (selectedEmotion == "Selecciona un estado emocional") {
+                    Toast.makeText(
+                        this,
+                        "Por favor selecciona un estado emocional válido.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@setPositiveButton
+                }
+
+                if (selectedEmotion == "Selecciona una emoción") {
+                    Toast.makeText(
+                        this,
+                        "Por favor selecciona una emoción válida.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@setPositiveButton
+                }
+
                 val finalSymbol = if (symbolsSpinner.isEnabled) selectedSymbol else {
                     val customChip = customSymbolsChipGroup.getChildAt(0) as Chip
                     customChip.text.toString()
@@ -414,6 +524,7 @@ class AccountMovementsActivity : AppCompatActivity() {
                 val swap = swapEditText.text.toString().toDoubleOrNull() ?: 0.0
                 val commission = commissionEditText.text.toString().toDoubleOrNull() ?: 0.0
                 val operationType = operationTypeSpinner.selectedItem.toString()
+                val selectedEmotion = emotionalStateSpinner.selectedItem.toString()
 
                 val profit = exitPrice - entryPrice - commission - swap
                 val movement = Movement(
@@ -426,10 +537,10 @@ class AccountMovementsActivity : AppCompatActivity() {
                     swap = swap,
                     commission = commission,
                     profit = profit,
-                    emotionalState = "Psico+", // Reemplazar con el cálculo correcto
+                    emotionalState = selectedEmotion,
                     entryTime = entryDateTime ?: 0L,
                     exitTime = exitDateTime ?: 0L,
-                    photos = listOf(),
+                    photos = listOf(image01Url ?: "", image02Url ?: ""), // Fotos opcionales
                     tradingStyle = "Swing", // Reemplazar según la duración real
                     comments = commentsEditText.text.toString()
                 )
@@ -440,7 +551,7 @@ class AccountMovementsActivity : AppCompatActivity() {
                     // Guardar el movimiento en la subcolección de la estrategia seleccionada
                     saveMovementToStrategy(selectedStrategy.id, movement)
 
-                Toast.makeText(
+                    Toast.makeText(
                         this,
                         "Movimiento registrado en la estrategia: ${selectedStrategy.title}",
                         Toast.LENGTH_SHORT
@@ -455,7 +566,7 @@ class AccountMovementsActivity : AppCompatActivity() {
     }
 
 
-        private fun saveMovementToFirebase(movement: Movement) {
+    private fun saveMovementToFirebase(movement: Movement) {
         val db = Firebase.firestore // Instancia de Firestore
 
         val movementData = hashMapOf(
@@ -518,7 +629,8 @@ class AccountMovementsActivity : AppCompatActivity() {
             this,
             { _, year, month, dayOfMonth ->
                 // Crear un TimePickerDialog personalizado con segundos
-                val timePickerView = layoutInflater.inflate(R.layout.dialog_time_picker_with_seconds, null)
+                val timePickerView =
+                    layoutInflater.inflate(R.layout.dialog_time_picker_with_seconds, null)
                 val hourPicker = timePickerView.findViewById<NumberPicker>(R.id.hourPicker)
                 val minutePicker = timePickerView.findViewById<NumberPicker>(R.id.minutePicker)
                 val secondPicker = timePickerView.findViewById<NumberPicker>(R.id.secondPicker)
@@ -540,7 +652,14 @@ class AccountMovementsActivity : AppCompatActivity() {
                 AlertDialog.Builder(this)
                     .setView(timePickerView)
                     .setPositiveButton("Aceptar") { _, _ ->
-                        calendar.set(year, month, dayOfMonth, hourPicker.value, minutePicker.value, secondPicker.value)
+                        calendar.set(
+                            year,
+                            month,
+                            dayOfMonth,
+                            hourPicker.value,
+                            minutePicker.value,
+                            secondPicker.value
+                        )
                         callback(calendar.timeInMillis)
                     }
                     .setNegativeButton("Cancelar", null)
@@ -580,7 +699,8 @@ class AccountMovementsActivity : AppCompatActivity() {
         val userStrategiesQuery = db.collection("strategies").whereEqualTo("createdBy", userId)
 
         // Consultar estrategias favoritas del usuario
-        val favoriteStrategiesQuery = db.collection("strategies").whereArrayContains("favoritedBy", userId)
+        val favoriteStrategiesQuery =
+            db.collection("strategies").whereArrayContains("favoritedBy", userId)
 
         userStrategiesQuery.get().addOnSuccessListener { userStrategiesSnapshot ->
             strategies.addAll(userStrategiesSnapshot.toObjects(Strategy::class.java)) // Estrategias del usuario
@@ -592,10 +712,15 @@ class AccountMovementsActivity : AppCompatActivity() {
 
                 callback(strategies) // Llamar al callback con la lista de estrategias
             }.addOnFailureListener { e ->
-                Toast.makeText(this, "Error al cargar estrategias favoritas: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Error al cargar estrategias favoritas: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }.addOnFailureListener { e ->
-            Toast.makeText(this, "Error al cargar estrategias: ${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Error al cargar estrategias: ${e.message}", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -625,11 +750,132 @@ class AccountMovementsActivity : AppCompatActivity() {
             .collection("movements") // Subcolección
             .add(movementData)
             .addOnSuccessListener {
-                Toast.makeText(this, "Movimiento registrado correctamente.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Movimiento registrado correctamente.", Toast.LENGTH_SHORT)
+                    .show()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Error al registrar movimiento: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Error al registrar movimiento: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
-}
+    // Función para actualizar dinámicamente las opciones del Spinner de emociones
+    private fun setEmotionSpinnerOptions(spinner: Spinner, options: List<String>) {
+        val optionsWithDefault =
+            mutableListOf("Selecciona una emoción") // Añadir opción predeterminada
+        optionsWithDefault.addAll(options) // Añadir las emociones específicas
+
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            optionsWithDefault
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
+    }
+
+    // Función para limpiar las opciones del Spinner
+    private fun clearEmotionSpinner(spinner: Spinner) {
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            listOf("Selecciona una emoción") // Mostrar solo la opción predeterminada
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
+    }
+
+    //Crear el diálogo para seleccionar imágenes
+    private fun showImageManagementDialog(imageView01: ImageView, imageView02: ImageView) {
+        val options = arrayOf("Imagen 01", "Imagen 02")
+        AlertDialog.Builder(this)
+            .setTitle("Seleccionar imagen a gestionar")
+            .setItems(options) { _, which ->
+                val selectedImageView = if (which == 0) imageView01 else imageView02
+                openImagePicker(selectedImageView)
+            }
+            .show()
+    }
+
+
+    //Permitir al usuario seleccionar una imagen
+    private fun openImagePicker(targetImageView: ImageView) {
+        val intent = Intent(Intent.ACTION_PICK).apply {
+            type = "image/*"
+        }
+        startActivityForResult(intent, REQUEST_CODE_IMAGE_PICKER)
+
+        // Guardamos la referencia del ImageView seleccionado para usarla después
+        this.selectedImageView = targetImageView
+    }
+
+
+
+    // Gestionar el resultado de la selección de imágenes
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_IMAGE_PICKER && resultCode == RESULT_OK) {
+            val imageUri = data?.data
+            if (imageUri != null) {
+                uploadImageToFirebase(imageUri) { uploadedUrl ->
+                    if (uploadedUrl != null) {
+                        selectedImageView?.let { imageView ->
+                            Glide.with(this)
+                                .load(uploadedUrl)
+                                .placeholder(R.drawable.ic_placeholder)
+                                .error(R.drawable.ic_placeholder)
+                                .into(imageView)
+
+                            // Actualizamos la URL según el ImageView
+                            if (imageView.id == R.id.MovementeImageView01) {
+                                image01Url = uploadedUrl
+                            } else if (imageView.id == R.id.MovementeImageView02) {
+                                image02Url = uploadedUrl
+                            }
+                        }
+                        Toast.makeText(this, "Imagen subida exitosamente", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "Error al subir la imagen", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } else {
+                Toast.makeText(this, "No se seleccionó ninguna imagen", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+
+
+
+    private fun uploadImageToFirebase(imageUri: Uri, callback: (String?) -> Unit) {
+            val storageRef =
+                FirebaseStorage.getInstance().reference.child("images/${System.currentTimeMillis()}.jpg")
+
+            storageRef.putFile(imageUri)
+                .addOnSuccessListener {
+                    storageRef.downloadUrl.addOnSuccessListener { uri ->
+                        callback(uri.toString())
+                    }.addOnFailureListener {
+                        Toast.makeText(
+                            this,
+                            "Error al obtener la URL de la imagen",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        callback(null)
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(
+                        this,
+                        "Error al subir la imagen: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    callback(null)
+                }
+        }
+    }
+
+

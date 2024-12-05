@@ -144,47 +144,28 @@
 
 
         <!-- Selección de Estrategia -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Selecciona una estrategia"
-            android:textSize="16sp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp" />
 
         <Spinner
             android:id="@+id/strategySpinner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"/>
 
         <!-- Estado Emocional -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Selecciona un estado emocional"
-            android:textSize="16sp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp" />
 
         <Spinner
             android:id="@+id/emotionalStateSpinner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"/>
 
         <!-- Selección de Emoción -->
-        <TextView
-            android:id="@+id/emotionLabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Selecciona una emoción"
-            android:textSize="16sp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp" />
 
         <Spinner
             android:id="@+id/emotionSpinner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"/>
 
         <!-- Comentarios -->
         <EditText
@@ -216,7 +197,7 @@
 
             <!-- Vista previa de la imagen -->
             <ImageView
-                android:id="@+id/entryImageView"
+                android:id="@+id/MovementeImageView01"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:contentDescription="Vista previa de la imagen_01"
@@ -227,7 +208,7 @@
 
             <!-- Vista previa de la imagen -->
             <ImageView
-                android:id="@+id/exitImageView"
+                android:id="@+id/MovementeImageView02"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:contentDescription="Vista previa de la imagen_02"

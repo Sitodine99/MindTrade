@@ -129,11 +129,12 @@
         </string-array>
 
 
-
     <string-array name="emotional_states">
+        <item>Selecciona un estado emocional</item>
         <item>Psico+</item>
         <item>Psico-</item>
     </string-array>
+
 
 
 
