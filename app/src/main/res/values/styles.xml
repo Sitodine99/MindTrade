@@ -21,9 +21,13 @@
         <!-- Esquinas redondeadas -->
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">16dp</item>
-
-
     </style>
+
+    <style name="FadeDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowEnterAnimation">@anim/fade_in</item>
+        <item name="android:windowExitAnimation">@anim/fade_out</item>
+    </style>
+
 
 
 
