@@ -3,7 +3,7 @@ package com.example.mindtrade.model
 import model.Comment
 
 data class Strategy(
-    val id: String = "",
+    var id: String = "",
     val title: String = "",
     val description: String = "",
     val author: String = "",
@@ -22,6 +22,7 @@ data class Strategy(
     val comments: List<Comment> = emptyList(),
     val entryConditionImageUrl: String? = null, // Imagen para condiciones de entrada
     val exitConditionImageUrl: String? = null, // Imagen para condiciones de salida
+    val movements: List<String> = emptyList() // IDs de los movimientos asociados
 )
 
 

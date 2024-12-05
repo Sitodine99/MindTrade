@@ -543,7 +543,8 @@ class RegisterStrategyActivity : AppCompatActivity() {
                     "totalVotes" to 0,
                     "timestamp" to System.currentTimeMillis(),
                     "entryConditionImageUrl" to (entryImageUrl ?: ""),
-                    "exitConditionImageUrl" to (exitImageUrl ?: "")
+                    "exitConditionImageUrl" to (exitImageUrl ?: ""),
+                    "movements" to emptyList<String>()
                 )
 
                 db.collection("strategies").add(strategy).addOnSuccessListener { documentRef ->

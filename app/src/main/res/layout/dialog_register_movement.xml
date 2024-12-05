@@ -218,12 +218,5 @@
                 android:layout_marginStart="16dp" />
         </LinearLayout>
 
-        <!-- Botón Registrar -->
-        <Button
-            android:id="@+id/registerButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Registrar Movimiento"
-            android:layout_marginTop="16dp" />
     </LinearLayout>
 </ScrollView>

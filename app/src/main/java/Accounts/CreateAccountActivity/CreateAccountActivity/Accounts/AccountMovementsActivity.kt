@@ -9,6 +9,7 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
@@ -41,6 +42,7 @@ import com.google.android.material.chip.ChipGroup
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
 import java.util.Calendar
@@ -58,6 +60,10 @@ class AccountMovementsActivity : AppCompatActivity() {
     private var movementImageView01: ImageView? = null
     private var movementImageView02: ImageView? = null
     private var selectedImageView: ImageView? = null
+    private var selectedStrategy: Strategy? = null
+    private var selectedEmotionDetail: String? = null
+
+
 
 
     // Definir las emociones para Psico+ y Psico-
@@ -85,6 +91,8 @@ class AccountMovementsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_account_movements)
+        val accountId = intent.getStringExtra("accountId") ?: "default_account_id"
+
 
         // Configurar el ViewPager2
         val viewPager = findViewById<ViewPager2>(R.id.viewPager)
@@ -140,7 +148,7 @@ class AccountMovementsActivity : AppCompatActivity() {
                             movementsView.findViewById<TextView>(R.id.accountMovementsCountTextView).text =
                                 "Movimientos: ${accountMovements.size}"
                             // Configura el RecyclerView de movimientos aquí
-                            setupMovementsView(movementsView) // Llama al método aquí
+                            setupMovementsView(movementsView, accountId) // Llama al método aquí
                         }
                     }
                     // Maneja más pantallas si es necesario
@@ -190,27 +198,23 @@ class AccountMovementsActivity : AppCompatActivity() {
         lineChart.invalidate() // Redibujar el gráfico
     }
 
-    private fun setupMovementsView(rootView: View) {
+    private fun setupMovementsView(rootView: View, accountId: String) {
         val recyclerView = rootView.findViewById<RecyclerView>(R.id.movementsRecyclerView)
         val addMovementButton = rootView.findViewById<ImageButton>(R.id.addMovementButton)
 
-
-        // Inicializa el adaptador con el contexto y la lista de movimientos
         movementsAdapter = MovementsAdapter(this, movementsList)
 
-        // Configurar el RecyclerView
         recyclerView.adapter = movementsAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Agregar funcionalidad al botón (ejemplo)
         addMovementButton.setOnClickListener {
-            // Lógica para añadir un nuevo movimiento
-            showMovementDialog()
+            showMovementDialog(accountId, strategies)
         }
     }
 
 
-    private fun showMovementDialog() {
+
+    private fun showMovementDialog(accountId: String, strategies: List<Strategy>) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_register_movement, null)
 
 
@@ -436,17 +440,26 @@ class AccountMovementsActivity : AppCompatActivity() {
                 position: Int,
                 id: Long
             ) {
-                val selectedEmotionState = parent?.getItemAtPosition(position).toString()
-                when (selectedEmotionState) {
-                    "Psico+" -> setEmotionSpinnerOptions(emotionSpinner, emotionsPsicoPlus)
-                    "Psico-" -> setEmotionSpinnerOptions(emotionSpinner, emotionsPsicoMinus)
-                    else -> clearEmotionSpinner(emotionSpinner) // Limpiar si no selecciona válido
+                selectedEmotion = parent?.getItemAtPosition(position).toString()
+                when (selectedEmotion) {
+                    "Psico+" -> {
+                        setEmotionSpinnerOptions(emotionSpinner, emotionsPsicoPlus)
+                    }
+                    "Psico-" -> {
+                        setEmotionSpinnerOptions(emotionSpinner, emotionsPsicoMinus)
+                    }
+                    else -> {
+                        selectedEmotion = "Selecciona un estado emocional"
+                        clearEmotionSpinner(emotionSpinner) // Limpiamos si no selecciona válido
+                    }
                 }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                clearEmotionSpinner(emotionSpinner) // Limpiar si no selecciona nada
+                selectedEmotion = "Selecciona un estado emocional"
+                clearEmotionSpinner(emotionSpinner) // Limpiamos si no selecciona nada
             }
+
         }
 
 
@@ -470,156 +483,168 @@ class AccountMovementsActivity : AppCompatActivity() {
                     position: Int,
                     id: Long
                 ) {
-                    if (position != 0) {
-                        val selectedStrategy = strategies[position - 1]
-                        Toast.makeText(
-                            this@AccountMovementsActivity,
-                            "Estrategia: ${selectedStrategy.title}",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                    if (position != 0) { // Asume que la posición 0 es "Selecciona una Estrategia"
+                        selectedStrategy = strategies[position - 1]
+                        Log.d("StrategyDebug", "Estrategia seleccionada: ${selectedStrategy?.id}")
+                    } else {
+                        selectedStrategy = null
+                        Log.d("StrategyDebug", "No se seleccionó ninguna estrategia")
                     }
                 }
 
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                    selectedStrategy = null
+                }
             }
         }
 
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
             .setNegativeButton("Cancelar", null)
-            .setPositiveButton("Registrar") { _, _ ->
+            .setPositiveButton("Registrar", null) // Evitamos el cierre automático aquí
+            .create()
+
+// Sobrescribimos el comportamiento del botón "Registrar"
+        dialog.setOnShowListener {
+            val registerButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            registerButton.setOnClickListener {
+                // Validaciones
+                val finalSymbol = if (symbolsSpinner.isEnabled) selectedSymbol else {
+                    val customChip = customSymbolsChipGroup.getChildAt(0) as Chip
+                    customChip.text.toString()
+                }
+
                 if (selectedSymbol == null && customSymbolsChipGroup.childCount == 0) {
                     Toast.makeText(
                         this,
                         "Por favor selecciona o añade un símbolo",
                         Toast.LENGTH_SHORT
                     ).show()
-                    return@setPositiveButton
+                    return@setOnClickListener // Salimos sin cerrar el diálogo
                 }
 
-                if (selectedEmotion == "Selecciona un estado emocional") {
+                if (selectedEmotion == "Selecciona un estado emocional" || selectedEmotionDetail == null) {
                     Toast.makeText(
                         this,
                         "Por favor selecciona un estado emocional válido.",
                         Toast.LENGTH_SHORT
                     ).show()
-                    return@setPositiveButton
+                    return@setOnClickListener // Salimos sin cerrar el diálogo
                 }
 
-                if (selectedEmotion == "Selecciona una emoción") {
+                if (selectedEmotionDetail == "Selecciona una emoción") {
                     Toast.makeText(
                         this,
                         "Por favor selecciona una emoción válida.",
                         Toast.LENGTH_SHORT
                     ).show()
-                    return@setPositiveButton
+                    return@setOnClickListener // Salimos sin cerrar el diálogo
                 }
 
-                val finalSymbol = if (symbolsSpinner.isEnabled) selectedSymbol else {
-                    val customChip = customSymbolsChipGroup.getChildAt(0) as Chip
-                    customChip.text.toString()
-                }
                 val entryPrice = entryPriceEditText.text.toString().toDoubleOrNull() ?: 0.0
                 val exitPrice = exitPriceEditText.text.toString().toDoubleOrNull() ?: 0.0
                 val swap = swapEditText.text.toString().toDoubleOrNull() ?: 0.0
                 val commission = commissionEditText.text.toString().toDoubleOrNull() ?: 0.0
                 val operationType = operationTypeSpinner.selectedItem.toString()
-                val selectedEmotion = emotionalStateSpinner.selectedItem.toString()
-
                 val profit = exitPrice - entryPrice - commission - swap
+
+                // Creamos el objeto Movement
                 val movement = Movement(
                     id = UUID.randomUUID().toString(),
-                    accountId = "account_id", // Reemplazar con el ID de la cuenta real
+                    accountId = accountId,
                     symbol = finalSymbol ?: "Símbolo no especificado",
                     type = operationType,
                     entryPrice = entryPrice,
                     exitPrice = exitPrice,
+                    entryTime = entryDateTime ?: 0L,
+                    exitTime = exitDateTime ?: 0L,
                     swap = swap,
                     commission = commission,
                     profit = profit,
+                    createdAt = System.currentTimeMillis(),
+                    strategyId = selectedStrategy?.id,
                     emotionalState = selectedEmotion,
-                    entryTime = entryDateTime ?: 0L,
-                    exitTime = exitDateTime ?: 0L,
-                    photos = listOf(image01Url ?: "", image02Url ?: ""), // Fotos opcionales
-                    tradingStyle = "Swing", // Reemplazar según la duración real
-                    comments = commentsEditText.text.toString()
+                    emotion = selectedEmotionDetail,
+                    tradingStyle = "Swing", // Según tu lógica
+                    comments = commentsEditText.text.toString(),
+                    photos = listOf(image01Url ?: "", image02Url ?: "")
                 )
 
-                val selectedStrategyPosition = strategySpinner.selectedItemPosition
-                if (selectedStrategyPosition > 0) {
-                    val selectedStrategy = strategies[selectedStrategyPosition - 1]
-                    // Guardar el movimiento en la subcolección de la estrategia seleccionada
-                    saveMovementToStrategy(selectedStrategy.id, movement)
-
-                    Toast.makeText(
-                        this,
-                        "Movimiento registrado en la estrategia: ${selectedStrategy.title}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    Toast.makeText(this, "Por favor selecciona una estrategia.", Toast.LENGTH_SHORT)
-                        .show()
-                }
+                // Guardamos el movimiento y cerramos el diálogo si todo está correcto
+                saveMovement(movement, accountId, selectedStrategy?.id)
+                dialog.dismiss()
             }
-            .create()
+        }
+
         dialog.show()
     }
 
 
-    private fun saveMovementToFirebase(movement: Movement) {
-        val db = Firebase.firestore // Instancia de Firestore
 
+        private fun saveMovement(movement: Movement, accountId: String, strategyId: String?) {
+        val db = Firebase.firestore
+
+        // Guardar el movimiento en la colección de movimientos
         val movementData = hashMapOf(
             "id" to movement.id,
-            "accountId" to movement.accountId,
+            "accountId" to accountId,
             "symbol" to movement.symbol,
             "type" to movement.type,
             "entryPrice" to movement.entryPrice,
             "exitPrice" to movement.exitPrice,
+            "entryTime" to movement.entryTime,
+            "exitTime" to movement.exitTime,
             "swap" to movement.swap,
             "commission" to movement.commission,
             "profit" to movement.profit,
-            "strategyId" to movement.strategyId,
+            "createdAt" to movement.createdAt,
+            "strategyId" to strategyId,
             "emotionalState" to movement.emotionalState,
-            "entryTime" to movement.entryTime,
-            "exitTime" to movement.exitTime,
-            "photos" to movement.photos,
+            "strategyId" to strategyId,
+            "emotion" to movement.emotion,
             "tradingStyle" to movement.tradingStyle,
-            "comments" to movement.comments
+            "comments" to movement.comments,
+            "photos" to movement.photos
         )
 
-        db.collection("movements")
-            .document(movement.id)
-            .set(movementData)
-            .addOnSuccessListener {
-                updateAccountWithMovement(movement.accountId, movement.id)
-                Toast.makeText(this, "Movimiento guardado exitosamente", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Error al guardar: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-    }
+            db.collection("accounts")
+                .document(accountId)
+                .collection("movements") // Subcolección de movimientos
+                .document(movement.id)
+                .set(movementData)
+                .addOnSuccessListener {
+                    // Actualizar la lista de movimientos de la cuenta
+                    updateAccountWithMovement(accountId, movement.id)
+
+                    // Si hay una estrategia asociada, guardar el movimiento allí también
+                    strategyId?.let {
+                        saveAndLinkMovementToStrategy(strategyId, movement)
+                    }
+
+
+                    Toast.makeText(this, "Movimiento guardado exitosamente.", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error al guardar el movimiento: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+
 
 
     private fun updateAccountWithMovement(accountId: String, movementId: String) {
         val db = Firebase.firestore
 
-        // Actualizar el campo "movements" de la cuenta
-        val accountRef = db.collection("accounts").document(accountId)
-
-        accountRef.update("movements", FieldValue.arrayUnion(movementId))
+        db.collection("accounts")
+            .document(accountId)
+            .update("movements", FieldValue.arrayUnion(movementId)) // Añadir el movimiento al array
             .addOnSuccessListener {
-                Toast.makeText(this, "Movimiento registrado correctamente.", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(this, "Cuenta actualizada correctamente.", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(
-                    this,
-                    "Error al actualizar la cuenta: ${e.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this, "Error al actualizar la cuenta: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
 
     private fun showDateTimePicker(callback: (Long) -> Unit) {
         val calendar = Calendar.getInstance()
@@ -703,12 +728,19 @@ class AccountMovementsActivity : AppCompatActivity() {
             db.collection("strategies").whereArrayContains("favoritedBy", userId)
 
         userStrategiesQuery.get().addOnSuccessListener { userStrategiesSnapshot ->
-            strategies.addAll(userStrategiesSnapshot.toObjects(Strategy::class.java)) // Estrategias del usuario
+            for (doc in userStrategiesSnapshot) {
+                val strategy = doc.toObject(Strategy::class.java).copy(id = doc.id) // Añade el ID del documento
+                strategies.add(strategy)
+            }
 
             favoriteStrategiesQuery.get().addOnSuccessListener { favoriteStrategiesSnapshot ->
-                val favoriteStrategies = favoriteStrategiesSnapshot.toObjects(Strategy::class.java)
-                // Añadir las estrategias favoritas que no están duplicadas
-                strategies.addAll(favoriteStrategies.filter { it !in strategies })
+                for (doc in favoriteStrategiesSnapshot) {
+                    val strategy = doc.toObject(Strategy::class.java).copy(id = doc.id) // Añade el ID del documento
+                    // Añadir las estrategias favoritas que no están duplicadas
+                    if (strategies.none { it.id == strategy.id }) { // Evitar duplicados
+                        strategies.add(strategy)
+                    }
+                }
 
                 callback(strategies) // Llamar al callback con la lista de estrategias
             }.addOnFailureListener { e ->
@@ -725,47 +757,9 @@ class AccountMovementsActivity : AppCompatActivity() {
     }
 
 
-    private fun saveMovementToStrategy(strategyId: String, movement: Movement) {
-        val db = Firebase.firestore
-
-        val movementData = mapOf(
-            "id" to movement.id,
-            "accountId" to movement.accountId,
-            "symbol" to movement.symbol,
-            "type" to movement.type,
-            "entryPrice" to movement.entryPrice,
-            "exitPrice" to movement.exitPrice,
-            "swap" to movement.swap,
-            "commission" to movement.commission,
-            "profit" to movement.profit,
-            "emotionalState" to movement.emotionalState,
-            "entryTime" to movement.entryTime,
-            "exitTime" to movement.exitTime,
-            "tradingStyle" to movement.tradingStyle,
-            "comments" to movement.comments
-        )
-
-        // Acceder a la subcolección "movements" dentro de la estrategia
-        db.collection("strategies").document(strategyId)
-            .collection("movements") // Subcolección
-            .add(movementData)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Movimiento registrado correctamente.", Toast.LENGTH_SHORT)
-                    .show()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(
-                    this,
-                    "Error al registrar movimiento: ${e.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-    }
-
     // Función para actualizar dinámicamente las opciones del Spinner de emociones
     private fun setEmotionSpinnerOptions(spinner: Spinner, options: List<String>) {
-        val optionsWithDefault =
-            mutableListOf("Selecciona una emoción") // Añadir opción predeterminada
+        val optionsWithDefault = mutableListOf("Selecciona una emoción") // Opción predeterminada
         optionsWithDefault.addAll(options) // Añadir las emociones específicas
 
         val adapter = ArrayAdapter(
@@ -775,7 +769,23 @@ class AccountMovementsActivity : AppCompatActivity() {
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter
+
+        // Configurar el listener para capturar la emoción seleccionada
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                selectedEmotionDetail = if (position > 0) {
+                    optionsWithDefault[position] // Capturamos la emoción seleccionada
+                } else {
+                    null // Si selecciona "Selecciona una emoción"
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                selectedEmotionDetail = null // Reiniciar emoción al no seleccionar nada
+            }
+        }
     }
+
 
     // Función para limpiar las opciones del Spinner
     private fun clearEmotionSpinner(spinner: Spinner) {
@@ -786,9 +796,20 @@ class AccountMovementsActivity : AppCompatActivity() {
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter
+
+        // Configurar el listener para manejar la selección vacía
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                selectedEmotionDetail = null // Reiniciar emoción al limpiar opciones
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                selectedEmotionDetail = null
+            }
+        }
     }
 
-    //Crear el diálogo para seleccionar imágenes
+    // Crear el diálogo para seleccionar imágenes
     private fun showImageManagementDialog(imageView01: ImageView, imageView02: ImageView) {
         val options = arrayOf("Imagen 01", "Imagen 02")
         AlertDialog.Builder(this)
@@ -799,6 +820,7 @@ class AccountMovementsActivity : AppCompatActivity() {
             }
             .show()
     }
+
 
 
     //Permitir al usuario seleccionar una imagen
@@ -836,7 +858,8 @@ class AccountMovementsActivity : AppCompatActivity() {
                                 image02Url = uploadedUrl
                             }
                         }
-                        Toast.makeText(this, "Imagen subida exitosamente", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Imagen subida exitosamente", Toast.LENGTH_SHORT)
+                            .show()
                     } else {
                         Toast.makeText(this, "Error al subir la imagen", Toast.LENGTH_SHORT).show()
                     }
@@ -846,8 +869,6 @@ class AccountMovementsActivity : AppCompatActivity() {
             }
         }
     }
-
-
 
 
     private fun uploadImageToFirebase(imageUri: Uri, callback: (String?) -> Unit) {
@@ -876,6 +897,40 @@ class AccountMovementsActivity : AppCompatActivity() {
                     callback(null)
                 }
         }
+
+    private fun saveAndLinkMovementToStrategy(strategyId: String, movement: Movement) {
+        val db = Firebase.firestore
+
+        // Actualiza el array `movements` directamente
+        db.collection("strategies")
+            .document(strategyId)
+            .update("movements", FieldValue.arrayUnion(movement.id))
+            .addOnSuccessListener {
+                Log.d("MovementDebug", "ID del movimiento añadido al array de la estrategia.")
+
+                // Guarda los detalles del movimiento en la subcolección
+                db.collection("strategies")
+                    .document(strategyId)
+                    .collection("movements")
+                    .document(movement.id)
+                    .set(movement)
+                    .addOnSuccessListener {
+                        Log.d("MovementDebug", "Movimiento guardado correctamente en la subcolección.")
+                        Toast.makeText(
+                            this,
+                            "Movimiento guardado y asociado correctamente a la estrategia.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("FirestoreError", "Error al guardar en subcolección: ${e.message}")
+                    }
+            }
+            .addOnFailureListener { e ->
+                Log.e("FirestoreError", "Error al actualizar el array: ${e.message}")
+            }
     }
+
+}
 
 
