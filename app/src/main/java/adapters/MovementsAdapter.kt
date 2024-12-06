@@ -8,17 +8,20 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.mindtrade.R
 import com.example.mindtrade.model.Movement
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 class MovementsAdapter(
     private val context: Context,
-    private val movements: List<Movement>
+    private val movements: MutableList<Movement>
+
 ) : RecyclerView.Adapter<MovementsAdapter.ViewHolder>() {
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         // Vista colapsada
@@ -51,6 +54,36 @@ class MovementsAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val movement = movements[position]
+
+        // Configuración del texto y datos del movimiento...
+        holder.typeTextView.text = "${movement.type}, ${movement.lotes}"
+
+        // Configuración del texto y datos del movimiento...
+        holder.typeTextView.text = "${movement.type}, ${movement.lotes}"
+        // Resto del código existente para configurar las vistas...
+
+        // Agregar el evento de pulsación larga
+        holder.itemView.setOnLongClickListener {
+            // Mostrar un diálogo con opciones
+            val options = arrayOf("Eliminar movimiento", "Ajustar beneficio")
+            AlertDialog.Builder(context)
+                .setTitle("Opciones del movimiento")
+                .setItems(options) { dialog, which ->
+                    when (which) {
+                        0 -> {
+                            // Opción de eliminar movimiento
+                            confirmDeleteMovement(position)
+                        }
+                        1 -> {
+                            // Opción de ajustar beneficio
+                            showAdjustProfitDialog(position)
+                        }
+                    }
+                }
+                .setNegativeButton("Cancelar", null)
+                .show()
+            true // Retornar true para indicar que el evento fue manejado
+        }
 
 
         // Tipo (Buy/Sell) y lotes
@@ -173,6 +206,83 @@ class MovementsAdapter(
         }
     }
 
+    // Confirmar eliminación del movimiento
+    private fun confirmDeleteMovement(position: Int) {
+        AlertDialog.Builder(context)
+            .setTitle("Eliminar movimiento")
+            .setMessage("¿Estás seguro de que deseas eliminar este movimiento?")
+            .setPositiveButton("Sí") { _, _ ->
+                deleteMovement(position)
+            }
+            .setNegativeButton("No", null)
+            .show()
+    }
+
+    // Eliminar el movimiento
+    private fun deleteMovement(position: Int) {
+        val movement = movements[position]
+        // Eliminar de Firestore o la base de datos
+        FirebaseFirestore.getInstance()
+            .collection("accounts")
+            .document(movement.accountId)
+            .collection("movements")
+            .document(movement.id)
+            .delete()
+            .addOnSuccessListener {
+                movements.removeAt(position)
+                notifyItemRemoved(position)
+                Toast.makeText(context, "Movimiento eliminado", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(context, "Error al eliminar: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    // Mostrar un diálogo para ajustar el beneficio
+    private fun showAdjustProfitDialog(position: Int) {
+        val movement = movements[position]
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_adjust_profit, null)
+        val profitEditText = dialogView.findViewById<EditText>(R.id.profitEditText)
+        profitEditText.setText(movement.profit?.toString() ?: "")
+
+        AlertDialog.Builder(context)
+            .setTitle("Ajustar beneficio")
+            .setView(dialogView)
+            .setPositiveButton("Guardar") { _, _ ->
+                val newProfit = profitEditText.text.toString().toDoubleOrNull()
+                if (newProfit != null) {
+                    updateMovementProfit(position, newProfit)
+                } else {
+                    Toast.makeText(context, "Por favor, introduce un valor válido", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    // Actualizar el beneficio del movimiento
+    // Actualizar el beneficio del movimiento
+    private fun updateMovementProfit(position: Int, newProfit: Double) {
+        val movement = movements[position] // Recuperar el movimiento actual
+        FirebaseFirestore.getInstance()
+            .collection("accounts")
+            .document(movement.accountId)
+            .collection("movements")
+            .document(movement.id)
+            .update("profit", newProfit) // Actualizar el campo "profit" en Firestore
+            .addOnSuccessListener {
+                movements[position] = movement.copy(profit = newProfit) // Actualizar la lista local
+                notifyItemChanged(position) // Notificar al adaptador sobre el cambio
+                Toast.makeText(context, "Beneficio actualizado", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(context, "Error al actualizar: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+
+
+
     private fun showPhotosDialog(photos: List<String>) {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_photos, null)
         val photosRecyclerView = dialogView.findViewById<RecyclerView>(R.id.photosRecyclerView)
@@ -185,7 +295,6 @@ class MovementsAdapter(
             .setPositiveButton("Cerrar", null)
             .show()
     }
-
 
     override fun getItemCount() = movements.size
 }
