@@ -46,6 +46,8 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.util.Calendar
 import java.util.UUID
 
@@ -68,20 +70,22 @@ class AccountMovementsActivity : AppCompatActivity() {
         "Forex" to listOf(
             "EUR/USD", "USD/JPY", "GBP/USD", "USD/CHF",
             "AUD/USD", "USD/CAD", "NZD/USD"
-        ),
-        "Exotics" to listOf("USD/SEK", "USD/NOK", "USD/ZAR", "EUR/TRY"),
-        "Metals" to listOf("XAU/USD", "XAG/USD", "XPT/USD", "XPD/USD"),
-        "Crypto" to listOf("BTC/USD", "ETH/USD", "LTC/USD", "XRP/USD", "ADA/USD", "DOT/USD"),
+        ).map { it.trim().uppercase() }, // Normalizar a mayúsculas
+        "Exotics" to listOf("USD/SEK", "USD/NOK", "USD/ZAR", "EUR/TRY").map { it.trim().uppercase() },
+        "Metals" to listOf("XAU/USD", "XAG/USD", "XPT/USD", "XPD/USD").map { it.trim().uppercase() },
+        "Crypto" to listOf("BTC/USD", "ETH/USD", "LTC/USD", "XRP/USD", "ADA/USD", "DOT/USD").map { it.trim().uppercase() },
         "Cash CFD" to listOf(
             "US30.cash", "SPX500.cash", "NAS100.cash", "GER30.cash", "FRA40.cash",
             "UK100.cash", "ESP35.cash", "JPN225.cash", "AUS200.cash"
-        ),
+        ).map { it.trim().uppercase() },
         "Commodities" to listOf(
             "SOYBEAN", "WHEAT", "CORN", "COFFEE", "COCOA", "USOIL", "NATGAS"
-        ),
-        "Equities" to listOf("AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "META", "NFLX", "NVDA")
+        ).map { it.trim().uppercase() },
+        "Equities" to listOf("AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "META", "NFLX", "NVDA").map { it.trim().uppercase() }
     )
+
     private var selectedSymbol: String? = null
+
 
 
     // Definir las emociones para Psico+ y Psico-
@@ -305,35 +309,6 @@ class AccountMovementsActivity : AppCompatActivity() {
         var entryDateTime: Long? = null
         var exitDateTime: Long? = null
 
-        // Grupos de símbolos
-        val symbolGroups = mapOf(
-            "Forex" to listOf(
-                "EUR/USD",
-                "USD/JPY",
-                "GBP/USD",
-                "USD/CHF",
-                "AUD/USD",
-                "USD/CAD",
-                "NZD/USD"
-            ),
-            "Exotics" to listOf("USD/SEK", "USD/NOK", "USD/ZAR", "EUR/TRY"),
-            "Metals" to listOf("XAU/USD", "XAG/USD", "XPT/USD", "XPD/USD"),
-            "Crypto" to listOf("BTC/USD", "ETH/USD", "LTC/USD", "XRP/USD", "ADA/USD", "DOT/USD"),
-            "Cash CFD" to listOf(
-                "US30.cash", "SPX500.cash", "NAS100.cash", "GER30.cash", "FRA40.cash",
-                "UK100.cash", "ESP35.cash", "JPN225.cash", "AUS200.cash"
-            ),
-            "Commodities" to listOf(
-                "SOYBEAN",
-                "WHEAT",
-                "CORN",
-                "COFFEE",
-                "COCOA",
-                "USOIL",
-                "NATGAS"
-            ),
-            "Equities" to listOf("AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "META", "NFLX", "NVDA")
-        )
 
         val symbolsWithHeaders = mutableListOf<String>().apply {
             add("Selecciona un Activo") // Opción inicial
@@ -391,12 +366,14 @@ class AccountMovementsActivity : AppCompatActivity() {
             ) {
                 val symbol = symbolsWithHeaders[position]
                 if (!symbol.startsWith("**") && position != 0) {
-                    selectedSymbol = symbol
+                    selectedSymbol = symbol.trim().uppercase()
+                    Log.d("DebugSpinner", "selectedSymbol actualizado: $selectedSymbol")
                     multiplierEditText.visibility = View.VISIBLE
                     val autoMultiplier = calcularMultiplicadorPorSimbolo(selectedSymbol)
                     multiplierEditText.setText(autoMultiplier.toString())
                 } else {
                     selectedSymbol = null
+                    Log.d("DebugSpinner", "Símbolo no seleccionado o inválido.")
                     multiplierEditText.visibility = View.GONE
                     multiplierEditText.setText("")
                 }
@@ -645,17 +622,6 @@ class AccountMovementsActivity : AppCompatActivity() {
                     return@setOnClickListener
                 }
 
-
-                // Determinar el tipo de instrumento según el símbolo seleccionado
-                val tipoInstrumento = when (selectedSymbol ?: "") {
-                    in (symbolGroups["Forex"] ?: emptyList()) -> "Forex"
-                    in (symbolGroups["Metals"] ?: emptyList()) -> "Metals"
-                    in (symbolGroups["Crypto"] ?: emptyList()) -> "Crypto"
-                    in (symbolGroups["Cash CFD"] ?: emptyList()) -> "Cash CFD"
-                    in (symbolGroups["Commodities"] ?: emptyList()) -> "Commodities"
-                    in (symbolGroups["Equities"] ?: emptyList()) -> "Equities"
-                    else -> "Otros"
-                }
 
                 if (selectedEmotion == "Selecciona un estado emocional" || selectedEmotionDetail == null) {
                     Toast.makeText(
@@ -1121,18 +1087,27 @@ class AccountMovementsActivity : AppCompatActivity() {
     }
 
     fun calcularMultiplicadorPorSimbolo(simbolo: String?): Double {
-        return when {
-            simbolo == null -> 1.0 // Por defecto
-            simbolo.startsWith("XAU") -> 100.0 // Oro
-            simbolo.startsWith("XAG") -> 5000.0  // Plata (contrato estándar: 5000 onzas por lote)
-            simbolo.endsWith(".cash") || simbolo.startsWith("US") -> 1.0 // CFDs de índices (tamaño de contrato es 1)
-            simbolo in symbolGroups["Forex"] ?: emptyList() -> 100000.0 // Forex (lotes estándar)
-            simbolo in symbolGroups["Crypto"] ?: emptyList() -> 1.0 // Criptomonedas
-            simbolo in symbolGroups["Commodities"] ?: emptyList() -> 1.0 // Otras materias primas
-            simbolo in symbolGroups["Equities"] ?: emptyList() -> 1.0 // Acciones
-            else -> 1.0 // Por defecto
+        val normalizedSymbol = simbolo?.trim()?.uppercase()
+        val multiplicador = when {
+            normalizedSymbol == null -> 1.0
+            normalizedSymbol.startsWith("XAU") -> 100.0
+            normalizedSymbol.startsWith("XAG") -> 5000.0
+            normalizedSymbol.startsWith("USD/JPY") -> 100000.0
+            normalizedSymbol.startsWith("USD/CHF") -> 100000.0
+            normalizedSymbol.startsWith("USD/CAD") -> 100000.0
+            normalizedSymbol.startsWith("USOIL") -> 100.0
+            normalizedSymbol.endsWith(".CASH") || normalizedSymbol.startsWith("US") -> 1.0
+            normalizedSymbol in (symbolGroups["Forex"] ?: emptyList()) -> 100000.0
+            normalizedSymbol in (symbolGroups["Exotics"] ?: emptyList()) -> 100000.0
+            normalizedSymbol in (symbolGroups["Crypto"] ?: emptyList()) -> 1.0
+            normalizedSymbol in (symbolGroups["Commodities"] ?: emptyList()) -> 1.0
+            normalizedSymbol in (symbolGroups["Equities"] ?: emptyList()) -> 1.0
+            else -> 1.0
         }
+        Log.d("DebugSimbolo", "Multiplicador calculado para $normalizedSymbol: $multiplicador")
+        return multiplicador
     }
+
 
 
 
@@ -1168,7 +1143,10 @@ class AccountMovementsActivity : AppCompatActivity() {
         )
 
         // Calcular el beneficio total considerando lotes y tamaño de contrato
-        return (diferenciaPrecio * lotes * multiplicador) - comision - swap
+        val beneficio = (diferenciaPrecio * lotes * multiplicador) - comision - swap
+
+        // Redondear el beneficio a 2 decimales antes de retornarlo
+        return BigDecimal(beneficio).setScale(2, RoundingMode.HALF_UP).toDouble()
     }
 }
 

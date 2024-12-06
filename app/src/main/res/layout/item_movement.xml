@@ -2,12 +2,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_margin="0dp"
     app:cardBackgroundColor="@android:color/white"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp"
     app:cardUseCompatPadding="true"
-    app:contentPadding="8dp">
+    app:contentPadding="0dp">
 
     <!-- Vista Colapsada -->
     <LinearLayout
@@ -47,35 +47,52 @@
 
             </LinearLayout>
 
-            <!-- Centro: Precios -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:gravity="center_vertical">
 
-                <TextView
-                    android:id="@+id/entryPriceTextView"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="1.1234"
-                    android:textSize="14sp" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
+                    <TextView
+                        android:id="@+id/entryPriceTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1.1234"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" → "
+                        android:textSize="14sp"
+                        android:paddingHorizontal="4dp" />
+
+                    <TextView
+                        android:id="@+id/exitPriceTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1.2345"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- Emoción -->
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/firstEmotionTextView"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text=" → "
+                    android:text="Emoción no definida"
                     android:textSize="14sp"
-                    android:paddingHorizontal="4dp" />
-
-                <TextView
-                    android:id="@+id/exitPriceTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="1.2345"
-                    android:textSize="14sp" />
+                    android:textStyle="bold"
+                    android:layout_marginTop="4dp" />
             </LinearLayout>
+
 
             <!-- Derecha: Detalles -->
             <LinearLayout
@@ -182,7 +199,7 @@
                 android:id="@+id/emotionTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Emoción: "
+                android:text=""
                 android:textSize="12sp"
                 android:layout_marginBottom="4dp" />
 

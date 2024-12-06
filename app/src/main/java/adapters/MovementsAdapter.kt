@@ -1,13 +1,17 @@
 import android.app.AlertDialog
 import android.content.Context
+import android.graphics.Typeface
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.mindtrade.R
 import com.example.mindtrade.model.Movement
 
@@ -25,6 +29,7 @@ class MovementsAdapter(
         val swapTextView: TextView = view.findViewById(R.id.swapTextView)
         val commissionTextView: TextView = view.findViewById(R.id.commissionTextView)
         val profitTextView: TextView = view.findViewById(R.id.profitTextView)
+        val firstEmotionTextView: TextView = view.findViewById(R.id.firstEmotionTextView)
 
 
 
@@ -47,6 +52,7 @@ class MovementsAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val movement = movements[position]
 
+
         // Tipo (Buy/Sell) y lotes
         holder.typeTextView.text = "${movement.type}, ${movement.lotes}"
         holder.typeTextView.setTextColor(
@@ -64,24 +70,83 @@ class MovementsAdapter(
             else ContextCompat.getColor(context, R.color.my_red)
         )
 
+        // Configuración de la emoción
+        val emotion = movement.emotion ?: "Sin emoción" // Asigna "Sin emoción" si es nulo
+        holder.firstEmotionTextView.text = emotion
+
+        // Lista de emociones positivas y negativas
+        val positiveEmotions = listOf("Autocontrol", "Confianza", "Eficiencia", "Optimismo", "Paciencia",
+            "Realización", "Satisfacción", "Seguridad", "Sintonía", "Tranquilidad",
+            "Aceptación", "Afirmación")
+        val isPositiveEmotion = positiveEmotions.contains(emotion)
+
+        // Aplicar color y estilo según la emoción en la vista colapsada
+        if (isPositiveEmotion) {
+            holder.firstEmotionTextView.setTextColor(ContextCompat.getColor(context, R.color.forest_green)) // Azul para positivo
+            holder.firstEmotionTextView.setTypeface(null, Typeface.BOLD)
+        } else {
+            holder.firstEmotionTextView.setTextColor(ContextCompat.getColor(context, R.color.my_red)) // Rojo para negativo
+            holder.firstEmotionTextView.setTypeface(null, Typeface.BOLD)
+        }
+
+        // Cambiar el color y estilo según la emoción
+        if (isPositiveEmotion) {
+            holder.emotionTextView.setTextColor(ContextCompat.getColor(context, R.color.forest_green)) // Azul para positivo
+            holder.emotionTextView.setTypeface(null, Typeface.BOLD)
+        } else {
+            holder.emotionTextView.setTextColor(ContextCompat.getColor(context, R.color.my_red)) // Rojo para negativo
+            holder.emotionTextView.setTypeface(null, Typeface.BOLD)
+        }
+
+
 
         // Vista expandida
-        holder.entryDateTextView.text = "Fecha entrada: ${formatDate(movement.entryTime)}"
-        holder.exitDateTextView.text = "Fecha salida: ${formatDate(movement.exitTime)}"
-        holder.tradingStyleTextView.text = "Estilo: ${determineTradingStyle(movement.entryTime, movement.exitTime)}"
-        holder.emotionalStateTextView.text = "Estado emocional: ${movement.emotionalState}"
-        holder.emotionTextView.text = "Emoción: ${movement.emotion}"
-        holder.commentsTextView.text = "Comentario: ${movement.comments ?: "Sin comentarios"}"
+        holder.entryDateTextView.text = Html.fromHtml("<b>Fecha de entrada:</b> ${formatDate(movement.entryTime)}")
+        holder.exitDateTextView.text = Html.fromHtml("<b>Fecha de salida:</b> ${formatDate(movement.exitTime)}")
 
-        // Mostrar fotos si existen
-        if (movement.photos != null && movement.photos.isNotEmpty()) {
+        holder.tradingStyleTextView.text = Html.fromHtml("<b>Estilo:</b> ${determineTradingStyle(movement.entryTime, movement.exitTime)}")
+        holder.emotionalStateTextView.text = "${movement.emotionalState}"
+        holder.emotionTextView.text = "${movement.emotion}"
+        holder.commentsTextView.text = Html.fromHtml("<b>Comentario:</b> ${movement.comments ?: "Sin comentarios"}")
+
+        // Cambiar color según el estado emocional
+        val emotionalState = movement.emotionalState ?: "Desconocido"
+        if (emotionalState.equals("Psico+", ignoreCase = true)) {
+            holder.emotionalStateTextView.setTextColor(ContextCompat.getColor(context, R.color.forest_green)) // Verde para Psico+
+            holder.emotionalStateTextView.setTypeface(null, Typeface.BOLD) // Negrita
+        } else if (emotionalState.equals("Psico-", ignoreCase = true)) {
+            holder.emotionalStateTextView.setTextColor(ContextCompat.getColor(context, R.color.my_red)) // Rojo para Psico-
+            holder.emotionalStateTextView.setTypeface(null, Typeface.BOLD) // Negrita
+        }
+
+        // Obtener el estilo de trading
+        val tradingStyle = determineTradingStyle(movement.entryTime, movement.exitTime)
+
+// Determinar el color según el estilo
+        val colorRes = when (tradingStyle) {
+            "Scalping" -> R.color.orange // Naranja para Scalping
+            "Intradia" -> R.color.blue_normal // Azul para Intradia
+             // Verde para Swing Trading
+            else -> R.color.forest_green
+        }
+
+    // Asignar el estilo y color al TextView
+        holder.tradingStyleTextView.text = tradingStyle
+        holder.tradingStyleTextView.setTextColor(ContextCompat.getColor(context, colorRes))
+        holder.tradingStyleTextView.setTypeface(null, Typeface.BOLD) // Aplicar negrita
+
+        // Mostrar el enlace "Ver fotos" únicamente si el usuario ha subido imágenes válidas
+        val validPhotos = movement.photos?.filter { it.isNotEmpty() && it != "DEFAULT_IMAGE_URL" } ?: emptyList()
+
+        if (validPhotos.isNotEmpty()) {
             holder.photosLinkTextView.visibility = View.VISIBLE
             holder.photosLinkTextView.setOnClickListener {
-                showPhotosDialog(movement.photos)
+                showPhotosDialog(validPhotos) // Mostrar el diálogo con las fotos válidas
             }
         } else {
-            holder.photosLinkTextView.visibility = View.GONE
+            holder.photosLinkTextView.visibility = View.GONE // Ocultar el enlace si no hay fotos válidas
         }
+
 
         // Expandir/Colapsar al hacer clic
         holder.itemView.setOnClickListener {
@@ -124,4 +189,3 @@ class MovementsAdapter(
 
     override fun getItemCount() = movements.size
 }
-
