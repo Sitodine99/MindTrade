@@ -3,7 +3,9 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mindtrade.R
@@ -24,6 +26,8 @@ class MovementsAdapter(
         val commissionTextView: TextView = view.findViewById(R.id.commissionTextView)
         val profitTextView: TextView = view.findViewById(R.id.profitTextView)
 
+
+
         // Vista expandida
         val expandedView: View = view.findViewById(R.id.expandedView)
         val entryDateTextView: TextView = view.findViewById(R.id.entryDateTextView)
@@ -43,14 +47,23 @@ class MovementsAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val movement = movements[position]
 
-        // Vista colapsada
-        holder.typeTextView.text = movement.type
+        // Tipo (Buy/Sell) y lotes
+        holder.typeTextView.text = "${movement.type}, ${movement.lotes}"
+        holder.typeTextView.setTextColor(
+            if (movement.type == "Buy") ContextCompat.getColor(context, R.color.blue_normal)
+            else ContextCompat.getColor(context, R.color.my_red)
+        )
         holder.symbolTextView.text = movement.symbol
         holder.entryPriceTextView.text = movement.entryPrice.toString()
         holder.exitPriceTextView.text = movement.exitPrice?.toString() ?: "N/A"
         holder.swapTextView.text = movement.swap.toString()
         holder.commissionTextView.text = movement.commission.toString()
         holder.profitTextView.text = movement.profit?.toString() ?: "N/A"
+        holder.profitTextView.setTextColor(
+            if (movement.profit >= 0) ContextCompat.getColor(context, R.color.blue_normal)
+            else ContextCompat.getColor(context, R.color.my_red)
+        )
+
 
         // Vista expandida
         holder.entryDateTextView.text = "Fecha entrada: ${formatDate(movement.entryTime)}"

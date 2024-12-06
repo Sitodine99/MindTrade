@@ -202,16 +202,39 @@ class AccountMovementsActivity : AppCompatActivity() {
         val recyclerView = rootView.findViewById<RecyclerView>(R.id.movementsRecyclerView)
         val addMovementButton = rootView.findViewById<ImageButton>(R.id.addMovementButton)
 
+        // Configurar el adaptador
         movementsAdapter = MovementsAdapter(this, movementsList)
-
         recyclerView.adapter = movementsAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
+        // Cargar movimientos desde Firestore
+        loadMovementsFromFirestore(accountId)
+
+        // Botón para añadir un nuevo movimiento
         addMovementButton.setOnClickListener {
             showMovementDialog(accountId, strategies)
         }
     }
 
+    private fun loadMovementsFromFirestore(accountId: String) {
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("accounts")
+            .document(accountId)
+            .collection("movements")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                movementsList.clear()
+                for (doc in snapshot) {
+                    val movement = doc.toObject(Movement::class.java)
+                    movementsList.add(movement)
+                }
+                movementsAdapter.notifyDataSetChanged()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error al cargar movimientos: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
 
 
     private fun showMovementDialog(accountId: String, strategies: List<Strategy>) {
@@ -540,7 +563,7 @@ class AccountMovementsActivity : AppCompatActivity() {
                     ).show()
                     return@setOnClickListener // Salimos sin cerrar el diálogo
                 }
-
+                val lotes = dialogView.findViewById<EditText>(R.id.lotesEditText).text.toString().toDoubleOrNull() ?: 0.0
                 val entryPrice = entryPriceEditText.text.toString().toDoubleOrNull() ?: 0.0
                 val exitPrice = exitPriceEditText.text.toString().toDoubleOrNull() ?: 0.0
                 val swap = swapEditText.text.toString().toDoubleOrNull() ?: 0.0
@@ -553,6 +576,7 @@ class AccountMovementsActivity : AppCompatActivity() {
                     id = UUID.randomUUID().toString(),
                     accountId = accountId,
                     symbol = finalSymbol ?: "Símbolo no especificado",
+                    lotes = lotes,
                     type = operationType,
                     entryPrice = entryPrice,
                     exitPrice = exitPrice,
@@ -589,6 +613,7 @@ class AccountMovementsActivity : AppCompatActivity() {
             "id" to movement.id,
             "accountId" to accountId,
             "symbol" to movement.symbol,
+            "lotes" to movement.lotes,
             "type" to movement.type,
             "entryPrice" to movement.entryPrice,
             "exitPrice" to movement.exitPrice,

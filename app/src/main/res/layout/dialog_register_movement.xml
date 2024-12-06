@@ -44,6 +44,15 @@
             android:text="Añadir símbolo"
             android:layout_marginTop="8dp" />
 
+        <EditText
+            android:id="@+id/lotesEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Número de lotes"
+            android:inputType="numberDecimal"
+            android:layout_marginBottom="8dp" />
+
+
 
         <!-- Tipo de Operación -->
         <TextView
