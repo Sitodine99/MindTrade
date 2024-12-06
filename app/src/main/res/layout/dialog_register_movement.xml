@@ -45,6 +45,16 @@
             android:layout_marginTop="8dp" />
 
         <EditText
+            android:id="@+id/multiplierEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Multiplicador (obligatorio para símbolos personalizados)"
+            android:inputType="numberDecimal"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone" />
+
+
+        <EditText
             android:id="@+id/lotesEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

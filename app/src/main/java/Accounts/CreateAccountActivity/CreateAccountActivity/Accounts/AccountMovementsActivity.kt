@@ -7,6 +7,7 @@ import android.app.TimePickerDialog
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
+import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -48,6 +49,7 @@ import com.google.firebase.storage.FirebaseStorage
 import java.util.Calendar
 import java.util.UUID
 
+
 class AccountMovementsActivity : AppCompatActivity() {
 
     private val movementsList = mutableListOf<Movement>() // Lista de movimientos
@@ -62,8 +64,24 @@ class AccountMovementsActivity : AppCompatActivity() {
     private var selectedImageView: ImageView? = null
     private var selectedStrategy: Strategy? = null
     private var selectedEmotionDetail: String? = null
-
-
+    private val symbolGroups = mapOf(
+        "Forex" to listOf(
+            "EUR/USD", "USD/JPY", "GBP/USD", "USD/CHF",
+            "AUD/USD", "USD/CAD", "NZD/USD"
+        ),
+        "Exotics" to listOf("USD/SEK", "USD/NOK", "USD/ZAR", "EUR/TRY"),
+        "Metals" to listOf("XAU/USD", "XAG/USD", "XPT/USD", "XPD/USD"),
+        "Crypto" to listOf("BTC/USD", "ETH/USD", "LTC/USD", "XRP/USD", "ADA/USD", "DOT/USD"),
+        "Cash CFD" to listOf(
+            "US30.cash", "SPX500.cash", "NAS100.cash", "GER30.cash", "FRA40.cash",
+            "UK100.cash", "ESP35.cash", "JPN225.cash", "AUS200.cash"
+        ),
+        "Commodities" to listOf(
+            "SOYBEAN", "WHEAT", "CORN", "COFFEE", "COCOA", "USOIL", "NATGAS"
+        ),
+        "Equities" to listOf("AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "META", "NFLX", "NVDA")
+    )
+    private var selectedSymbol: String? = null
 
 
     // Definir las emociones para Psico+ y Psico-
@@ -222,25 +240,29 @@ class AccountMovementsActivity : AppCompatActivity() {
         db.collection("accounts")
             .document(accountId)
             .collection("movements")
+            .orderBy("createdAt") // Ordena por el campo `createdAt`
             .get()
             .addOnSuccessListener { snapshot ->
                 movementsList.clear()
                 for (doc in snapshot) {
                     val movement = doc.toObject(Movement::class.java)
                     movementsList.add(movement)
+                    movementsAdapter.notifyItemInserted(movementsList.size - 1)
                 }
                 movementsAdapter.notifyDataSetChanged()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Error al cargar movimientos: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Error al cargar movimientos: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
 
     private fun showMovementDialog(accountId: String, strategies: List<Strategy>) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_register_movement, null)
-
-
         // Referencias a los elementos de la vista
         val symbolsSpinner = dialogView.findViewById<Spinner>(R.id.symbolsSpinner)
         val addSymbolEditText = dialogView.findViewById<EditText>(R.id.addSymbolEditText)
@@ -253,6 +275,7 @@ class AccountMovementsActivity : AppCompatActivity() {
         val swapEditText = dialogView.findViewById<EditText>(R.id.swapEditText)
         val commissionEditText = dialogView.findViewById<EditText>(R.id.commissionEditText)
         val operationTypeSpinner = dialogView.findViewById<Spinner>(R.id.operationTypeSpinner)
+
         val strategySpinner = dialogView.findViewById<Spinner>(R.id.strategySpinner)
         val emotionalStateSpinner = dialogView.findViewById<Spinner>(R.id.emotionalStateSpinner)
         val commentsEditText = dialogView.findViewById<EditText>(R.id.commentsEditText)
@@ -261,7 +284,23 @@ class AccountMovementsActivity : AppCompatActivity() {
         // Asocia los ImageView del diálogo
         val movementImageView01 = dialogView.findViewById<ImageView>(R.id.MovementeImageView01)
         val movementImageView02 = dialogView.findViewById<ImageView>(R.id.MovementeImageView02)
-
+        val lotesEditText = dialogView.findViewById<EditText>(R.id.lotesEditText)
+        val multiplierEditText = dialogView.findViewById<EditText>(R.id.multiplierEditText)
+        // Ajuste al guardar el movimiento
+        val finalMultiplier = if (customSymbolsChipGroup.childCount > 0) {
+            val multiplier = multiplierEditText.text.toString().toDoubleOrNull()
+            if (multiplier == null || multiplier <= 0) {
+                Toast.makeText(
+                    this,
+                    "Introduce un multiplicador válido para el símbolo personalizado",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return // Salimos del método showMovementDialog
+            }
+            multiplier
+        } else {
+            calcularMultiplicadorPorSimbolo(selectedSymbol)
+        }
 
         var entryDateTime: Long? = null
         var exitDateTime: Long? = null
@@ -297,16 +336,18 @@ class AccountMovementsActivity : AppCompatActivity() {
         )
 
         val symbolsWithHeaders = mutableListOf<String>().apply {
-            add("Selecciona un Activo")
+            add("Selecciona un Activo") // Opción inicial
             symbolGroups.forEach { (header, symbols) ->
-                add("**$header**")
-                addAll(symbols)
+                add("**$header**") // Categorías como títulos
+                addAll(symbols)    // Símbolos dentro de las categorías
             }
         }
 
-        // Configuración del Spinner de símbolos
-        val symbolsAdapter = object :
-            ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, symbolsWithHeaders) {
+        val symbolsAdapter = object : ArrayAdapter<String>(
+            this,
+            android.R.layout.simple_spinner_item,
+            symbolsWithHeaders
+        ) {
             override fun isEnabled(position: Int): Boolean {
                 return !symbolsWithHeaders[position].startsWith("**") && position != 0
             }
@@ -341,7 +382,6 @@ class AccountMovementsActivity : AppCompatActivity() {
         operationTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         operationTypeSpinner.adapter = operationTypeAdapter
 
-        var selectedSymbol: String? = null
         symbolsSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -352,17 +392,25 @@ class AccountMovementsActivity : AppCompatActivity() {
                 val symbol = symbolsWithHeaders[position]
                 if (!symbol.startsWith("**") && position != 0) {
                     selectedSymbol = symbol
-                    if (customSymbolsChipGroup.childCount > 0) {
-                        customSymbolsChipGroup.removeAllViews()
-                    }
+                    multiplierEditText.visibility = View.VISIBLE
+                    val autoMultiplier = calcularMultiplicadorPorSimbolo(selectedSymbol)
+                    multiplierEditText.setText(autoMultiplier.toString())
                 } else {
                     selectedSymbol = null
+                    multiplierEditText.visibility = View.GONE
+                    multiplierEditText.setText("")
                 }
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                selectedSymbol = null
+                multiplierEditText.visibility = View.GONE
+                multiplierEditText.setText("")
+            }
         }
 
+
+// Configuración del botón para añadir un símbolo personalizado
         addSymbolButton.setOnClickListener {
             val newSymbol = addSymbolEditText.text.toString().trim()
             if (newSymbol.isNotEmpty()) {
@@ -374,12 +422,22 @@ class AccountMovementsActivity : AppCompatActivity() {
                             customSymbolsChipGroup.removeView(this)
                             symbolsSpinner.isEnabled = true
                             selectedSymbol = null
+                            multiplierEditText.visibility =
+                                View.GONE // Ocultar campo de multiplicador
+                            multiplierEditText.setText("") // Limpiar el campo
                         }
                     }
                     customSymbolsChipGroup.addView(chip)
                     addSymbolEditText.text.clear()
-                    symbolsSpinner.setSelection(0)
-                    selectedSymbol = null
+
+                    // Deshabilitar Spinner y forzar uso de símbolo personalizado
+                    symbolsSpinner.setSelection(0) // Deseleccionar cualquier símbolo estándar
+                    symbolsSpinner.isEnabled = false // Desactivar el Spinner
+                    selectedSymbol = newSymbol
+
+                    // Mostrar el campo de multiplicador para el símbolo personalizado
+                    multiplierEditText.visibility = View.VISIBLE
+                    multiplierEditText.setText("") // Vaciar el campo para entrada manual
                 } else {
                     Toast.makeText(
                         this,
@@ -391,6 +449,8 @@ class AccountMovementsActivity : AppCompatActivity() {
                 Toast.makeText(this, "Introduce un símbolo válido", Toast.LENGTH_SHORT).show()
             }
         }
+
+
 
         entryDateButton.setOnClickListener {
             showDateTimePicker { selectedDateTime: Long ->
@@ -468,9 +528,11 @@ class AccountMovementsActivity : AppCompatActivity() {
                     "Psico+" -> {
                         setEmotionSpinnerOptions(emotionSpinner, emotionsPsicoPlus)
                     }
+
                     "Psico-" -> {
                         setEmotionSpinnerOptions(emotionSpinner, emotionsPsicoMinus)
                     }
+
                     else -> {
                         selectedEmotion = "Selecciona un estado emocional"
                         clearEmotionSpinner(emotionSpinner) // Limpiamos si no selecciona válido
@@ -531,19 +593,68 @@ class AccountMovementsActivity : AppCompatActivity() {
         dialog.setOnShowListener {
             val registerButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
             registerButton.setOnClickListener {
-                // Validaciones
-                val finalSymbol = if (symbolsSpinner.isEnabled) selectedSymbol else {
-                    val customChip = customSymbolsChipGroup.getChildAt(0) as Chip
-                    customChip.text.toString()
+                val lotes = lotesEditText.text.toString().toDoubleOrNull()
+                val entryPrice = entryPriceEditText.text.toString().replace(",", ".").toDoubleOrNull()
+                val exitPrice = exitPriceEditText.text.toString().replace(",", ".").toDoubleOrNull()
+                val swap = swapEditText.text.toString().toDoubleOrNull() ?: 0.0
+                val commission = commissionEditText.text.toString().toDoubleOrNull() ?: 0.0
+                val multiplierText = multiplierEditText.text.toString().trim()
+                val multiplier = multiplierText.toDoubleOrNull()
+                val operationType = operationTypeSpinner.selectedItem.toString()
+
+                // Determinar el símbolo final
+                val finalSymbol = if (!symbolsSpinner.isEnabled) {
+                    // Si es símbolo personalizado, tomarlo del Chip
+                    if (customSymbolsChipGroup.childCount > 0) {
+                        val customChip = customSymbolsChipGroup.getChildAt(0) as Chip
+                        customChip.text.toString()
+                    } else {
+                        null
+                    }
+                } else {
+                    // Si es símbolo estándar, tomarlo del Spinner
+                    selectedSymbol
                 }
 
-                if (selectedSymbol == null && customSymbolsChipGroup.childCount == 0) {
+                // Validar el multiplicador para símbolos personalizados
+                if (!symbolsSpinner.isEnabled && (multiplier == null || multiplier <= 0)) {
                     Toast.makeText(
                         this,
-                        "Por favor selecciona o añade un símbolo",
+                        "Por favor, introduce un multiplicador válido para el símbolo personalizado.",
                         Toast.LENGTH_SHORT
                     ).show()
-                    return@setOnClickListener // Salimos sin cerrar el diálogo
+                    return@setOnClickListener
+                }
+
+                // Validar los campos obligatorios
+                if (finalSymbol == null) {
+                    Toast.makeText(
+                        this,
+                        "Por favor selecciona o añade un símbolo.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@setOnClickListener
+                }
+
+                if (lotes == null || entryPrice == null || exitPrice == null) {
+                    Toast.makeText(
+                        this,
+                        "Por favor, introduce valores válidos para lotes y precios.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@setOnClickListener
+                }
+
+
+                // Determinar el tipo de instrumento según el símbolo seleccionado
+                val tipoInstrumento = when (selectedSymbol ?: "") {
+                    in (symbolGroups["Forex"] ?: emptyList()) -> "Forex"
+                    in (symbolGroups["Metals"] ?: emptyList()) -> "Metals"
+                    in (symbolGroups["Crypto"] ?: emptyList()) -> "Crypto"
+                    in (symbolGroups["Cash CFD"] ?: emptyList()) -> "Cash CFD"
+                    in (symbolGroups["Commodities"] ?: emptyList()) -> "Commodities"
+                    in (symbolGroups["Equities"] ?: emptyList()) -> "Equities"
+                    else -> "Otros"
                 }
 
                 if (selectedEmotion == "Selecciona un estado emocional" || selectedEmotionDetail == null) {
@@ -563,13 +674,43 @@ class AccountMovementsActivity : AppCompatActivity() {
                     ).show()
                     return@setOnClickListener // Salimos sin cerrar el diálogo
                 }
-                val lotes = dialogView.findViewById<EditText>(R.id.lotesEditText).text.toString().toDoubleOrNull() ?: 0.0
-                val entryPrice = entryPriceEditText.text.toString().toDoubleOrNull() ?: 0.0
-                val exitPrice = exitPriceEditText.text.toString().toDoubleOrNull() ?: 0.0
-                val swap = swapEditText.text.toString().toDoubleOrNull() ?: 0.0
-                val commission = commissionEditText.text.toString().toDoubleOrNull() ?: 0.0
-                val operationType = operationTypeSpinner.selectedItem.toString()
-                val profit = exitPrice - entryPrice - commission - swap
+
+                dialog.setOnShowListener {
+                    val registerButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                    registerButton.setOnClickListener {
+                        val operationType = operationTypeSpinner.selectedItem?.toString()
+                        if (operationType.isNullOrEmpty()) {
+                            Toast.makeText(
+                                this,
+                                "Selecciona un tipo de operación válido.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            return@setOnClickListener
+                        }
+                    }
+                }
+
+                // Determinar si es una operación de compra o venta
+                val esCompra = operationType == "Buy"
+
+                // Calcular el multiplicador: automático o manual
+                val multiplicador = if (customSymbolsChipGroup.childCount > 0) {
+                    multiplierEditText.text.toString().toDoubleOrNull() ?: 1.0
+                } else {
+                    calcularMultiplicadorPorSimbolo(finalSymbol)
+                }
+
+                // Calcular el beneficio
+                val profit = calcularBeneficioPorSimbolo(
+                    precioEntrada = entryPrice,
+                    precioSalida = exitPrice,
+                    lotes = lotes,
+                    swap = swap,
+                    comision = commission,
+                    simbolo = finalSymbol, // Pasamos el símbolo para calcular el multiplicador automático si aplica
+                    multiplicadorManual = null, // Ya lo calculamos arriba
+                    esCompra = esCompra
+                )
 
                 // Creamos el objeto Movement
                 val movement = Movement(
@@ -604,9 +745,9 @@ class AccountMovementsActivity : AppCompatActivity() {
     }
 
 
-
-        private fun saveMovement(movement: Movement, accountId: String, strategyId: String?) {
+    private fun saveMovement(movement: Movement, accountId: String, strategyId: String?) {
         val db = Firebase.firestore
+
 
         // Guardar el movimiento en la colección de movimientos
         val movementData = hashMapOf(
@@ -632,28 +773,34 @@ class AccountMovementsActivity : AppCompatActivity() {
             "photos" to movement.photos
         )
 
-            db.collection("accounts")
-                .document(accountId)
-                .collection("movements") // Subcolección de movimientos
-                .document(movement.id)
-                .set(movementData)
-                .addOnSuccessListener {
-                    // Actualizar la lista de movimientos de la cuenta
-                    updateAccountWithMovement(accountId, movement.id)
+        db.collection("accounts")
+            .document(accountId)
+            .collection("movements") // Subcolección de movimientos
+            .document(movement.id)
+            .set(movementData)
+            .addOnSuccessListener {
+                // Actualizar la lista de movimientos local
+                val mediaPlayer = MediaPlayer.create(this, R.raw.cash)
+                mediaPlayer.start()
+                movementsList.add(movement) // Añadir el nuevo movimiento a la lista local
+                movementsAdapter.notifyItemInserted(movementsList.size - 1) // Notificar al adaptador sobre el cambio
 
-                    // Si hay una estrategia asociada, guardar el movimiento allí también
-                    strategyId?.let {
-                        saveAndLinkMovementToStrategy(strategyId, movement)
-                    }
-
-
-                    Toast.makeText(this, "Movimiento guardado exitosamente.", Toast.LENGTH_SHORT).show()
+                // Actualizar la cuenta y estrategia, si corresponde
+                updateAccountWithMovement(accountId, movement.id)
+                strategyId?.let {
+                    saveAndLinkMovementToStrategy(strategyId, movement)
                 }
-                .addOnFailureListener { e ->
-                    Toast.makeText(this, "Error al guardar el movimiento: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-        }
 
+                Toast.makeText(this, "Movimiento guardado exitosamente.", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(
+                    this,
+                    "Error al guardar el movimiento: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+    }
 
 
     private fun updateAccountWithMovement(accountId: String, movementId: String) {
@@ -666,7 +813,11 @@ class AccountMovementsActivity : AppCompatActivity() {
                 Toast.makeText(this, "Cuenta actualizada correctamente.", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Error al actualizar la cuenta: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Error al actualizar la cuenta: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
@@ -754,13 +905,15 @@ class AccountMovementsActivity : AppCompatActivity() {
 
         userStrategiesQuery.get().addOnSuccessListener { userStrategiesSnapshot ->
             for (doc in userStrategiesSnapshot) {
-                val strategy = doc.toObject(Strategy::class.java).copy(id = doc.id) // Añade el ID del documento
+                val strategy = doc.toObject(Strategy::class.java)
+                    .copy(id = doc.id) // Añade el ID del documento
                 strategies.add(strategy)
             }
 
             favoriteStrategiesQuery.get().addOnSuccessListener { favoriteStrategiesSnapshot ->
                 for (doc in favoriteStrategiesSnapshot) {
-                    val strategy = doc.toObject(Strategy::class.java).copy(id = doc.id) // Añade el ID del documento
+                    val strategy = doc.toObject(Strategy::class.java)
+                        .copy(id = doc.id) // Añade el ID del documento
                     // Añadir las estrategias favoritas que no están duplicadas
                     if (strategies.none { it.id == strategy.id }) { // Evitar duplicados
                         strategies.add(strategy)
@@ -797,7 +950,12 @@ class AccountMovementsActivity : AppCompatActivity() {
 
         // Configurar el listener para capturar la emoción seleccionada
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
                 selectedEmotionDetail = if (position > 0) {
                     optionsWithDefault[position] // Capturamos la emoción seleccionada
                 } else {
@@ -824,7 +982,12 @@ class AccountMovementsActivity : AppCompatActivity() {
 
         // Configurar el listener para manejar la selección vacía
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
                 selectedEmotionDetail = null // Reiniciar emoción al limpiar opciones
             }
 
@@ -847,7 +1010,6 @@ class AccountMovementsActivity : AppCompatActivity() {
     }
 
 
-
     //Permitir al usuario seleccionar una imagen
     private fun openImagePicker(targetImageView: ImageView) {
         val intent = Intent(Intent.ACTION_PICK).apply {
@@ -858,7 +1020,6 @@ class AccountMovementsActivity : AppCompatActivity() {
         // Guardamos la referencia del ImageView seleccionado para usarla después
         this.selectedImageView = targetImageView
     }
-
 
 
     // Gestionar el resultado de la selección de imágenes
@@ -897,31 +1058,31 @@ class AccountMovementsActivity : AppCompatActivity() {
 
 
     private fun uploadImageToFirebase(imageUri: Uri, callback: (String?) -> Unit) {
-            val storageRef =
-                FirebaseStorage.getInstance().reference.child("images/${System.currentTimeMillis()}.jpg")
+        val storageRef =
+            FirebaseStorage.getInstance().reference.child("images/${System.currentTimeMillis()}.jpg")
 
-            storageRef.putFile(imageUri)
-                .addOnSuccessListener {
-                    storageRef.downloadUrl.addOnSuccessListener { uri ->
-                        callback(uri.toString())
-                    }.addOnFailureListener {
-                        Toast.makeText(
-                            this,
-                            "Error al obtener la URL de la imagen",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        callback(null)
-                    }
-                }
-                .addOnFailureListener { e ->
+        storageRef.putFile(imageUri)
+            .addOnSuccessListener {
+                storageRef.downloadUrl.addOnSuccessListener { uri ->
+                    callback(uri.toString())
+                }.addOnFailureListener {
                     Toast.makeText(
                         this,
-                        "Error al subir la imagen: ${e.message}",
+                        "Error al obtener la URL de la imagen",
                         Toast.LENGTH_SHORT
                     ).show()
                     callback(null)
                 }
-        }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(
+                    this,
+                    "Error al subir la imagen: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+                callback(null)
+            }
+    }
 
     private fun saveAndLinkMovementToStrategy(strategyId: String, movement: Movement) {
         val db = Firebase.firestore
@@ -940,7 +1101,10 @@ class AccountMovementsActivity : AppCompatActivity() {
                     .document(movement.id)
                     .set(movement)
                     .addOnSuccessListener {
-                        Log.d("MovementDebug", "Movimiento guardado correctamente en la subcolección.")
+                        Log.d(
+                            "MovementDebug",
+                            "Movimiento guardado correctamente en la subcolección."
+                        )
                         Toast.makeText(
                             this,
                             "Movimiento guardado y asociado correctamente a la estrategia.",
@@ -956,6 +1120,56 @@ class AccountMovementsActivity : AppCompatActivity() {
             }
     }
 
+    fun calcularMultiplicadorPorSimbolo(simbolo: String?): Double {
+        return when {
+            simbolo == null -> 1.0 // Por defecto
+            simbolo.startsWith("XAU") -> 100.0 // Oro
+            simbolo.startsWith("XAG") -> 5000.0  // Plata (contrato estándar: 5000 onzas por lote)
+            simbolo.endsWith(".cash") || simbolo.startsWith("US") -> 1.0 // CFDs de índices (tamaño de contrato es 1)
+            simbolo in symbolGroups["Forex"] ?: emptyList() -> 100000.0 // Forex (lotes estándar)
+            simbolo in symbolGroups["Crypto"] ?: emptyList() -> 1.0 // Criptomonedas
+            simbolo in symbolGroups["Commodities"] ?: emptyList() -> 1.0 // Otras materias primas
+            simbolo in symbolGroups["Equities"] ?: emptyList() -> 1.0 // Acciones
+            else -> 1.0 // Por defecto
+        }
+    }
+
+
+
+    fun calcularBeneficioPorSimbolo(
+        precioEntrada: Double,
+        precioSalida: Double,
+        lotes: Double,
+        swap: Double,
+        comision: Double,
+        simbolo: String?,
+        multiplicadorManual: Double?,
+        esCompra: Boolean
+    ): Double {
+        // Determinar el multiplicador correcto
+        val multiplicador = if (multiplicadorManual != null && multiplicadorManual > 0) {
+            multiplicadorManual
+        } else {
+
+            calcularMultiplicadorPorSimbolo(simbolo)
+        }
+
+        // Calcular la diferencia de precio dependiendo del tipo de operación (compra/venta)
+        val diferenciaPrecio = if (esCompra) {
+            precioSalida - precioEntrada
+        } else {
+            precioEntrada - precioSalida
+        }
+
+        // Log para verificar los valores del cálculo
+        Log.d(
+            "DebugBeneficio",
+            "Diferencia: $diferenciaPrecio, Lotes: $lotes, Multiplicador: $multiplicador, Comisión: $comision, Swap: $swap"
+        )
+
+        // Calcular el beneficio total considerando lotes y tamaño de contrato
+        return (diferenciaPrecio * lotes * multiplicador) - comision - swap
+    }
 }
 
 
