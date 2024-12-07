@@ -102,7 +102,7 @@
                     android:textSize="14sp" />
 
                 <EditText
-                    android:id="@+id/swapEditText"
+                    android:id="@+id/TotalswapEditText"
                     android:layout_width="80dp"
                     android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
@@ -134,7 +134,7 @@
                     android:textSize="14sp" />
 
                 <EditText
-                    android:id="@+id/commissionEditText"
+                    android:id="@+id/TotalcommissionEditText"
                     android:layout_width="80dp"
                     android:layout_height="wrap_content"
                     android:inputType="numberDecimal"

@@ -263,6 +263,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                     movementsList.add(movement)
                     movementsAdapter.notifyItemInserted(movementsList.size - 1)
                     updateMovementsCount()
+                    calculateMetrics()
                 }
                 movementsAdapter.notifyDataSetChanged()
             }
@@ -772,6 +773,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 movementsList.add(movement) // Añadir el nuevo movimiento a la lista local
                 movementsAdapter.notifyItemInserted(movementsList.size - 1) // Notificar al adaptador sobre el cambio
                 updateMovementsCount() // Actualizar el contador
+                calculateMetrics()
                 // Actualizar la cuenta y estrategia, si corresponde
                 updateAccountWithMovement(accountId, movement.id)
                 strategyId?.let {
@@ -1264,6 +1266,44 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             }
     }
 
+    private fun calculateMetrics() {
+        // Inicializa las variables de las métricas
+        var totalSwap = 0.0
+        var totalCommission = 0.0
+
+        // Itera por todos los movimientos y acumula los valores
+        movementsList.forEach { movement ->
+            // totalProfit += movement.profit ?: 0.0 // Comentado porque no necesitamos el profit
+            totalSwap += movement.swap ?: 0.0
+            totalCommission += movement.commission ?: 0.0
+        }
+
+        // Recupera el depósito inicial (deberías pasarlo al Activity usando `Intent` o Firestore)
+        // val deposit = intent.getDoubleExtra("accountDeposit", 0.0) // Comentado porque no necesitamos el depósito
+
+        // Calcula el balance
+        // val balance = deposit + totalProfit - totalSwap - totalCommission // Comentado porque no necesitamos el balance
+
+        // Actualiza la interfaz de usuario con las métricas calculadas
+        updateMetricsUI(
+            // profit = totalProfit, // Comentado porque no calculamos el profit
+            swap = totalSwap,
+            commission = totalCommission
+            // balance = balance // Comentado porque no calculamos el balance
+        )
+    }
+
+    private fun updateMetricsUI(
+        // profit: Double, // Comentado porque no lo usamos
+        swap: Double,
+        commission: Double
+        // balance: Double // Comentado porque no lo usamos
+    ) {
+        // findViewById<EditText>(R.id.benefitEditText).setText(String.format("%.2f", profit)) // Comentado porque no mostramos el profit
+        findViewById<EditText>(R.id.TotalswapEditText).setText(String.format("%.2f", swap))
+        findViewById<EditText>(R.id.TotalcommissionEditText).setText(String.format("%.2f", commission))
+        // findViewById<EditText>(R.id.balanceEditText).setText(String.format("%.2f", balance)) // Comentado porque no mostramos el balance
+    }
+
 
 }
-
