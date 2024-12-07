@@ -255,6 +255,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                     val movement = doc.toObject(Movement::class.java)
                     movementsList.add(movement)
                     movementsAdapter.notifyItemInserted(movementsList.size - 1)
+                    updateMovementsCount()
                 }
                 movementsAdapter.notifyDataSetChanged()
             }
@@ -753,7 +754,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 mediaPlayer.start()
                 movementsList.add(movement) // Añadir el nuevo movimiento a la lista local
                 movementsAdapter.notifyItemInserted(movementsList.size - 1) // Notificar al adaptador sobre el cambio
-
+                updateMovementsCount() // Actualizar el contador
                 // Actualizar la cuenta y estrategia, si corresponde
                 updateAccountWithMovement(accountId, movement.id)
                 strategyId?.let {
@@ -1176,6 +1177,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 // Eliminar el movimiento de la lista y notificar al adaptador
                 movementsList.removeAt(position)
                 movementsAdapter.notifyItemRemoved(position)
+                updateMovementsCount()
                 Toast.makeText(this, "Movimiento eliminado", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { e ->
@@ -1223,6 +1225,12 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 Toast.makeText(this, "Error al actualizar: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
+    private fun updateMovementsCount() {
+        val movementsCountTextView = findViewById<TextView>(R.id.accountMovementsCountTextView)
+        movementsCountTextView.text = "Movimientos: ${movementsList.size}"
+    }
+
 
 }
 
