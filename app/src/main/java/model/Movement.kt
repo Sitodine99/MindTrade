@@ -11,7 +11,8 @@ data class Movement(
     val exitTime: Long?, // Agregado
     val swap: Double = 0.0, // Swap
     val commission: Double = 0.0, // Comisión
-    val profit: Double = 0.0, // Beneficio
+    val profit: Double = 0.0, // Beneficio neto
+    //val grossProfit: Double = 0.0, // Beneficio bruto (nuevo campo)//
     val createdAt: Long = System.currentTimeMillis(), // Fecha de creación
     val strategyId: String? = null, // Estrategia asociada
     val emotionalState: String?,
@@ -34,6 +35,7 @@ data class Movement(
         swap = 0.0,
         commission = 0.0,
         profit = 0.0,
+        //grossProfit = 0.0, // Inicialización del nuevo campo//
         createdAt = 0L,
         strategyId = null,
         emotionalState = null,

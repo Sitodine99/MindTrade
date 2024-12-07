@@ -253,38 +253,26 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         db.collection("accounts")
             .document(accountId)
             .collection("movements")
-            .orderBy("createdAt")
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    Toast.makeText(this, "Error al cargar movimientos: ${error.message}", Toast.LENGTH_SHORT).show()
-                    return@addSnapshotListener
+            .orderBy("createdAt") // Ordena por el campo `createdAt`
+            .get()
+            .addOnSuccessListener { snapshot ->
+                movementsList.clear()
+                for (doc in snapshot) {
+                    val movement = doc.toObject(Movement::class.java)
+                    movementsList.add(movement)
+                    movementsAdapter.notifyItemInserted(movementsList.size - 1)
+                    updateMovementsCount()
                 }
-
-                if (snapshot != null) {
-                    // Manejamos cambios en tiempo real directamente desde Firestore
-                    movementsList.clear()
-                    for (doc in snapshot.documents) {
-                        val movement = doc.toObject(Movement::class.java)
-                        if (movement != null) {
-                            movementsList.add(movement)
-                        }
-                    }
-                    movementsAdapter.notifyDataSetChanged()
-
-                    // Actualizar contador de movimientos directamente desde aquí
-                    updateMovementsCountUI()
-                    // Calcula y actualiza las métricas
-                    calculateMetrics()
-                }
+                movementsAdapter.notifyDataSetChanged()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(
+                    this,
+                    "Error al cargar movimientos: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
-
-    // Actualizar la UI del contador de movimientos
-    private fun updateMovementsCountUI() {
-        val movementsCountTextView = findViewById<TextView>(R.id.accountMovementsCountTextView)
-        movementsCountTextView.text = "Movimientos: ${movementsList.size}"
-    }
-
 
 
     private fun showMovementDialog(accountId: String, strategies: List<Strategy>) {
@@ -736,6 +724,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
     private fun saveMovement(movement: Movement, accountId: String, strategyId: String?) {
         val db = Firebase.firestore
 
+
         // Guardar el movimiento en la colección de movimientos
         val movementData = hashMapOf(
             "id" to movement.id,
@@ -753,6 +742,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             "createdAt" to movement.createdAt,
             "strategyId" to strategyId,
             "emotionalState" to movement.emotionalState,
+            "strategyId" to strategyId,
             "emotion" to movement.emotion,
             "tradingStyle" to movement.tradingStyle,
             "comments" to movement.comments,
@@ -761,20 +751,23 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
 
         db.collection("accounts")
             .document(accountId)
-            .collection("movements")
+            .collection("movements") // Subcolección de movimientos
             .document(movement.id)
             .set(movementData)
             .addOnSuccessListener {
+                // Actualizar la lista de movimientos local
                 val mediaPlayer = MediaPlayer.create(this, R.raw.cash)
                 mediaPlayer.start()
-
-                // No añadimos manualmente el movimiento a movementsList
-                Toast.makeText(this, "Movimiento guardado exitosamente.", Toast.LENGTH_SHORT).show()
-                // Calcula y actualiza las métricas
-                calculateMetrics()
-                // Opcional: actualizar estrategia o cuenta
+                movementsList.add(movement) // Añadir el nuevo movimiento a la lista local
+                movementsAdapter.notifyItemInserted(movementsList.size - 1) // Notificar al adaptador sobre el cambio
+                updateMovementsCount() // Actualizar el contador
+                // Actualizar la cuenta y estrategia, si corresponde
                 updateAccountWithMovement(accountId, movement.id)
-                strategyId?.let { saveAndLinkMovementToStrategy(strategyId, movement) }
+                strategyId?.let {
+                    saveAndLinkMovementToStrategy(strategyId, movement)
+                }
+
+                Toast.makeText(this, "Movimiento guardado exitosamente.", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { e ->
                 Toast.makeText(
@@ -784,7 +777,6 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 ).show()
             }
     }
-
 
 
     private fun updateAccountWithMovement(accountId: String, movementId: String) {
@@ -1261,34 +1253,6 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             }
     }
 
-    private fun calculateMetrics() {
-        // Inicializa las variables de las métricas
-        var totalProfit = 0.0
-        var totalSwap = 0.0
-        var totalCommission = 0.0
-
-        // Itera por todos los movimientos y acumula los valores
-        movementsList.forEach { movement ->
-            totalProfit += movement.profit ?: 0.0
-            totalSwap += movement.swap ?: 0.0
-            totalCommission += movement.commission ?: 0.0
-        }
-
-        // Recupera el depósito inicial (deberías pasarlo al Activity usando `Intent` o Firestore)
-        val deposit = intent.getDoubleExtra("accountDeposit", 0.0)
-
-        // Calcula el balance
-        val balance = deposit + totalProfit - totalSwap - totalCommission
-
-        // Actualiza la interfaz de usuario con las métricas calculadas
-        updateMetricsUI(totalProfit, totalSwap, totalCommission, balance)
-    }
-
-    private fun updateMetricsUI(profit: Double, swap: Double, commission: Double, balance: Double) {
-        findViewById<EditText>(R.id.benefitEditText).setText(String.format("%.2f", profit))
-        findViewById<EditText>(R.id.swapEditText).setText(String.format("%.2f", swap))
-        findViewById<EditText>(R.id.commissionEditText).setText(String.format("%.2f", commission))
-        findViewById<EditText>(R.id.balanceEditText).setText(String.format("%.2f", balance))
-    }
 
 }
+
