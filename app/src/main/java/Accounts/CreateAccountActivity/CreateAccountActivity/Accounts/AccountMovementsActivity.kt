@@ -52,7 +52,7 @@ import java.util.Calendar
 import java.util.UUID
 
 
-class AccountMovementsActivity : AppCompatActivity() {
+class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementActionListener {
 
     private val movementsList = mutableListOf<Movement>() // Lista de movimientos
     private lateinit var movementsAdapter: MovementsAdapter
@@ -66,6 +66,8 @@ class AccountMovementsActivity : AppCompatActivity() {
     private var selectedImageView: ImageView? = null
     private var selectedStrategy: Strategy? = null
     private var selectedEmotionDetail: String? = null
+
+
     private val symbolGroups = mapOf(
         "Forex" to listOf(
             "EUR/USD", "USD/JPY", "GBP/USD", "USD/CHF",
@@ -225,7 +227,8 @@ class AccountMovementsActivity : AppCompatActivity() {
         val addMovementButton = rootView.findViewById<ImageButton>(R.id.addMovementButton)
 
         // Configurar el adaptador
-        movementsAdapter = MovementsAdapter(this, movementsList)
+        movementsAdapter = MovementsAdapter(this, movementsList, this) // 'this' implementa MovementActionListener
+
         recyclerView.adapter = movementsAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -1148,6 +1151,80 @@ class AccountMovementsActivity : AppCompatActivity() {
         // Redondear el beneficio a 2 decimales antes de retornarlo
         return BigDecimal(beneficio).setScale(2, RoundingMode.HALF_UP).toDouble()
     }
+
+    // Confirmar eliminación del movimiento
+    override fun confirmDeleteMovement(position: Int) {
+        AlertDialog.Builder(this)
+            .setTitle("Eliminar movimiento")
+            .setMessage("¿Estás seguro de que deseas eliminar este movimiento?")
+            .setPositiveButton("Sí") { _, _ ->
+                deleteMovement(position)
+            }
+            .setNegativeButton("No", null)
+            .show()
+    }
+
+    private fun deleteMovement(position: Int) {
+        val movement = movementsList[position] // Obtiene el movimiento a eliminar
+        FirebaseFirestore.getInstance()
+            .collection("accounts")
+            .document(movement.accountId)
+            .collection("movements")
+            .document(movement.id)
+            .delete()
+            .addOnSuccessListener {
+                // Eliminar el movimiento de la lista y notificar al adaptador
+                movementsList.removeAt(position)
+                movementsAdapter.notifyItemRemoved(position)
+                Toast.makeText(this, "Movimiento eliminado", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error al eliminar: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    // Mostrar un diálogo para ajustar el beneficio
+    override fun showAdjustProfitDialog(position: Int) { // Agrega "override"
+        val movement = movementsList[position]
+        val dialogView = layoutInflater.inflate(R.layout.dialog_adjust_profit, null)
+        val profitEditText = dialogView.findViewById<EditText>(R.id.profitEditText)
+        profitEditText.setText(movement.profit?.toString() ?: "")
+
+        AlertDialog.Builder(this)
+            .setTitle("Ajustar beneficio")
+            .setView(dialogView)
+            .setPositiveButton("Guardar") { _, _ ->
+                val newProfit = profitEditText.text.toString().toDoubleOrNull()
+                if (newProfit != null) {
+                    updateMovementProfit(position, newProfit)
+                } else {
+                    Toast.makeText(this, "Por favor, introduce un valor válido", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    // Actualizar el beneficio del movimiento
+    private fun updateMovementProfit(position: Int, newProfit: Double) {
+        val movement = movementsList[position]
+        FirebaseFirestore.getInstance()
+            .collection("accounts")
+            .document(movement.accountId)
+            .collection("movements")
+            .document(movement.id)
+            .update("profit", newProfit)
+            .addOnSuccessListener {
+                movementsList[position] = movement.copy(profit = newProfit)
+                movementsAdapter.notifyItemChanged(position)
+                Toast.makeText(this, "Beneficio actualizado", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error al actualizar: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
 }
+
 
 

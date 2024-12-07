@@ -20,7 +20,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class MovementsAdapter(
     private val context: Context,
-    private val movements: MutableList<Movement>
+    private val movements: MutableList<Movement>,
+    private val listener: MovementActionListener
 
 ) : RecyclerView.Adapter<MovementsAdapter.ViewHolder>() {
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -64,26 +65,20 @@ class MovementsAdapter(
 
         // Agregar el evento de pulsación larga
         holder.itemView.setOnLongClickListener {
-            // Mostrar un diálogo con opciones
             val options = arrayOf("Eliminar movimiento", "Ajustar beneficio")
             AlertDialog.Builder(context)
                 .setTitle("Opciones del movimiento")
-                .setItems(options) { dialog, which ->
+                .setItems(options) { _, which ->
                     when (which) {
-                        0 -> {
-                            // Opción de eliminar movimiento
-                            confirmDeleteMovement(position)
-                        }
-                        1 -> {
-                            // Opción de ajustar beneficio
-                            showAdjustProfitDialog(position)
-                        }
+                        0 -> listener.confirmDeleteMovement(position) // Llama a la interfaz
+                        1 -> listener.showAdjustProfitDialog(position) // Llama a la interfaz
                     }
                 }
                 .setNegativeButton("Cancelar", null)
                 .show()
-            true // Retornar true para indicar que el evento fue manejado
+            true
         }
+
 
 
         // Tipo (Buy/Sell) y lotes
@@ -159,11 +154,11 @@ class MovementsAdapter(
         val colorRes = when (tradingStyle) {
             "Scalping" -> R.color.orange // Naranja para Scalping
             "Intradia" -> R.color.blue_normal // Azul para Intradia
-             // Verde para Swing Trading
+            // Verde para Swing Trading
             else -> R.color.forest_green
         }
 
-    // Asignar el estilo y color al TextView
+        // Asignar el estilo y color al TextView
         holder.tradingStyleTextView.text = tradingStyle
         holder.tradingStyleTextView.setTextColor(ContextCompat.getColor(context, colorRes))
         holder.tradingStyleTextView.setTypeface(null, Typeface.BOLD) // Aplicar negrita
@@ -297,4 +292,9 @@ class MovementsAdapter(
     }
 
     override fun getItemCount() = movements.size
+
+    interface MovementActionListener {
+        fun confirmDeleteMovement(position: Int)
+        fun showAdjustProfitDialog(position: Int)
+    }
 }

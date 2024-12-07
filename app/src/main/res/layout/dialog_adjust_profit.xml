@@ -9,6 +9,10 @@
         android:id="@+id/profitEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nuevo beneficio"
-        android:inputType="numberDecimal" />
+        android:hint="Introduce el beneficio"
+        android:inputType="text"
+        android:maxLines="1"
+        android:imeOptions="actionDone" />
+
+
 </LinearLayout>

@@ -9,6 +9,7 @@ data class Account(
     val profitTarget: Double? = null, // Objetivo de beneficio (opcional)
     val maxDailyLoss: Double? = null, // Pérdida diaria máxima (opcional)
     val createdAt: Long = System.currentTimeMillis(), // Fecha de creación en timestamp
-    val movements: List<String> = emptyList(), // IDs de los movimientos asociados
-    val isActive: Boolean = true // Indica si la cuenta está activa
+    var movements: List<String> = emptyList(),
+    val isActive: Boolean = true, // Indica si la cuenta está activa
+    var movementsCount: Int = 0 // Campo adicional para el número de movimientos
 )
