@@ -1167,23 +1167,30 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
 
     private fun deleteMovement(position: Int) {
         val movement = movementsList[position] // Obtiene el movimiento a eliminar
-        FirebaseFirestore.getInstance()
-            .collection("accounts")
-            .document(movement.accountId)
-            .collection("movements")
-            .document(movement.id)
-            .delete()
+        val db = FirebaseFirestore.getInstance()
+        val accountRef = db.collection("accounts").document(movement.accountId)
+        val movementRef = accountRef.collection("movements").document(movement.id)
+
+        movementRef.delete()
             .addOnSuccessListener {
-                // Eliminar el movimiento de la lista y notificar al adaptador
-                movementsList.removeAt(position)
-                movementsAdapter.notifyItemRemoved(position)
-                updateMovementsCount()
-                Toast.makeText(this, "Movimiento eliminado", Toast.LENGTH_SHORT).show()
+                // Eliminar el ID del movimiento del array "movements" en el documento de cuenta
+                accountRef.update("movements", FieldValue.arrayRemove(movement.id))
+                    .addOnSuccessListener {
+                        // Actualizar la lista local y notificar al adaptador
+                        movementsList.removeAt(position)
+                        movementsAdapter.notifyItemRemoved(position)
+                        updateMovementsCount() // Actualizar contador en la UI
+                        Toast.makeText(this, "Movimiento eliminado correctamente.", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Error al actualizar la cuenta: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Error al eliminar: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Error al eliminar el movimiento: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
 
     // Mostrar un diálogo para ajustar el beneficio
     override fun showAdjustProfitDialog(position: Int) { // Agrega "override"
@@ -1227,12 +1234,20 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
     }
 
     private fun updateMovementsCount() {
-        val movementsCountTextView = findViewById<TextView>(R.id.accountMovementsCountTextView)
-        movementsCountTextView.text = "Movimientos: ${movementsList.size}"
+        val accountId = movementsList.firstOrNull()?.accountId ?: return
+        val db = FirebaseFirestore.getInstance()
+        val accountRef = db.collection("accounts").document(accountId)
+
+        accountRef.update("movementsCount", movementsList.size)
+            .addOnSuccessListener {
+                Log.d("Firebase", "Movements count updated: ${movementsList.size}")
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error al actualizar contador: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
 
 }
-
 
 
