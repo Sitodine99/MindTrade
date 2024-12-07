@@ -1271,6 +1271,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         var totalSwap = 0.0
         var totalCommission = 0.0
         var totalGrossProfit = 0.0 // Variable para el beneficio bruto
+        var totalNetProfit = 0.0
 
 
 
@@ -1285,6 +1286,17 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 multiplier,
                 movement.type == "Buy"
             )
+            val netProfit = calcularBeneficioPorSimbolo(
+                movement.entryPrice,
+                movement.exitPrice,
+                movement.lotes,
+                movement.swap,
+                movement.commission,
+                movement.symbol,
+                multiplier,
+                movement.type == "Buy"
+            )
+            totalNetProfit += netProfit
             totalGrossProfit += grossProfit // Acumula el beneficio bruto
             totalSwap += movement.swap ?: 0.0
             totalCommission += movement.commission ?: 0.0
@@ -1301,6 +1313,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             // profit = totalProfit, // Comentado porque no calculamos el profit
             grossProfit = totalGrossProfit, // Enviamos el beneficio bruto
             swap = totalSwap,
+            netProfit = totalNetProfit,
             commission = totalCommission
             // balance = balance // Comentado porque no calculamos el balance
         )
@@ -1310,6 +1323,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         // profit: Double, // Comentado porque no lo usamos
         grossProfit: Double,
         swap: Double,
+        netProfit: Double, // Beneficio neto
         commission: Double
         // balance: Double // Comentado porque no lo usamos
     ) {
@@ -1317,6 +1331,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         findViewById<EditText>(R.id.TotalswapEditText).setText(String.format("%.2f", swap))
         findViewById<EditText>(R.id.TotalcommissionEditText).setText(String.format("%.2f", commission))
         findViewById<EditText>(R.id.grossProfitEditText).setText(String.format("%.2f", grossProfit))
+        //findViewById<EditText>(R.id.netProfitEditText).setText(String.format("%.2f", netProfit)) // Beneficio neto
         // findViewById<EditText>(R.id.balanceEditText).setText(String.format("%.2f", balance)) // Comentado porque no mostramos el balance
     }
 
