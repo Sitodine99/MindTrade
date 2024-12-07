@@ -169,8 +169,14 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                     1 -> { // Pantalla de movimientos
                         val screenMovementsView = viewPager.findViewWithTag<View>("f1")
                         screenMovementsView?.let { movementsView ->
+                            // Actualizar el TextView para mostrar el número de movimientos
                             movementsView.findViewById<TextView>(R.id.accountMovementsCountTextView).text =
                                 "Movimientos: ${accountMovements.size}"
+
+                            // Actualizar el EditText para mostrar el balance de la cuenta
+                            val depositEditText = movementsView.findViewById<EditText>(R.id.depositEditText)
+                            depositEditText.setText("$%.2f".format(accountBalance))
+
                             // Configura el RecyclerView de movimientos aquí
                             setupMovementsView(movementsView, accountId) // Llama al método aquí
                         }
@@ -1286,4 +1292,3 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
     }
 
 }
-

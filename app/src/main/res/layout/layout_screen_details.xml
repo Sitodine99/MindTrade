@@ -32,19 +32,19 @@
             <TextView
                 android:id="@+id/accountBalanceTextView"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="12dp"
+                android:layout_marginBottom="4dp"
                 android:text="Balance: $0.00"
-                android:textSize="16sp"
-                android:layout_marginBottom="4dp" />
+                android:textSize="16sp" />
 
             <!-- Divisa -->
             <TextView
                 android:id="@+id/accountCurrencyTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
                 android:text="Divisa: USD"
-                android:textSize="16sp"
-                android:layout_marginBottom="4dp" />
+                android:textSize="16sp" />
 
             <!-- Objetivo de beneficio -->
             <TextView
