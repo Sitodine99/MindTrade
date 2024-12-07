@@ -267,6 +267,8 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
 
                     // Actualizar contador de movimientos directamente desde aquí
                     updateMovementsCountUI()
+                    // Calcula y actualiza las métricas
+                    calculateMetrics()
                 }
             }
     }
@@ -762,7 +764,8 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
 
                 // No añadimos manualmente el movimiento a movementsList
                 Toast.makeText(this, "Movimiento guardado exitosamente.", Toast.LENGTH_SHORT).show()
-
+                // Calcula y actualiza las métricas
+                calculateMetrics()
                 // Opcional: actualizar estrategia o cuenta
                 updateAccountWithMovement(accountId, movement.id)
                 strategyId?.let { saveAndLinkMovementToStrategy(strategyId, movement) }
@@ -1252,6 +1255,35 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             }
     }
 
+    private fun calculateMetrics() {
+        // Inicializa las variables de las métricas
+        var totalProfit = 0.0
+        var totalSwap = 0.0
+        var totalCommission = 0.0
+
+        // Itera por todos los movimientos y acumula los valores
+        movementsList.forEach { movement ->
+            totalProfit += movement.profit ?: 0.0
+            totalSwap += movement.swap ?: 0.0
+            totalCommission += movement.commission ?: 0.0
+        }
+
+        // Recupera el depósito inicial (deberías pasarlo al Activity usando `Intent` o Firestore)
+        val deposit = intent.getDoubleExtra("accountDeposit", 0.0)
+
+        // Calcula el balance
+        val balance = deposit + totalProfit - totalSwap - totalCommission
+
+        // Actualiza la interfaz de usuario con las métricas calculadas
+        updateMetricsUI(totalProfit, totalSwap, totalCommission, balance)
+    }
+
+    private fun updateMetricsUI(profit: Double, swap: Double, commission: Double, balance: Double) {
+        findViewById<EditText>(R.id.benefitEditText).setText(String.format("%.2f", profit))
+        findViewById<EditText>(R.id.swapEditText).setText(String.format("%.2f", swap))
+        findViewById<EditText>(R.id.commissionEditText).setText(String.format("%.2f", commission))
+        findViewById<EditText>(R.id.balanceEditText).setText(String.format("%.2f", balance))
+    }
 
 }
 
