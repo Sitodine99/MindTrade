@@ -10,6 +10,7 @@ import android.graphics.Typeface
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
+import android.text.InputFilter
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -287,6 +288,16 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         val entryPriceEditText = dialogView.findViewById<EditText>(R.id.entryPriceEditText)
         val exitPriceEditText = dialogView.findViewById<EditText>(R.id.exitPriceEditText)
         val swapEditText = dialogView.findViewById<EditText>(R.id.swapEditText)
+
+        // Establecer un filtro para permitir números negativos y decimales
+        swapEditText.filters = arrayOf(InputFilter { source, _, _, _, _, _ ->
+            if (source.isEmpty() || source.toString().matches(Regex("-?\\d*(\\.\\d*)?"))) {
+                source // Permitir entrada válida
+            } else {
+                "" // Bloquear entrada inválida
+            }
+        })
+
         val commissionEditText = dialogView.findViewById<EditText>(R.id.commissionEditText)
         val operationTypeSpinner = dialogView.findViewById<Spinner>(R.id.operationTypeSpinner)
 
