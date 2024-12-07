@@ -119,6 +119,8 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         val accountId = intent.getStringExtra("accountId") ?: "default_account_id"
 
 
+
+
         // Configurar el ViewPager2
         val viewPager = findViewById<ViewPager2>(R.id.viewPager)
         val layouts = listOf(
@@ -240,7 +242,9 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         // Cargar movimientos desde Firestore
-        loadMovementsFromFirestore(accountId)
+        loadMovementsFromFirestore(accountId){
+            calculateMetrics()
+        }
 
         // Botón para añadir un nuevo movimiento
         addMovementButton.setOnClickListener {
@@ -248,7 +252,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         }
     }
 
-    private fun loadMovementsFromFirestore(accountId: String) {
+    private fun loadMovementsFromFirestore(accountId: String, onComplete: () -> Unit) {
         val db = FirebaseFirestore.getInstance()
 
         db.collection("accounts")
@@ -1272,12 +1276,11 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         var totalCommission = 0.0
         var totalGrossProfit = 0.0 // Variable para el beneficio bruto
         var totalNetProfit = 0.0
-
-
+        var accountBalance = intent.getDoubleExtra("accountBalance", 0.0) // Balance inicial
+        val accountCurrency = intent.getStringExtra("accountCurrency") ?: ""
 
         // Itera por todos los movimientos y acumula los valores
         movementsList.forEach { movement ->
-            // totalProfit += movement.profit ?: 0.0 // Comentado porque no necesitamos el profit
             val multiplier = calcularMultiplicadorPorSimbolo(movement.symbol)
             val grossProfit = calculateGrossProfit(
                 movement.entryPrice,
@@ -1300,37 +1303,45 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             totalGrossProfit += grossProfit // Acumula el beneficio bruto
             totalSwap += movement.swap ?: 0.0
             totalCommission += movement.commission ?: 0.0
+
+            // Agrega el beneficio neto al balance
+            accountBalance += netProfit
         }
 
-        // Recupera el depósito inicial (deberías pasarlo al Activity usando `Intent` o Firestore)
-        // val deposit = intent.getDoubleExtra("accountDeposit", 0.0) // Comentado porque no necesitamos el depósito
-
-        // Calcula el balance
-        // val balance = deposit + totalProfit - totalSwap - totalCommission // Comentado porque no necesitamos el balance
+        // Logs para depuración
+        Log.d("Metrics", "Total Gross Profit: $totalGrossProfit")
+        Log.d("Metrics", "Total Net Profit: $totalNetProfit")
+        Log.d("Metrics", "Updated Balance: $accountBalance")
 
         // Actualiza la interfaz de usuario con las métricas calculadas
         updateMetricsUI(
-            // profit = totalProfit, // Comentado porque no calculamos el profit
-            grossProfit = totalGrossProfit, // Enviamos el beneficio bruto
+            grossProfit = totalGrossProfit,
             swap = totalSwap,
             netProfit = totalNetProfit,
-            commission = totalCommission
-            // balance = balance // Comentado porque no calculamos el balance
+            commission = totalCommission,
+            accountCurrency = accountCurrency,
+            accountBalance = accountBalance
         )
     }
+
 
     private fun updateMetricsUI(
         // profit: Double, // Comentado porque no lo usamos
         grossProfit: Double,
         swap: Double,
         netProfit: Double, // Beneficio neto
-        commission: Double
+        commission: Double,
+        accountBalance: Double,
+        accountCurrency: String
         // balance: Double // Comentado porque no lo usamos
     ) {
         // findViewById<EditText>(R.id.benefitEditText).setText(String.format("%.2f", profit)) // Comentado porque no mostramos el profit
         findViewById<EditText>(R.id.TotalswapEditText).setText(String.format("%.2f", swap))
         findViewById<EditText>(R.id.TotalcommissionEditText).setText(String.format("%.2f", commission))
         findViewById<EditText>(R.id.grossProfitEditText).setText(String.format("%.2f", grossProfit))
+        findViewById<EditText>(R.id.balanceEditText).setText("%.2f %s".format(accountBalance, accountCurrency))
+        // Actualiza el balance en el formato adecuado
+
         //findViewById<EditText>(R.id.netProfitEditText).setText(String.format("%.2f", netProfit)) // Beneficio neto
         // findViewById<EditText>(R.id.balanceEditText).setText(String.format("%.2f", balance)) // Comentado porque no mostramos el balance
     }
