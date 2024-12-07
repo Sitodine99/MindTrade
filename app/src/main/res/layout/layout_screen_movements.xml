@@ -1,6 +1,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="16dp"
     android:id="@+id/movementsScrollView">
 
@@ -9,25 +10,205 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Número de movimientos -->
-        <TextView
-            android:id="@+id/accountMovementsCountTextView"
+        <!-- Cabecera con datos -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Movimientos: 0"
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
+            android:orientation="vertical"
+            android:layout_marginBottom="8dp">
 
-        <ImageButton
-            android:id="@+id/addMovementButton"
-            android:layout_width="wrap_content"
+            <!-- Beneficio -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Beneficio:"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:text="................................................."
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/benefitEditText"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:hint="0.00"
+                    android:textSize="14sp"
+                    android:layout_marginStart="8dp"
+                    android:background="@null"
+                    android:gravity="center" />
+            </LinearLayout>
+
+            <!-- Depósito -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Depósito:"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:text="................................................."
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/depositEditText"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:hint="0.00"
+                    android:textSize="14sp"
+                    android:layout_marginStart="8dp"
+                    android:background="@null"
+                    android:gravity="center" />
+            </LinearLayout>
+
+            <!-- Swap -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Swap:"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:text="................................................."
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/swapEditText"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:hint="0.00"
+                    android:textSize="14sp"
+                    android:layout_marginStart="8dp"
+                    android:background="@null"
+                    android:gravity="center" />
+            </LinearLayout>
+
+            <!-- Comisión -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Comisión:"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:text="................................................."
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/commissionEditText"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:hint="0.00"
+                    android:textSize="14sp"
+                    android:layout_marginStart="8dp"
+                    android:background="@null"
+                    android:gravity="center" />
+            </LinearLayout>
+
+            <!-- Balance -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Balance:"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:text="................................................."
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/balanceEditText"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:hint="0.00"
+                    android:textSize="14sp"
+                    android:layout_marginStart="8dp"
+                    android:background="@null"
+                    android:gravity="center" />
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <!-- Línea de movimientos y botón -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:src="@drawable/ic_add"
-            android:contentDescription="Añadir Movimiento"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:backgroundTintMode="src_in"
-            android:layout_margin="8dp" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <!-- Número de movimientos -->
+            <TextView
+                android:id="@+id/accountMovementsCountTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Movimientos: 0"
+                android:textSize="16sp" />
+
+            <!-- Botón para añadir movimiento -->
+            <ImageButton
+                android:id="@+id/addMovementButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/ic_add"
+                android:backgroundTintMode="src_in"
+                android:backgroundTint="#000000"
+                android:contentDescription="Añadir movimiento"
+                android:scaleType="fitCenter"
+                android:padding="4dp"
+                android:layout_marginEnd ="14dp"/>
+        </LinearLayout>
 
         <!-- RecyclerView para los movimientos -->
         <androidx.recyclerview.widget.RecyclerView
