@@ -1270,10 +1270,22 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         // Inicializa las variables de las métricas
         var totalSwap = 0.0
         var totalCommission = 0.0
+        var totalGrossProfit = 0.0 // Variable para el beneficio bruto
+
+
 
         // Itera por todos los movimientos y acumula los valores
         movementsList.forEach { movement ->
             // totalProfit += movement.profit ?: 0.0 // Comentado porque no necesitamos el profit
+            val multiplier = calcularMultiplicadorPorSimbolo(movement.symbol)
+            val grossProfit = calculateGrossProfit(
+                movement.entryPrice,
+                movement.exitPrice,
+                movement.lotes,
+                multiplier,
+                movement.type == "Buy"
+            )
+            totalGrossProfit += grossProfit // Acumula el beneficio bruto
             totalSwap += movement.swap ?: 0.0
             totalCommission += movement.commission ?: 0.0
         }
@@ -1287,6 +1299,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         // Actualiza la interfaz de usuario con las métricas calculadas
         updateMetricsUI(
             // profit = totalProfit, // Comentado porque no calculamos el profit
+            grossProfit = totalGrossProfit, // Enviamos el beneficio bruto
             swap = totalSwap,
             commission = totalCommission
             // balance = balance // Comentado porque no calculamos el balance
@@ -1295,6 +1308,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
 
     private fun updateMetricsUI(
         // profit: Double, // Comentado porque no lo usamos
+        grossProfit: Double,
         swap: Double,
         commission: Double
         // balance: Double // Comentado porque no lo usamos
@@ -1302,7 +1316,24 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         // findViewById<EditText>(R.id.benefitEditText).setText(String.format("%.2f", profit)) // Comentado porque no mostramos el profit
         findViewById<EditText>(R.id.TotalswapEditText).setText(String.format("%.2f", swap))
         findViewById<EditText>(R.id.TotalcommissionEditText).setText(String.format("%.2f", commission))
+        findViewById<EditText>(R.id.grossProfitEditText).setText(String.format("%.2f", grossProfit))
         // findViewById<EditText>(R.id.balanceEditText).setText(String.format("%.2f", balance)) // Comentado porque no mostramos el balance
+    }
+
+    // Método para calcular el beneficio bruto
+    private fun calculateGrossProfit(
+        entryPrice: Double,
+        exitPrice: Double,
+        lotes: Double,
+        multiplier: Double,
+        isBuy: Boolean
+    ): Double {
+        val priceDifference = if (isBuy) {
+            exitPrice - entryPrice
+        } else {
+            entryPrice - exitPrice
+        }
+        return priceDifference * lotes * multiplier
     }
 
 

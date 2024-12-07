@@ -38,7 +38,7 @@
                     android:textSize="14sp" />
 
                 <EditText
-                    android:id="@+id/benefitEditText"
+                    android:id="@+id/grossProfitEditText"
                     android:layout_width="80dp"
                     android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
