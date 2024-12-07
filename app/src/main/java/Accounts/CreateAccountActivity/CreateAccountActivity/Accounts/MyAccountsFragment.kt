@@ -53,7 +53,12 @@ class MyAccountsFragment : Fragment() {
 
         db.collection("accounts").whereEqualTo("userId", userId).get()
             .addOnSuccessListener { documents ->
-                val accounts = documents.map { it.toObject(Account::class.java) }
+                val accounts = documents.map { doc ->
+                    val account = doc.toObject(Account::class.java)
+                    account.copy(
+                        movements = (doc.get("movements") as? List<String>) ?: emptyList()
+                    )
+                }
                 myAccountsAdapter.updateAccounts(accounts)
             }
             .addOnFailureListener { e ->
@@ -61,6 +66,7 @@ class MyAccountsFragment : Fragment() {
                     .show()
             }
     }
+
 
     private fun openAccountMovementsActivity(account: Account) {
         val intent = Intent(requireContext(), AccountMovementsActivity::class.java).apply {

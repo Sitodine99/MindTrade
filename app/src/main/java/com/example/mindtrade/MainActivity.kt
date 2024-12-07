@@ -277,9 +277,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
-
-
-
     private fun setupAccountsRecyclerView(allAccounts: List<Account>) {
         val accountsRecyclerView = findViewById<RecyclerView>(R.id.accountsRecyclerView)
         val selectedAccounts = allAccounts.take(2) // Por defecto, tomamos las primeras 2 cuentas

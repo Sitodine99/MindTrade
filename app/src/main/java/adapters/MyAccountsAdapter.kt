@@ -31,6 +31,11 @@ class MyAccountsAdapter(
         val account = accounts[position]
         holder.accountName.text = account.name
 
+        // Mostrar el número de operaciones
+        val operationsCount = account.movements.size
+        holder.itemView.findViewById<TextView>(R.id.accountOperationsCountTextView).text =
+            "Operaciones: $operationsCount"
+
         // Configurar los clics en los botones de editar y eliminar
         holder.editIcon.setOnClickListener { onEditClicked(account) }
         holder.deleteIcon.setOnClickListener { onDeleteClicked(account) }
@@ -40,6 +45,7 @@ class MyAccountsAdapter(
             onAccountClick(account)
         }
     }
+
 
     override fun getItemCount(): Int = accounts.size
 

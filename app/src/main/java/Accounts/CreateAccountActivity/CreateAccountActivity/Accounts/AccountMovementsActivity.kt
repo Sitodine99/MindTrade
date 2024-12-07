@@ -1255,4 +1255,3 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
 
 }
 
-
