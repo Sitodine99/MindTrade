@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+</head>
+<body style="margin: 0; padding: 0; overflow: hidden;">
+<!-- Contenedor del gráfico -->
+<div id="main" style="width: 100%; height: 400px;"></div>
+<script>
+    // Inicializar el gráfico
+    var chart = echarts.init(document.getElementById('main'));
+
+    // Función para actualizar el gráfico
+    function updateChart(dataX, dataY) {
+        // Configurar las opciones del gráfico
+        var option = {
+            title: {
+                text: 'Movimientos vs Balance',
+                left: 'center',
+                textStyle: {
+                    fontSize: 18,
+                    fontWeight: 'bold'
+                }
+            },
+            tooltip: {
+                trigger: 'axis',
+                backgroundColor: '#fff',
+                borderColor: '#ccc',
+                borderWidth: 1,
+                textStyle: {
+                    color: '#000'
+                }
+            },
+            xAxis: {
+                type: 'category',
+                data: dataX,
+                axisLabel: {
+                    rotate: 0, // Etiquetas horizontales
+                    fontSize: 12,
+                    color: '#333'
+                },
+                position: 'bottom', // Asegurar que el eje X esté abajo
+                boundaryGap: false // Líneas pegadas al eje
+            },
+            yAxis: {
+                type: 'value',
+                name: 'Balance ($)',
+                axisLabel: {
+                    formatter: function (value) {
+                        return value.toFixed(0); // Redondear valores a enteros
+                    },
+                    fontSize: 12,
+                    color: '#333'
+                },
+                min: function (value) {
+                    return Math.floor(value.min * 0.9); // Reducir un 10% el mínimo
+                },
+                max: function (value) {
+                    return Math.ceil(value.max * 1.1); // Aumentar un 10% el máximo
+                },
+                splitLine: {
+                    lineStyle: {
+                        type: 'dashed', // Líneas punteadas
+                        color: '#ddd'
+                    }
+                }
+            },
+            grid: {
+                left: '10%',  // Margen izquierdo para evitar solapamientos
+                right: '10%', // Margen derecho
+                bottom: '10%', // Margen inferior para espacio en etiquetas del eje X
+                top: '15%',   // Margen superior para el título
+                containLabel: true // Asegurar que las etiquetas se muestren
+            },
+            series: [{
+                name: 'Balance',
+                data: dataY,
+                type: 'line',
+                smooth: true, // Hacer la línea más suave
+                lineStyle: {
+                    width: 3, // Grosor de la línea
+                    color: '#5470C6' // Color de la línea
+                },
+                itemStyle: {
+                    color: '#5470C6' // Color de los puntos
+                },
+                areaStyle: {
+                    color: 'rgba(84,112,198,0.2)' // Fondo degradado bajo la línea
+                },
+                symbol: 'circle', // Forma de los puntos
+                symbolSize: 8 // Tamaño de los puntos
+            }]
+        };
+
+        // Establecer la configuración del gráfico
+        chart.setOption(option);
+    }
+
+    // Prueba con datos ficticios
+    updateChart(
+        ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
+        [4800, 5000, 5200, 5400, 5600, 5675]
+    );
+</script>
+</body>
+</html>

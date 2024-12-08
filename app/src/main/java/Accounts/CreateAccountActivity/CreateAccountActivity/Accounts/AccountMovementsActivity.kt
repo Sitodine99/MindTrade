@@ -14,6 +14,8 @@ import android.text.InputFilter
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -74,9 +76,20 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             "EUR/USD", "USD/JPY", "GBP/USD", "USD/CHF",
             "AUD/USD", "USD/CAD", "NZD/USD"
         ).map { it.trim().uppercase() }, // Normalizar a mayúsculas
-        "Exotics" to listOf("USD/SEK", "USD/NOK", "USD/ZAR", "EUR/TRY").map { it.trim().uppercase() },
-        "Metals" to listOf("XAU/USD", "XAG/USD", "XPT/USD", "XPD/USD").map { it.trim().uppercase() },
-        "Crypto" to listOf("BTC/USD", "ETH/USD", "LTC/USD", "XRP/USD", "ADA/USD", "DOT/USD").map { it.trim().uppercase() },
+        "Exotics" to listOf("USD/SEK", "USD/NOK", "USD/ZAR", "EUR/TRY").map {
+            it.trim().uppercase()
+        },
+        "Metals" to listOf("XAU/USD", "XAG/USD", "XPT/USD", "XPD/USD").map {
+            it.trim().uppercase()
+        },
+        "Crypto" to listOf(
+            "BTC/USD",
+            "ETH/USD",
+            "LTC/USD",
+            "XRP/USD",
+            "ADA/USD",
+            "DOT/USD"
+        ).map { it.trim().uppercase() },
         "Cash CFD" to listOf(
             "US30.cash", "SPX500.cash", "NAS100.cash", "GER30.cash", "FRA40.cash",
             "UK100.cash", "ESP35.cash", "JPN225.cash", "AUS200.cash"
@@ -84,11 +97,19 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         "Commodities" to listOf(
             "SOYBEAN", "WHEAT", "CORN", "COFFEE", "COCOA", "USOIL", "NATGAS"
         ).map { it.trim().uppercase() },
-        "Equities" to listOf("AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "META", "NFLX", "NVDA").map { it.trim().uppercase() }
+        "Equities" to listOf(
+            "AAPL",
+            "MSFT",
+            "GOOGL",
+            "AMZN",
+            "TSLA",
+            "META",
+            "NFLX",
+            "NVDA"
+        ).map { it.trim().uppercase() }
     )
 
     private var selectedSymbol: String? = null
-
 
 
     // Definir las emociones para Psico+ y Psico-
@@ -117,8 +138,6 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_account_movements)
         val accountId = intent.getStringExtra("accountId") ?: "default_account_id"
-
-
 
 
         // Configurar el ViewPager2
@@ -152,6 +171,9 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                     0 -> { // Pantalla de detalles
                         val screenDetailsView = viewPager.findViewWithTag<View>("f0")
                         screenDetailsView?.let {
+                            val initialBalance = intent.getDoubleExtra("accountBalance", 0.0)
+                            val (dataX, dataY) = generateChartData(movementsList, initialBalance)
+                            setupECharts(it, dataX, dataY)
                             it.findViewById<TextView>(R.id.accountNameTextView).text = accountName
                             it.findViewById<TextView>(R.id.accountBalanceTextView).text =
                                 "Balance: $%.2f".format(accountBalance)
@@ -164,8 +186,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                             it.findViewById<TextView>(R.id.accountCreationDateTextView).text =
                                 "Creada el: $formattedDate"
 
-                            // Inicializar el gráfico desde esta vista
-                            setupLineChart(it, accountBalance)
+
                         }
                     }
 
@@ -177,7 +198,8 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                                 "Movimientos: ${accountMovements.size}"
 
                             // Actualizar el EditText para mostrar el balance de la cuenta
-                            val depositEditText = movementsView.findViewById<EditText>(R.id.depositEditText)
+                            val depositEditText =
+                                movementsView.findViewById<EditText>(R.id.depositEditText)
                             depositEditText.setText("$%.2f".format(accountBalance))
 
                             // Configura el RecyclerView de movimientos aquí
@@ -190,59 +212,20 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         })
     }
 
-    private fun setupLineChart(rootView: View, initialBalance: Float) {
-        val lineChart = rootView.findViewById<LineChart>(R.id.balanceChart)
-
-        // Configurar propiedades del gráfico
-        lineChart.description.isEnabled = false
-        lineChart.setTouchEnabled(true)
-        lineChart.isDragEnabled = true
-        lineChart.setScaleEnabled(true)
-        lineChart.setPinchZoom(true)
-        lineChart.setDrawGridBackground(false)
-        lineChart.axisRight.isEnabled = false // Deshabilitar eje derecho
-
-        // Configurar el eje X
-        val xAxis: XAxis = lineChart.xAxis
-        xAxis.position = XAxis.XAxisPosition.BOTTOM
-        xAxis.granularity = 1f // Incrementos de 1 en el eje X
-        xAxis.setDrawGridLines(false)
-        xAxis.axisMinimum = 0f // Inicia desde 0 en el eje X
-        xAxis.labelCount = 5 // Máximo número de etiquetas visibles
-
-        // Configurar el eje Y
-        val yAxis: YAxis = lineChart.axisLeft
-        yAxis.setDrawGridLines(true)
-        yAxis.setDrawZeroLine(true) // Línea en el 0 del eje Y
-        yAxis.axisMinimum = 0f // No permite valores negativos
-
-        // Añadir un punto inicial al gráfico
-        val initialData = mutableListOf<Entry>()
-        initialData.add(Entry(0f, initialBalance)) // Número de operaciones = 0, Balance inicial
-
-        val dataSet = LineDataSet(initialData, "Balance")
-        dataSet.color = resources.getColor(R.color.turquoise_blue, theme)
-        dataSet.setDrawCircles(true)
-        dataSet.setDrawValues(true)
-
-        // Añadir los datos al gráfico
-        val lineData = LineData(dataSet)
-        lineChart.data = lineData
-        lineChart.invalidate() // Redibujar el gráfico
-    }
 
     private fun setupMovementsView(rootView: View, accountId: String) {
         val recyclerView = rootView.findViewById<RecyclerView>(R.id.movementsRecyclerView)
         val addMovementButton = rootView.findViewById<ImageButton>(R.id.addMovementButton)
 
         // Configurar el adaptador
-        movementsAdapter = MovementsAdapter(this, movementsList, this) // 'this' implementa MovementActionListener
+        movementsAdapter =
+            MovementsAdapter(this, movementsList, this) // 'this' implementa MovementActionListener
 
         recyclerView.adapter = movementsAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         // Cargar movimientos desde Firestore
-        loadMovementsFromFirestore(accountId){
+        loadMovementsFromFirestore(accountId) {
             calculateMetrics()
         }
 
@@ -597,7 +580,8 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             val registerButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
             registerButton.setOnClickListener {
                 val lotes = lotesEditText.text.toString().toDoubleOrNull()
-                val entryPrice = entryPriceEditText.text.toString().replace(",", ".").toDoubleOrNull()
+                val entryPrice =
+                    entryPriceEditText.text.toString().replace(",", ".").toDoubleOrNull()
                 val exitPrice = exitPriceEditText.text.toString().replace(",", ".").toDoubleOrNull()
                 val swap = swapEditText.text.toString().toDoubleOrNull() ?: 0.0
                 val commission = commissionEditText.text.toString().toDoubleOrNull() ?: 0.0
@@ -1136,8 +1120,6 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
     }
 
 
-
-
     fun calcularBeneficioPorSimbolo(
         precioEntrada: Double,
         precioSalida: Double,
@@ -1203,14 +1185,26 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                         movementsList.removeAt(position)
                         movementsAdapter.notifyItemRemoved(position)
                         updateMovementsCount() // Actualizar contador en la UI
-                        Toast.makeText(this, "Movimiento eliminado correctamente.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this,
+                            "Movimiento eliminado correctamente.",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                     .addOnFailureListener { e ->
-                        Toast.makeText(this, "Error al actualizar la cuenta: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this,
+                            "Error al actualizar la cuenta: ${e.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Error al eliminar el movimiento: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Error al eliminar el movimiento: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
@@ -1230,7 +1224,8 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 if (newProfit != null) {
                     updateMovementProfit(position, newProfit)
                 } else {
-                    Toast.makeText(this, "Por favor, introduce un valor válido", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Por favor, introduce un valor válido", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
             .setNegativeButton("Cancelar", null)
@@ -1266,7 +1261,11 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 Log.d("Firebase", "Movements count updated: ${movementsList.size}")
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Error al actualizar contador: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Error al actualizar contador: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
@@ -1337,9 +1336,19 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
     ) {
         // findViewById<EditText>(R.id.benefitEditText).setText(String.format("%.2f", profit)) // Comentado porque no mostramos el profit
         findViewById<EditText>(R.id.TotalswapEditText).setText(String.format("%.2f", swap))
-        findViewById<EditText>(R.id.TotalcommissionEditText).setText(String.format("%.2f", commission))
+        findViewById<EditText>(R.id.TotalcommissionEditText).setText(
+            String.format(
+                "%.2f",
+                commission
+            )
+        )
         findViewById<EditText>(R.id.grossProfitEditText).setText(String.format("%.2f", grossProfit))
-        findViewById<EditText>(R.id.balanceEditText).setText("%.2f %s".format(accountBalance, accountCurrency))
+        findViewById<EditText>(R.id.balanceEditText).setText(
+            "%.2f %s".format(
+                accountBalance,
+                accountCurrency
+            )
+        )
         // Actualiza el balance en el formato adecuado
 
         //findViewById<EditText>(R.id.netProfitEditText).setText(String.format("%.2f", netProfit)) // Beneficio neto
@@ -1363,4 +1372,52 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
     }
 
 
+    private fun setupECharts(rootView: View, dataX: List<String>, dataY: List<Double>) {
+        val webView = rootView.findViewById<WebView>(R.id.chartWebViewTest)
+
+        // Ajustar dinámicamente la altura del WebView
+        val layoutParams = webView.layoutParams
+        layoutParams.height = 800 // Aumenta la altura en píxeles si es necesario
+        webView.layoutParams = layoutParams
+
+        // Configurar el WebView
+        webView.settings.javaScriptEnabled = true
+        webView.loadUrl("file:///android_asset/echarts.html") // Cargar el archivo HTML
+
+        // Esperar a que cargue el HTML
+        webView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+
+                // Formatear datos como JSON
+                val jsonX = dataX.joinToString(prefix = "[", postfix = "]") { "\"$it\"" }
+                val jsonY = dataY.joinToString(prefix = "[", postfix = "]")
+
+                // Ejecutar JavaScript para actualizar el gráfico
+                webView.evaluateJavascript("updateChart($jsonX, $jsonY);", null)
+            }
+        }
+    }
+
+
+    // Método para generar datos del gráfico
+    private fun generateChartData(
+        movements: List<Movement>,
+        initialBalance: Double
+    ): Pair<List<String>, List<Double>> {
+        val dataX = mutableListOf<String>() // Eje X: Número de movimientos
+        val dataY = mutableListOf<Double>() // Eje Y: Balance acumulado
+
+        var currentBalance = initialBalance
+        movements.forEachIndexed { index, movement ->
+            dataX.add("Movimiento ${index + 1}") // Etiqueta para el eje X
+            currentBalance += movement.profit ?: 0.0 // Sumar el profit
+            dataY.add(currentBalance) // Balance acumulado
+        }
+
+        return Pair(dataX, dataY)
+    }
+
+
 }
+

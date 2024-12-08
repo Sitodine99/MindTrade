@@ -42,7 +42,8 @@
         <activity
             android:name="auth.LoginActivity"
             android:exported="true"
-            android:theme="@style/Theme.MindTrade">
+            android:theme="@style/Theme.MindTrade"
+            android:usesCleartextTraffic="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -67,6 +68,8 @@
             android:theme="@style/Theme.MindTrade" />
 
         <activity android:name=".AccountMovementsActivity" />
+
+
 
     </application>
 

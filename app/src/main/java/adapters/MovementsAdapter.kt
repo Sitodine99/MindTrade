@@ -297,4 +297,6 @@ class MovementsAdapter(
         fun confirmDeleteMovement(position: Int)
         fun showAdjustProfitDialog(position: Int)
     }
+
+
 }
