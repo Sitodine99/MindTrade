@@ -1,21 +1,32 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="16dp"
-    android:id="@+id/movementsScrollView">
+    android:layout_height="match_parent">
 
+    <!-- Imagen de fondo -->
+    <ImageView
+        android:id="@+id/backgroundImageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/torosyosos"
+        android:contentDescription="@string/toros_y_osos" />
+
+    <!-- Contenedor principal -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <!-- Cabecera con datos -->
+        <!-- Cabecera fija -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginBottom="8dp">
+            android:background="@drawable/border_black"
+            android:elevation="4dp"
+            android:padding="8dp"
+            >
 
             <!-- Beneficio -->
             <LinearLayout
@@ -178,19 +189,14 @@
             </LinearLayout>
         </LinearLayout>
 
-
-
-
-
         <!-- Línea de movimientos y botón -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
+            android:layout_marginTop="18dp"
             android:layout_marginBottom="8dp">
-
-
 
             <!-- Número de movimientos -->
             <TextView
@@ -212,13 +218,16 @@
                 android:contentDescription="Añadir movimiento"
                 android:scaleType="fitCenter"
                 android:padding="4dp"
-                android:layout_marginEnd ="14dp"/>
+                android:layout_marginEnd="14dp" />
         </LinearLayout>
 
-        <!-- RecyclerView para los movimientos -->
+        <!-- RecyclerView desplazable -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/movementsRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:scrollbars="vertical" />
     </LinearLayout>
-</ScrollView>
+</FrameLayout>

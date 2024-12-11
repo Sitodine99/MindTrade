@@ -69,6 +69,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
     private var selectedImageView: ImageView? = null
     private var selectedStrategy: Strategy? = null
     private var selectedEmotionDetail: String? = null
+    private val emotionCounts = mutableMapOf<String, Int>() // Contador de emociones
 
 
     private val symbolGroups = mapOf(
@@ -143,8 +144,8 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         // Configurar el ViewPager2
         val viewPager = findViewById<ViewPager2>(R.id.viewPager)
         val layouts = listOf(
-            R.layout.layout_screen_details,
             R.layout.layout_screen_movements,
+            R.layout.layout_screen_details,
             R.layout.layout_screen_summary
         )
         val adapter = ScreenPagerAdapter(layouts)
@@ -163,35 +164,11 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         val formattedDate = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
             .format(java.util.Date(accountCreatedAt))
 
-
-        // Escuchar los cambios de página del ViewPager2 para actualizar las vistas
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 when (position) {
-                    0 -> { // Pantalla de detalles
-                        val screenDetailsView = viewPager.findViewWithTag<View>("f0")
-                        screenDetailsView?.let {
-                            val initialBalance = intent.getDoubleExtra("accountBalance", 0.0)
-                            val (dataX, dataY) = generateChartData(movementsList, initialBalance)
-                            setupECharts(it, dataX, dataY)
-                            it.findViewById<TextView>(R.id.accountNameTextView).text = accountName
-                            it.findViewById<TextView>(R.id.accountBalanceTextView).text =
-                                "Balance: $%.2f".format(accountBalance)
-                            it.findViewById<TextView>(R.id.accountCurrencyTextView).text =
-                                "Divisa: $accountCurrency"
-                            it.findViewById<TextView>(R.id.accountProfitTargetTextView).text =
-                                "Objetivo: $%.2f".format(accountProfitTarget)
-                            it.findViewById<TextView>(R.id.accountMaxDailyLossTextView).text =
-                                "Máx pérdida diaria: $%.2f".format(accountMaxDailyLoss)
-                            it.findViewById<TextView>(R.id.accountCreationDateTextView).text =
-                                "Creada el: $formattedDate"
-
-
-                        }
-                    }
-
-                    1 -> { // Pantalla de movimientos
-                        val screenMovementsView = viewPager.findViewWithTag<View>("f1")
+                    0 -> { // Pantalla de movimientos
+                        val screenMovementsView = viewPager.findViewWithTag<View>("f0")
                         screenMovementsView?.let { movementsView ->
                             // Actualizar el TextView para mostrar el número de movimientos
                             movementsView.findViewById<TextView>(R.id.accountMovementsCountTextView).text =
@@ -206,12 +183,38 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                             setupMovementsView(movementsView, accountId) // Llama al método aquí
                         }
                     }
-                    // Maneja más pantallas si es necesario
+
+                    1 -> { // Pantalla de detalles
+                        val screenDetailsView = viewPager.findViewWithTag<View>("f1")
+                        screenDetailsView?.let {
+                            val initialBalance = intent.getDoubleExtra("accountBalance", 0.0)
+
+                            // Configurar el gráfico del balance
+                            val (dataX, dataY) = generateChartData(movementsList, initialBalance)
+                            setupECharts(it, dataX, dataY)
+
+                            // Configurar el gráfico de emociones
+                            setupEmotionChart(
+                                rootView = it, // Pasar la vista raíz
+                                emotionData = emotionCounts // Pasar el mapa de datos de emociones
+                            )
+
+                            // Actualizar información adicional en la pantalla de detalles
+                            it.findViewById<TextView>(R.id.accountProfitTargetTextView).text =
+                                "Objetivo: $%.2f".format(accountProfitTarget)
+                            it.findViewById<TextView>(R.id.accountMaxDailyLossTextView).text =
+                                "Máx pérdida diaria: $%.2f".format(accountMaxDailyLoss)
+                        }
+                    }
+
+                    else -> {
+                        // Maneja más pantallas si es necesario
+                        Log.d("PageChange", "Página seleccionada: $position")
+                    }
                 }
             }
         })
     }
-
 
     private fun setupMovementsView(rootView: View, accountId: String) {
         val recyclerView = rootView.findViewById<RecyclerView>(R.id.movementsRecyclerView)
@@ -248,6 +251,11 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 for (doc in snapshot) {
                     val movement = doc.toObject(Movement::class.java)
                     movementsList.add(movement)
+                    // Actualizar el mapa de emociones
+                    movement.emotion?.let { emotion ->
+                        emotionCounts[emotion] = (emotionCounts[emotion] ?: 0) + 1
+                        updateEmotionChart(emotionCounts) // Actualizar el gráfico de emociones
+                    }
                     movementsAdapter.notifyItemInserted(movementsList.size - 1)
                     updateMovementsCount()
                     calculateMetrics()
@@ -276,6 +284,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         val entryPriceEditText = dialogView.findViewById<EditText>(R.id.entryPriceEditText)
         val exitPriceEditText = dialogView.findViewById<EditText>(R.id.exitPriceEditText)
         val swapEditText = dialogView.findViewById<EditText>(R.id.swapEditText)
+
 
         // Establecer un filtro para permitir números negativos y decimales
         swapEditText.filters = arrayOf(InputFilter { source, _, _, _, _, _ ->
@@ -603,7 +612,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                     selectedSymbol
                 }
 
-                // Validar el multiplicador para símbolos personalizados
+// Validar el multiplicador para símbolos personalizados
                 if (!symbolsSpinner.isEnabled && (multiplier == null || multiplier <= 0)) {
                     Toast.makeText(
                         this,
@@ -613,7 +622,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                     return@setOnClickListener
                 }
 
-                // Validar los campos obligatorios
+// Validar los campos obligatorios
                 if (finalSymbol == null) {
                     Toast.makeText(
                         this,
@@ -632,6 +641,26 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                     return@setOnClickListener
                 }
 
+                if (entryDateTime == null) {
+                    Toast.makeText(this, "La fecha de entrada es obligatoria.", Toast.LENGTH_SHORT)
+                        .show()
+                    return@setOnClickListener
+                }
+
+                if (exitDateTime == null) {
+                    Toast.makeText(this, "La fecha de salida es obligatoria.", Toast.LENGTH_SHORT)
+                        .show()
+                    return@setOnClickListener
+                }
+
+                if (exitDateTime!! < entryDateTime!!) {
+                    Toast.makeText(
+                        this,
+                        "La fecha de salida no puede ser anterior a la de entrada.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@setOnClickListener
+                }
 
                 if (selectedEmotion == "Selecciona un estado emocional" || selectedEmotionDetail == null) {
                     Toast.makeText(
@@ -683,10 +712,11 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                     lotes = lotes,
                     swap = swap,
                     comision = commission,
-                    simbolo = finalSymbol, // Pasamos el símbolo para calcular el multiplicador automático si aplica
-                    multiplicadorManual = null, // Ya lo calculamos arriba
+                    simbolo = finalSymbol,
+                    multiplicadorManual = multiplicador, // Aquí pasamos el multiplicador correcto
                     esCompra = esCompra
                 )
+
 
                 // Creamos el objeto Movement
                 val movement = Movement(
@@ -926,6 +956,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         spinner.adapter = adapter
 
         // Configurar el listener para capturar la emoción seleccionada
+
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -937,6 +968,13 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                     optionsWithDefault[position] // Capturamos la emoción seleccionada
                 } else {
                     null // Si selecciona "Selecciona una emoción"
+                }
+
+                // Si hay una emoción válida seleccionada
+                selectedEmotionDetail?.let { emotion ->
+                    // Incrementa el contador de la emoción seleccionada
+                    emotionCounts[emotion] = (emotionCounts[emotion] ?: 0) + 1
+                    updateEmotionChart(emotionCounts)
                 }
             }
 
@@ -1131,11 +1169,8 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         esCompra: Boolean
     ): Double {
         // Determinar el multiplicador correcto
-        val multiplicador = if (multiplicadorManual != null && multiplicadorManual > 0) {
-            multiplicadorManual
-        } else {
-
-            calcularMultiplicadorPorSimbolo(simbolo)
+        val multiplicador = multiplicadorManual ?: calcularMultiplicadorPorSimbolo(simbolo).also {
+            Log.d("MultiplicadorDebug", "Multiplicador aplicado: $it")
         }
 
         // Calcular la diferencia de precio dependiendo del tipo de operación (compra/venta)
@@ -1190,6 +1225,8 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                             "Movimiento eliminado correctamente.",
                             Toast.LENGTH_SHORT
                         ).show()
+                        // Recalcular métricas después de actualizar el beneficio
+                        calculateMetrics()
                     }
                     .addOnFailureListener { e ->
                         Toast.makeText(
@@ -1245,6 +1282,9 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 movementsList[position] = movement.copy(profit = newProfit)
                 movementsAdapter.notifyItemChanged(position)
                 Toast.makeText(this, "Beneficio actualizado", Toast.LENGTH_SHORT).show()
+
+                // Recalcular métricas después de actualizar el beneficio
+                calculateMetrics()
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Error al actualizar: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -1257,6 +1297,8 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         val accountRef = db.collection("accounts").document(accountId)
 
         accountRef.update("movementsCount", movementsList.size)
+
+
             .addOnSuccessListener {
                 Log.d("Firebase", "Movements count updated: ${movementsList.size}")
             }
@@ -1266,6 +1308,8 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                     "Error al actualizar contador: ${e.message}",
                     Toast.LENGTH_SHORT
                 ).show()
+                // Recalcular métricas después de actualizar el beneficio
+                calculateMetrics()
             }
     }
 
@@ -1281,6 +1325,8 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         // Itera por todos los movimientos y acumula los valores
         movementsList.forEach { movement ->
             val multiplier = calcularMultiplicadorPorSimbolo(movement.symbol)
+
+            // Calcula el beneficio bruto (sin comisiones ni swap)
             val grossProfit = calculateGrossProfit(
                 movement.entryPrice,
                 movement.exitPrice,
@@ -1288,7 +1334,9 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 multiplier,
                 movement.type == "Buy"
             )
-            val netProfit = calcularBeneficioPorSimbolo(
+
+            // Usa el beneficio ajustado manualmente o calcula el neto si no está definido
+            val netProfit = movement.profit ?: calcularBeneficioPorSimbolo(
                 movement.entryPrice,
                 movement.exitPrice,
                 movement.lotes,
@@ -1298,12 +1346,14 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 multiplier,
                 movement.type == "Buy"
             )
-            totalNetProfit += netProfit
-            totalGrossProfit += grossProfit // Acumula el beneficio bruto
+
+            // Acumula las métricas
+            totalGrossProfit += grossProfit // Beneficio bruto
+            totalNetProfit += netProfit    // Beneficio neto
             totalSwap += movement.swap ?: 0.0
             totalCommission += movement.commission ?: 0.0
 
-            // Agrega el beneficio neto al balance
+            // Actualiza el balance con el beneficio neto
             accountBalance += netProfit
         }
 
@@ -1322,7 +1372,6 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             accountBalance = accountBalance
         )
     }
-
 
     private fun updateMetricsUI(
         // profit: Double, // Comentado porque no lo usamos
@@ -1418,6 +1467,63 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         return Pair(dataX, dataY)
     }
 
+    private fun setupEmotionChart(rootView: View, emotionData: Map<String, Int>) {
+        val webView = rootView.findViewById<WebView>(R.id.emotionsChartWebView)
 
+        // Configuración del WebView
+        webView.settings.javaScriptEnabled = true
+        webView.loadUrl("file:///android_asset/emotions_chart.html") // Archivo HTML de ECharts
+
+        // Ajustar dimensiones
+        val layoutParams = webView.layoutParams
+        layoutParams.height = 800
+        webView.layoutParams = layoutParams
+
+        // Generar los datos de emociones
+        val pieData = emotionData.entries.joinToString(prefix = "[", postfix = "]") { entry ->
+            "{value: ${entry.value}, name: '${entry.key}'}"
+        }
+
+        // Cargar los datos en el gráfico
+        webView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                webView.evaluateJavascript("updatePieChart($pieData);", null)
+            }
+        }
+    }
+
+
+    private fun updateEmotionChart(emotionData: Map<String, Int>) {
+        val webView = findViewById<WebView>(R.id.emotionsChartWebView)
+
+        if (webView == null) {
+            Log.e("EmotionChart", "El WebView no está inicializado.")
+            return
+        }
+
+        // Convierte el mapa de datos en un formato JSON para el gráfico
+        val pieData = emotionData.entries.joinToString(prefix = "[", postfix = "]") { entry ->
+            "{value: ${entry.value}, name: '${entry.key}'}"
+        }
+
+        // Asegúrate de que el WebView haya terminado de cargar
+        webView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+
+                // Ejecutar JavaScript para actualizar el gráfico
+                webView.evaluateJavascript("updatePieChart($pieData);", null)
+            }
+        }
+
+        if (webView.url == null) {
+            // Si aún no se ha cargado el HTML, cárgalo aquí
+            webView.loadUrl("file:///android_asset/emotions_chart.html")
+        } else {
+            // Si ya está cargado, actualiza directamente
+            webView.evaluateJavascript("updatePieChart($pieData);", null)
+        }
+    }
 }
 

@@ -41,6 +41,7 @@
             android:id="@+id/addSymbolButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:backgroundTint="#000000"
             android:text="Añadir símbolo"
             android:layout_marginTop="8dp" />
 
@@ -144,23 +145,35 @@
             android:hint="Introduce el valor de la comisión"
             android:inputType="numberDecimal" />
 
-        <Button
-            android:id="@+id/entryDateButton"
+        <!-- Botones en línea -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Seleccionar Fecha de Entrada"
+            android:orientation="horizontal"
             android:layout_marginTop="16dp"
-            android:backgroundTint="?attr/colorPrimary"
-            android:textColor="@android:color/white" />
+            android:gravity="center_horizontal">
 
-        <Button
-            android:id="@+id/exitDateButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Seleccionar Fecha de Salida"
-            android:layout_marginTop="16dp"
-            android:backgroundTint="?attr/colorPrimary"
-            android:textColor="@android:color/white" />
+            <Button
+                android:id="@+id/entryDateButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Fecha de Entrada"
+                android:backgroundTint="#000000"
+                android:textColor="@android:color/white"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/exitDateButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Fecha de Salida"
+                android:backgroundTint="#000000"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+
 
 
 

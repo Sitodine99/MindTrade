@@ -1,102 +1,85 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp"
-    android:id="@+id/detailsScrollView">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <!-- Imagen de fondo -->
+    <ImageView
+        android:id="@+id/backgroundImageView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/torosyosos"
+        android:contentDescription="@string/toros_y_osos" />
 
-        <!-- Cabecera -->
-        <TextView
-            android:id="@+id/accountNameTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Nombre de la cuenta"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:paddingBottom="16dp" />
+    <!-- Contenedor principal -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:id="@+id/detailsScrollView">
 
-        <!-- Detalles de la cuenta -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="8dp"
-            android:background="@color/white"
-            android:elevation="2dp"
-            android:layout_marginBottom="16dp"
-            android:paddingBottom="16dp">
+            android:orientation="vertical">
 
-            <!-- Balance -->
-            <TextView
-                android:id="@+id/accountBalanceTextView"
+            <!-- Cabecera fija con estilo -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="Balance: $0.00"
-                android:textSize="16sp"
-                android:textColor="@color/black" />
+                android:orientation="vertical"
+                android:background="@drawable/border_black"
+                android:elevation="4dp"
+                android:padding="8dp"
+                android:layout_marginBottom="16dp">
 
-            <!-- Divisa -->
-            <TextView
-                android:id="@+id/accountCurrencyTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="Divisa: USD"
-                android:textSize="16sp"
-                android:textColor="@color/black" />
+                <!-- Objetivo de beneficio -->
+                <TextView
+                    android:id="@+id/accountProfitTargetTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Objetivo: $0.00"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"
+                    android:paddingBottom="4dp" />
 
-            <!-- Objetivo de beneficio -->
-            <TextView
-                android:id="@+id/accountProfitTargetTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="Objetivo: $0.00"
-                android:textSize="16sp"
-                android:textColor="@color/black" />
+                <!-- Máxima pérdida diaria -->
+                <TextView
+                    android:id="@+id/accountMaxDailyLossTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Máx pérdida diaria: $0.00"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"
+                    android:paddingBottom="4dp" />
 
-            <!-- Máxima pérdida diaria -->
-            <TextView
-                android:id="@+id/accountMaxDailyLossTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="Máx pérdida diaria: $0.00"
-                android:textSize="16sp"
-                android:textColor="@color/black" />
+                <!-- Rentabilidad -->
+                <TextView
+                    android:id="@+id/accountReturnTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Rentabilidad: 0.00%"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"
+                    android:paddingBottom="4dp" />
 
-            <!-- Rentabilidad -->
-            <TextView
-                android:id="@+id/accountReturnTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="Rentabilidad: 0.00%"
-                android:textSize="16sp"
-                android:textColor="@color/black" />
+            </LinearLayout>
 
-            <!-- Fecha de creación -->
-            <TextView
-                android:id="@+id/accountCreationDateTextView"
+            <!-- Gráfico -->
+            <WebView
+                android:id="@+id/chartWebViewTest"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="Creada el: 01/01/2024"
-                android:textSize="16sp"
-                android:textColor="@color/black" />
+                android:layout_height="200dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Gráfico de emociones -->
+            <WebView
+                android:id="@+id/emotionsChartWebView"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp" />
         </LinearLayout>
-
-        <!-- Gráfico -->
-        <WebView
-            android:id="@+id/chartWebViewTest"
-            android:layout_width="match_parent"
-            android:layout_height="200dp" />
-
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</FrameLayout>
