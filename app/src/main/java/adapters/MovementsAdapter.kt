@@ -42,6 +42,7 @@ class MovementsAdapter(
         val entryDateTextView: TextView = view.findViewById(R.id.entryDateTextView)
         val exitDateTextView: TextView = view.findViewById(R.id.exitDateTextView)
         val tradingStyleTextView: TextView = view.findViewById(R.id.tradingStyleTextView)
+        val strategyNameTextView: TextView = view.findViewById(R.id.strategyNameTextView)
         val emotionalStateTextView: TextView = view.findViewById(R.id.emotionalStateTextView)
         val emotionTextView: TextView = view.findViewById(R.id.emotionTextView)
         val commentsTextView: TextView = view.findViewById(R.id.commentsTextView)
@@ -65,13 +66,20 @@ class MovementsAdapter(
 
         // Agregar el evento de pulsación larga
         holder.itemView.setOnLongClickListener {
-            val options = arrayOf("Eliminar movimiento", "Ajustar beneficio")
+            val options = arrayOf(
+                "Eliminar movimiento",
+                "Ajustar beneficio",
+                "Ajustar comisión",
+                "Ajustar swap"
+            )
             AlertDialog.Builder(context)
                 .setTitle("Opciones del movimiento")
                 .setItems(options) { _, which ->
                     when (which) {
                         0 -> listener.confirmDeleteMovement(position) // Llama a la interfaz
                         1 -> listener.showAdjustProfitDialog(position) // Llama a la interfaz
+                        2 -> listener.showAdjustCommissionDialog(position) // Nueva opción: Ajustar comisión
+                        3 -> listener.showAdjustSwapDialog(position) // Nueva opción: Ajustar swap
                     }
                 }
                 .setNegativeButton("Cancelar", null)
@@ -174,6 +182,27 @@ class MovementsAdapter(
         } else {
             holder.photosLinkTextView.visibility = View.GONE // Ocultar el enlace si no hay fotos válidas
         }
+
+        // Actualizar el nombre de la estrategia
+        if (movement.strategyId != null) {
+            FirebaseFirestore.getInstance()
+                .collection("strategies")
+                .document(movement.strategyId)
+                .get()
+                .addOnSuccessListener { document ->
+                    val strategyName = document.getString("title") ?: "Sin asignar"
+                    val formattedText = Html.fromHtml("<b>Estrategia:</b> $strategyName")
+                    holder.strategyNameTextView.text = formattedText
+                }
+                .addOnFailureListener {
+                    val formattedText = Html.fromHtml("<b>Estrategia:</b> Sin asignar")
+                    holder.strategyNameTextView.text = formattedText
+                }
+        } else {
+            val formattedText = Html.fromHtml("<b>Estrategia:</b> Sin asignar")
+            holder.strategyNameTextView.text = formattedText
+        }
+
 
 
         // Expandir/Colapsar al hacer clic
@@ -296,7 +325,10 @@ class MovementsAdapter(
     interface MovementActionListener {
         fun confirmDeleteMovement(position: Int)
         fun showAdjustProfitDialog(position: Int)
+        fun showAdjustCommissionDialog(position: Int) // Nueva función para ajustar comisión
+        fun showAdjustSwapDialog(position: Int) // Nueva función para ajustar swap
     }
+
 
 
 }

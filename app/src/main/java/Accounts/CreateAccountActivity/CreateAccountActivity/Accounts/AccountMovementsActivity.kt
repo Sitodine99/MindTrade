@@ -1272,6 +1272,8 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
     // Actualizar el beneficio del movimiento
     private fun updateMovementProfit(position: Int, newProfit: Double) {
         val movement = movementsList[position]
+
+        // Actualizar el beneficio directamente en Firestore
         FirebaseFirestore.getInstance()
             .collection("accounts")
             .document(movement.accountId)
@@ -1279,17 +1281,20 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             .document(movement.id)
             .update("profit", newProfit)
             .addOnSuccessListener {
+                // Actualizar la lista local
                 movementsList[position] = movement.copy(profit = newProfit)
-                movementsAdapter.notifyItemChanged(position)
-                Toast.makeText(this, "Beneficio actualizado", Toast.LENGTH_SHORT).show()
+                movementsAdapter.notifyItemChanged(position) // Notificar al adaptador
 
-                // Recalcular métricas después de actualizar el beneficio
+                Toast.makeText(this, "Beneficio ajustado manualmente", Toast.LENGTH_SHORT).show()
+
+                // Recalcular métricas generales
                 calculateMetrics()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Error al actualizar: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Error al ajustar el beneficio: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
 
     private fun updateMovementsCount() {
         val accountId = movementsList.firstOrNull()?.accountId ?: return
@@ -1314,55 +1319,29 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
     }
 
     private fun calculateMetrics() {
-        // Inicializa las variables de las métricas
         var totalSwap = 0.0
         var totalCommission = 0.0
-        var totalGrossProfit = 0.0 // Variable para el beneficio bruto
+        var totalGrossProfit = 0.0
         var totalNetProfit = 0.0
         var accountBalance = intent.getDoubleExtra("accountBalance", 0.0) // Balance inicial
         val accountCurrency = intent.getStringExtra("accountCurrency") ?: ""
 
-        // Itera por todos los movimientos y acumula los valores
         movementsList.forEach { movement ->
-            val multiplier = calcularMultiplicadorPorSimbolo(movement.symbol)
+            val profit = movement.profit ?: 0.0 // Usar el beneficio directamente
 
-            // Calcula el beneficio bruto (sin comisiones ni swap)
-            val grossProfit = calculateGrossProfit(
-                movement.entryPrice,
-                movement.exitPrice,
-                movement.lotes,
-                multiplier,
-                movement.type == "Buy"
-            )
-
-            // Usa el beneficio ajustado manualmente o calcula el neto si no está definido
-            val netProfit = movement.profit ?: calcularBeneficioPorSimbolo(
-                movement.entryPrice,
-                movement.exitPrice,
-                movement.lotes,
-                movement.swap,
-                movement.commission,
-                movement.symbol,
-                multiplier,
-                movement.type == "Buy"
-            )
-
-            // Acumula las métricas
-            totalGrossProfit += grossProfit // Beneficio bruto
-            totalNetProfit += netProfit    // Beneficio neto
+            totalGrossProfit += profit // Acumular el beneficio
             totalSwap += movement.swap ?: 0.0
             totalCommission += movement.commission ?: 0.0
-
-            // Actualiza el balance con el beneficio neto
-            accountBalance += netProfit
+            totalNetProfit += profit
+            accountBalance += profit // Ajustar el balance
         }
 
-        // Logs para depuración
+        // Actualizar los logs de depuración
         Log.d("Metrics", "Total Gross Profit: $totalGrossProfit")
         Log.d("Metrics", "Total Net Profit: $totalNetProfit")
         Log.d("Metrics", "Updated Balance: $accountBalance")
 
-        // Actualiza la interfaz de usuario con las métricas calculadas
+        // Actualizar la interfaz de usuario
         updateMetricsUI(
             grossProfit = totalGrossProfit,
             swap = totalSwap,
@@ -1372,6 +1351,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             accountBalance = accountBalance
         )
     }
+
 
     private fun updateMetricsUI(
         // profit: Double, // Comentado porque no lo usamos
@@ -1525,5 +1505,112 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             webView.evaluateJavascript("updatePieChart($pieData);", null)
         }
     }
-}
+    override fun showAdjustCommissionDialog(position: Int) {
+        val movement = movementsList[position]
+        val dialogView = layoutInflater.inflate(R.layout.dialog_adjust_profit, null)
+        val editText = dialogView.findViewById<EditText>(R.id.profitEditText)
+        editText.hint = "Introduce la nueva comisión"
+        editText.setText(movement.commission?.toString() ?: "")
 
+        AlertDialog.Builder(this)
+            .setTitle("Ajustar comisión")
+            .setView(dialogView)
+            .setPositiveButton("Guardar") { _, _ ->
+                val newCommission = editText.text.toString().toDoubleOrNull()
+                if (newCommission != null) {
+                    updateMovementCommission(position, newCommission)
+                } else {
+                    Toast.makeText(this, "Por favor, introduce un valor válido", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun updateMovementCommission(position: Int, newCommission: Double) {
+        val movement = movementsList[position]
+        val updatedProfit = calcularBeneficioPorSimbolo(
+            precioEntrada = movement.entryPrice,
+            precioSalida = movement.exitPrice,
+            lotes = movement.lotes,
+            swap = movement.swap ?: 0.0, // Usa el swap actual
+            comision = newCommission,   // Usa la nueva comisión
+            simbolo = movement.symbol,
+            multiplicadorManual = calcularMultiplicadorPorSimbolo(movement.symbol),
+            esCompra = movement.type == "Buy"
+        )
+
+        FirebaseFirestore.getInstance()
+            .collection("accounts")
+            .document(movement.accountId)
+            .collection("movements")
+            .document(movement.id)
+            .update("commission", newCommission, "profit", updatedProfit)
+            .addOnSuccessListener {
+                movementsList[position] = movement.copy(commission = newCommission, profit = updatedProfit)
+                movementsAdapter.notifyItemChanged(position)
+                Toast.makeText(this, "Comisión y beneficio actualizados", Toast.LENGTH_SHORT).show()
+
+                // Recalcular métricas y actualizar la interfaz
+                calculateMetrics()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error al actualizar: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    override fun showAdjustSwapDialog(position: Int) {
+        val movement = movementsList[position]
+        val dialogView = layoutInflater.inflate(R.layout.dialog_adjust_profit, null)
+        val editText = dialogView.findViewById<EditText>(R.id.profitEditText)
+        editText.hint = "Introduce el nuevo swap"
+        editText.setText(movement.swap?.toString() ?: "")
+
+        AlertDialog.Builder(this)
+            .setTitle("Ajustar swap")
+            .setView(dialogView)
+            .setPositiveButton("Guardar") { _, _ ->
+                val newSwap = editText.text.toString().toDoubleOrNull()
+                if (newSwap != null) {
+                    updateMovementSwap(position, newSwap)
+                } else {
+                    Toast.makeText(this, "Por favor, introduce un valor válido", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun updateMovementSwap(position: Int, newSwap: Double) {
+        val movement = movementsList[position]
+        val updatedProfit = calcularBeneficioPorSimbolo(
+            precioEntrada = movement.entryPrice,
+            precioSalida = movement.exitPrice,
+            lotes = movement.lotes,
+            swap = newSwap,            // Usa el nuevo swap
+            comision = movement.commission ?: 0.0, // Usa la comisión actual
+            simbolo = movement.symbol,
+            multiplicadorManual = calcularMultiplicadorPorSimbolo(movement.symbol),
+            esCompra = movement.type == "Buy"
+        )
+
+        FirebaseFirestore.getInstance()
+            .collection("accounts")
+            .document(movement.accountId)
+            .collection("movements")
+            .document(movement.id)
+            .update("swap", newSwap, "profit", updatedProfit)
+            .addOnSuccessListener {
+                movementsList[position] = movement.copy(swap = newSwap, profit = updatedProfit)
+                movementsAdapter.notifyItemChanged(position)
+                Toast.makeText(this, "Swap y beneficio actualizados", Toast.LENGTH_SHORT).show()
+
+                // Recalcular métricas y actualizar la interfaz
+                calculateMetrics()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error al actualizar: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+}
