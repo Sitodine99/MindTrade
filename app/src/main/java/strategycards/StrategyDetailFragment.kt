@@ -1,5 +1,6 @@
 package strategycards
 
+import RecordsFragment
 import adapters.StrategyPagerAdapter
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -100,7 +101,12 @@ class StrategyDetailFragment : Fragment() {
                     }, "Foro")
 
                     // Añade pestaña "Registros"
-                    adapter.addFragment(RecordsFragment(), "Registros")
+                    adapter.addFragment(RecordsFragment().apply {
+                        arguments = Bundle().apply {
+                            putString("STRATEGY_ID", strategyId) // Pasar el strategyId al RecordsFragment
+                        }
+                    }, "Registros")
+
 
                     // Añade la pestaña "Trading Algorítmico" solo si el campo no está vacío
                     if (algorithmCode.isNotBlank()) {

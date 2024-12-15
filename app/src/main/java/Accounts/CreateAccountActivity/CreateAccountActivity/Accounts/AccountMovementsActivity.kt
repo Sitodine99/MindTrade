@@ -1208,25 +1208,42 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
     private fun deleteMovement(position: Int) {
         val movement = movementsList[position] // Obtiene el movimiento a eliminar
         val db = FirebaseFirestore.getInstance()
+
         val accountRef = db.collection("accounts").document(movement.accountId)
         val movementRef = accountRef.collection("movements").document(movement.id)
 
+        // Eliminar de la subcolección de movimientos de la cuenta
         movementRef.delete()
             .addOnSuccessListener {
-                // Eliminar el ID del movimiento del array "movements" en el documento de cuenta
+                // Eliminar el ID del movimiento del array "movements" en el documento de la cuenta
                 accountRef.update("movements", FieldValue.arrayRemove(movement.id))
                     .addOnSuccessListener {
-                        // Actualizar la lista local y notificar al adaptador
-                        movementsList.removeAt(position)
-                        movementsAdapter.notifyItemRemoved(position)
-                        updateMovementsCount() // Actualizar contador en la UI
-                        Toast.makeText(
-                            this,
-                            "Movimiento eliminado correctamente.",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        // Recalcular métricas después de actualizar el beneficio
-                        calculateMetrics()
+                        // Eliminar el movimiento de la estrategia si tiene una asociada
+                        movement.strategyId?.let { strategyId ->
+                            deleteMovementFromStrategy(strategyId, movement.id) {
+                                // Actualizar la lista local y notificar al adaptador
+                                movementsList.removeAt(position)
+                                movementsAdapter.notifyItemRemoved(position)
+                                updateMovementsCount() // Actualizar contador en la UI
+                                calculateMetrics() // Recalcular métricas
+                                Toast.makeText(
+                                    this,
+                                    "Movimiento eliminado correctamente.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        } ?: run {
+                            // Si no hay estrategia, actualizar directamente la lista
+                            movementsList.removeAt(position)
+                            movementsAdapter.notifyItemRemoved(position)
+                            updateMovementsCount() // Actualizar contador en la UI
+                            calculateMetrics() // Recalcular métricas
+                            Toast.makeText(
+                                this,
+                                "Movimiento eliminado correctamente.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                     .addOnFailureListener { e ->
                         Toast.makeText(
@@ -1244,6 +1261,40 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 ).show()
             }
     }
+
+    private fun deleteMovementFromStrategy(strategyId: String, movementId: String, onComplete: () -> Unit) {
+        val db = FirebaseFirestore.getInstance()
+        val strategyRef = db.collection("strategies").document(strategyId)
+
+        // Eliminar el movimiento del array de movimientos de la estrategia
+        strategyRef.update("movements", FieldValue.arrayRemove(movementId))
+            .addOnSuccessListener {
+                // Eliminar el movimiento de la subcolección "movements" dentro de la estrategia
+                strategyRef.collection("movements").document(movementId).delete()
+                    .addOnSuccessListener {
+                        Log.d("DeleteMovement", "Movimiento eliminado correctamente de la estrategia.")
+                        onComplete()
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("DeleteMovement", "Error al eliminar de la subcolección: ${e.message}")
+                        Toast.makeText(
+                            this,
+                            "Error al eliminar de la estrategia: ${e.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+            }
+            .addOnFailureListener { e ->
+                Log.e("DeleteMovement", "Error al actualizar la estrategia: ${e.message}")
+                Toast.makeText(
+                    this,
+                    "Error al actualizar la estrategia: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+    }
+
+
 
 
     // Mostrar un diálogo para ajustar el beneficio
