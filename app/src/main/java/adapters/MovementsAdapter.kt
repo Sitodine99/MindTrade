@@ -147,10 +147,10 @@ class MovementsAdapter(
 
         // Cambiar color según el estado emocional
         val emotionalState = movement.emotionalState ?: "Desconocido"
-        if (emotionalState.equals("Psico+", ignoreCase = true)) {
+        if (emotionalState.equals("Psico +", ignoreCase = true)) {
             holder.emotionalStateTextView.setTextColor(ContextCompat.getColor(context, R.color.forest_green)) // Verde para Psico+
             holder.emotionalStateTextView.setTypeface(null, Typeface.BOLD) // Negrita
-        } else if (emotionalState.equals("Psico-", ignoreCase = true)) {
+        } else if (emotionalState.equals("Psico -", ignoreCase = true)) {
             holder.emotionalStateTextView.setTextColor(ContextCompat.getColor(context, R.color.my_red)) // Rojo para Psico-
             holder.emotionalStateTextView.setTypeface(null, Typeface.BOLD) // Negrita
         }
@@ -225,7 +225,7 @@ class MovementsAdapter(
 
         return when {
             durationInMinutes < 10 -> "Scalping"
-            durationInMinutes < 1440 -> "Intradia" // Menos de 1 día (1440 minutos)
+            durationInMinutes < 1440 -> "Day Trading" // Cambiamos "Intradia" por "Day Trading"
             else -> "Swing Trading"
         }
     }

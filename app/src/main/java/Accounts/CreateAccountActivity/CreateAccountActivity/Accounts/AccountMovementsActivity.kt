@@ -734,9 +734,9 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                     profit = profit,
                     createdAt = System.currentTimeMillis(),
                     strategyId = selectedStrategy?.id,
-                    emotionalState = selectedEmotion,
+                    emotionalState = formatEmotionalState(selectedEmotion),
                     emotion = selectedEmotionDetail,
-                    tradingStyle = "Swing", // Según tu lógica
+                    tradingStyle = determineTradingStyle(entryDateTime ?: 0L, exitDateTime ?: 0L),
                     comments = commentsEditText.text.toString(),
                     photos = listOf(image01Url ?: "", image02Url ?: "")
                 )
@@ -792,11 +792,14 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 movementsAdapter.notifyItemInserted(movementsList.size - 1) // Notificar al adaptador sobre el cambio
                 updateMovementsCount() // Actualizar el contador
                 calculateMetrics()
+
                 // Actualizar la cuenta y estrategia, si corresponde
                 updateAccountWithMovement(accountId, movement.id)
                 strategyId?.let {
                     saveAndLinkMovementToStrategy(strategyId, movement)
                 }
+
+                updateUserDynamicImages(movement)
 
                 Toast.makeText(this, "Movimiento guardado exitosamente.", Toast.LENGTH_SHORT).show()
             }
@@ -1116,6 +1119,8 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                     .document(movement.id)
                     .set(movement)
                     .addOnSuccessListener {
+                        val intent = Intent()
+                        intent.putExtra("updateRequired", true)
                         Log.d(
                             "MovementDebug",
                             "Movimiento guardado correctamente en la subcolección."
@@ -1663,5 +1668,54 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 Toast.makeText(this, "Error al actualizar: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
+    private fun updateUserDynamicImages(movement: Movement) {
+        val db = Firebase.firestore
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        // Log para verificar los datos
+        Log.d("UpdateDebug", "Datos enviados a Firebase:")
+        Log.d("UpdateDebug", "EmotionalState: ${movement.emotionalState}")
+        Log.d("UpdateDebug", "Emotion: ${movement.emotion}")
+        Log.d("UpdateDebug", "TradingStyle: ${movement.tradingStyle}")
+
+        // Datos a actualizar
+        val updatedData = mapOf(
+            "psico" to (movement.emotionalState ?: "Desconocido"),
+            "emotion" to (movement.emotion ?: "Sin emoción"),
+            "trading_style" to (movement.tradingStyle ?: "No definido")
+        )
+
+        db.collection("users")
+            .document(userId)
+            .update(updatedData)
+            .addOnSuccessListener {
+                Log.d("DynamicImages", "Datos del usuario actualizados correctamente.")
+            }
+            .addOnFailureListener { e ->
+                Log.e("DynamicImages", "Error al actualizar datos del usuario: ${e.message}")
+            }
+    }
+
+    private fun determineTradingStyle(entryTime: Long, exitTime: Long?): String {
+        if (exitTime == null) return "Desconocido" // Si no hay tiempo de salida, no se puede calcular
+
+        val durationInMinutes = (exitTime - entryTime) / (1000 * 60) // Diferencia en minutos
+
+        return when {
+            durationInMinutes < 10 -> "Scalping"
+            durationInMinutes < 1440 -> "Day Trading" // Cambiamos "Intradia" por "Day Trading"
+            else -> "Swing Trading"
+        }
+    }
+
+    private fun formatEmotionalState(state: String?): String {
+        return when (state?.lowercase()) {
+            "psico+" -> "Psico +"
+            "psico-" -> "Psico -"
+            else -> state ?: "Desconocido"
+        }
+    }
+
 
 }

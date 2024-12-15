@@ -25,6 +25,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.graphics.Color
 import android.text.InputFilter
+import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -46,8 +47,7 @@ import strategycards.RegisterStrategyActivity
 import strategycards.StrategyDetailFragment
 import welcome.AvatarSelectionActivity
 import com.example.mindtrade.model.Account
-
-
+import com.example.mindtrade.model.Movement
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyStrategiesFragment.OnStrategyDeletedListener {
@@ -1078,6 +1078,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         } else {
             // Restaurar la vista principal si no hay más fragmentos en la pila
             restoreMainView()
+            super.onBackPressed()
         }
     }
 
@@ -1090,6 +1091,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onResume()
         // Actualizar el RecyclerView de estrategias al volver al MainActivity
         setupRecyclerViews()
+        updateDynamicImages()
     }
 
     // Método para eliminar la escucha al cerrar sesión
@@ -1218,5 +1220,39 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         dialog.show()
     }
 
+    private fun updateDynamicImages() {
+        userId?.let { uid ->
+            db.collection("users").document(uid)
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    if (snapshot.exists()) {
+                        val predominantPsico = snapshot.getString("psico") ?: "No definido"
+                        val predominantEmotion = snapshot.getString("emotion") ?: "No definido"
+                        val predominantTradingStyle = snapshot.getString("trading_style") ?: "No definido"
+
+                        Log.d("DynamicImages", "Psico: $predominantPsico, Emotion: $predominantEmotion, Style: $predominantTradingStyle")
+
+                        // Aquí actualizamos las imágenes con los nuevos datos
+                        setPsicoImage(predominantPsico)
+                        setEmotionImage(predominantEmotion)
+                        setTradingStyleImage(predominantTradingStyle)
+                    } else {
+                        Log.e("DynamicImages", "No se encontraron datos para el usuario.")
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("DynamicImages", "Error al obtener datos: ${e.message}")
+                }
+        }
+    }
+
+
+    // Método auxiliar para calcular el valor predominante en una lista
+    private fun calculatePredominant(values: List<String?>): String? {
+        return values.filterNotNull() // Ignorar valores nulos
+            .groupingBy { it }
+            .eachCount()
+            .maxByOrNull { it.value }?.key // Obtener el más frecuente
+    }
 
 }

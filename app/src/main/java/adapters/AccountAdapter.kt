@@ -52,6 +52,7 @@ class AccountAdapter(
             }
         }
 
+
         // Mostrar número de operaciones
         holder.accountOperations.text = "Operaciones: ${account.movements.size}"
 
