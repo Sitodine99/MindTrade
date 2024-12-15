@@ -2,9 +2,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mindtrade.R
 import com.example.mindtrade.model.Account
+import com.example.mindtrade.model.Movement
+import com.google.firebase.firestore.FirebaseFirestore
 
 class AccountAdapter(
     private var accounts: List<Account>,
@@ -35,9 +38,19 @@ class AccountAdapter(
             .format(java.util.Date(account.createdAt))
         holder.accountCreationDate.text = "Creado: $creationDate"
 
-        // Rentabilidad por defecto es 0%
-        val profitability = calculateProfitability(account)
-        holder.accountProfitability.text = "Rentabilidad: $profitability%"
+        // Llamar a calculateProfitability para calcular y mostrar la rentabilidad
+        calculateProfitability(account) { profitability ->
+            holder.accountProfitability.text = "Rentabilidad: ${String.format("%.2f", profitability)}%"
+            if (profitability >= 0) {
+                holder.accountProfitability.setTextColor(
+                    ContextCompat.getColor(holder.itemView.context, android.R.color.holo_green_dark)
+                )
+            } else {
+                holder.accountProfitability.setTextColor(
+                    ContextCompat.getColor(holder.itemView.context, android.R.color.holo_red_dark)
+                )
+            }
+        }
 
         // Mostrar número de operaciones
         holder.accountOperations.text = "Operaciones: ${account.movements.size}"
@@ -55,12 +68,35 @@ class AccountAdapter(
         notifyDataSetChanged() // Refresca los datos
     }
 
-    private fun calculateProfitability(account: Account): Double {
-        // Simulación: Puedes reemplazar esto con una fórmula real basada en los movimientos
-        return 0.0
+    private fun calculateProfitability(account: Account, onCalculated: (Double) -> Unit) {
+        val firestore = FirebaseFirestore.getInstance()
+
+        firestore.collection("accounts").document(account.id)
+            .collection("movements")
+            .get()
+            .addOnSuccessListener { movementsSnapshot ->
+                val totalProfit = movementsSnapshot.documents.sumOf { doc ->
+                    val movement = doc.toObject(Movement::class.java)
+                    movement?.profit ?: 0.0
+                }
+
+                val initialBalance = account.balance
+                val currentBalance = initialBalance + totalProfit
+
+                val profitability = if (initialBalance > 0) {
+                    ((currentBalance - initialBalance) / initialBalance) * 100
+                } else {
+                    0.0
+                }
+
+                onCalculated(profitability)
+            }
+            .addOnFailureListener { error ->
+                // Manejo de errores
+                onCalculated(0.0)
+            }
     }
 }
-
 
 
 
