@@ -66,6 +66,11 @@
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.MindTrade" />
+        <activity
+            android:name=".SearchStrategyActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MindTrade" />
+
 
         <activity android:name=".AccountMovementsActivity" />
 

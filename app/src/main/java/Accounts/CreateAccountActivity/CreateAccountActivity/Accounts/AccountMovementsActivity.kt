@@ -801,6 +801,11 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
 
                 updateUserDynamicImages(movement)
 
+                // Devolver un resultado a MainActivity
+                val intent = Intent()
+                intent.putExtra("updateRequired", true)
+                setResult(RESULT_OK, intent)
+
                 Toast.makeText(this, "Movimiento guardado exitosamente.", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { e ->
@@ -1716,6 +1721,4 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             else -> state ?: "Desconocido"
         }
     }
-
-
 }

@@ -81,9 +81,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var userEmotion: String? = null
     private lateinit var registerStrategyLauncher: ActivityResultLauncher<Intent>
 
+    companion object {
+        const val REQUEST_UPDATE_IMAGES = 1001
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Inicializar el botón de búsqueda
+        searchStrategyButton = findViewById(R.id.searchStrategyButton)
+
+        // Asignar acción al botón de búsqueda
+        searchStrategyButton.setOnClickListener {
+            val intent = Intent(this, SearchStrategyActivity::class.java)
+            startActivity(intent)
+        }
 
         // Habilitar logs de Firestore (opcional para depuración)
         FirebaseFirestore.setLoggingEnabled(true)
@@ -109,6 +123,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         addAccountButton.setOnClickListener {
             showCreateAccountDialog()
         }
+
+        searchStrategyButton.setOnClickListener {
+            val intent = Intent(this, SearchStrategyActivity::class.java)
+            startActivity(intent)
+        }
+
 
         // Listener para añadir estrategias
         addStrategyButton.setOnClickListener {
@@ -303,7 +323,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     putStringArrayListExtra("accountMovements", ArrayList(selectedAccount.movements))
                     putExtra("accountIsActive", selectedAccount.isActive)
                 }
-                startActivity(intent)
+                startActivityForResult(intent, REQUEST_UPDATE_IMAGES)
             }
         }
 
@@ -670,12 +690,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
 
-    private fun openImageDetail(imageResId: Int?, imageName: String) {
+    private fun openImageDetail(imageResId: Int?, imageName: String, imageUrl: String? = null) {
         val intent = Intent(this, ImageDetailActivity::class.java)
-        intent.putExtra("imageResId", imageResId ?: 0)
+
+        // Envía la URL si está disponible, de lo contrario envía el recurso local
+        if (!imageUrl.isNullOrEmpty()) {
+            intent.putExtra("imageUrl", imageUrl)
+        } else {
+            intent.putExtra("imageResId", imageResId ?: 0)
+        }
+
         intent.putExtra("imageName", imageName)
         startActivityWithFade(intent)
     }
+
 
     private fun loadUserData() {
         userId?.let { id ->

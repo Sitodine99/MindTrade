@@ -6,6 +6,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 
 class ImageDetailActivity : AppCompatActivity() {
 
@@ -27,12 +28,19 @@ class ImageDetailActivity : AppCompatActivity() {
 
         // Cargar la imagen según sea una URL o un recurso local
         if (!imageUrl.isNullOrEmpty() && imageUrl.startsWith("https://")) {
-            // Cargar desde URL usando Glide
+            Glide.get(this).clearMemory() // Limpia la caché de memoria (debe ejecutarse en el hilo principal)
+            Thread {
+                Glide.get(this).clearDiskCache() // Limpia la caché en disco (debe ejecutarse en un hilo en segundo plano)
+            }.start()
+
             Glide.with(this)
                 .load(imageUrl)
-                .placeholder(R.drawable.interrogacion) // Imagen mientras se carga
-                .error(R.drawable.interrogacion) // Imagen si falla la carga
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .placeholder(R.drawable.interrogacion)
+                .error(R.drawable.interrogacion)
                 .into(imageView)
+
         } else if (imageResId != 0) {
             // Cargar desde un recurso local
             imageView.setImageResource(imageResId)
