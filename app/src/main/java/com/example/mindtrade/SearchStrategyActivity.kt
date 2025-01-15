@@ -6,11 +6,13 @@ import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mindtrade.model.Strategy
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import strategycards.StrategyDetailFragment
 
 class SearchStrategyActivity : AppCompatActivity() {
 
@@ -101,12 +103,36 @@ class SearchStrategyActivity : AppCompatActivity() {
 
     private fun fetchAllStrategies() {
         db.collection("strategies")
-            .orderBy("timestamp", Query.Direction.DESCENDING) // Mostrar las estrategias más recientes primero
+            .orderBy("timestamp", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { result ->
                 strategies.clear()
                 for (document in result) {
-                    val strategy = document.toObject(Strategy::class.java)
+                    val authorAlias = document.getString("authorAlias") ?: "Anónimo"
+                    Log.d("FirestoreCheck", "ID: ${document.id} - Author: $authorAlias")
+
+                    val strategy = Strategy(
+                        id = document.id,
+                        title = document.getString("title") ?: "Sin título",
+                        description = document.getString("description") ?: "Sin descripción",
+                        author = authorAlias,  // Verifica que esto tenga un valor
+                        avatarName = document.getString("avatarName"),
+                        avatarUrl = document.getString("avatarUrl"),
+                        rating = document.getDouble("rating") ?: 0.0,
+                        createdBy = document.getString("createdBy") ?: "",
+                        indicators = (document.get("indicators") as? List<*>)?.filterIsInstance<String>()
+                            ?: emptyList(),
+                        timeframes = (document.get("timeframes") as? List<*>)?.filterIsInstance<String>()
+                            ?: emptyList(),
+                        tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>()
+                            ?: emptyList(),
+                        symbols = (document.get("symbols") as? List<*>)?.filterIsInstance<String>()
+                            ?: emptyList(),
+                        algorithmCode = document.getString("algorithmCode") ?: "",
+                        entryConditionImageUrl = document.getString("entryConditionImageUrl"),
+                        exitConditionImageUrl = document.getString("exitConditionImageUrl")
+                    )
+
                     strategies.add(strategy)
                 }
                 strategyAdapter.notifyDataSetChanged()
@@ -116,6 +142,7 @@ class SearchStrategyActivity : AppCompatActivity() {
                 Toast.makeText(this, "Error al cargar estrategias", Toast.LENGTH_SHORT).show()
             }
     }
+
 
     private fun performSearch() {
         val nameQuery = searchNameInput.text.toString().trim().lowercase()
@@ -167,20 +194,33 @@ class SearchStrategyActivity : AppCompatActivity() {
             query = query.whereEqualTo("algorithmCode", "")
         }
 
-        // Ordenamiento por rating
-        when (ratingSpinner.selectedItem.toString()) {
-            "Más valoradas primero" -> query = query.orderBy("rating", Query.Direction.DESCENDING)
-            "Menos valoradas primero" -> query = query.orderBy("rating", Query.Direction.ASCENDING)
-        }
-
-        // Ejecutar la consulta
+        // Ejecutar la consulta Firebase
         query.get()
             .addOnSuccessListener { result ->
                 strategies.clear()
-                for (document in result) {
-                    val strategy = document.toObject(Strategy::class.java)
 
-                    // Filtrado manual en el cliente
+                for (document in result) {
+                    val movements = (document.get("movements") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
+
+                    val strategy = Strategy(
+                        id = document.id,
+                        title = document.getString("title") ?: "Sin título",
+                        description = document.getString("description") ?: "Sin descripción",
+                        author = document.getString("authorAlias") ?: "Anónimo",
+                        avatarName = document.getString("avatarName"),
+                        avatarUrl = document.getString("avatarUrl"),
+                        rating = document.getDouble("rating") ?: 0.0,
+                        createdBy = document.getString("createdBy") ?: "",
+                        indicators = (document.get("indicators") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                        timeframes = (document.get("timeframes") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                        tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                        symbols = (document.get("symbols") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                        algorithmCode = document.getString("algorithmCode") ?: "",
+                        entryConditionImageUrl = document.getString("entryConditionImageUrl"),
+                        exitConditionImageUrl = document.getString("exitConditionImageUrl"),
+                        movements = movements // Lista de movimientos
+                    )
+
                     if (keywords.isEmpty() || keywords.any { keyword ->
                             strategy.title.contains(keyword, ignoreCase = true)
                         }) {
@@ -188,10 +228,17 @@ class SearchStrategyActivity : AppCompatActivity() {
                     }
                 }
 
-                // Ordenar por número de comentarios y favoritos
-                strategies.sortByDescending { it.comments.size + it.favoritedBy.size }
+                // Ordenar las estrategias de acuerdo a la opción seleccionada en el Spinner
+                when (ratingSpinner.selectedItem.toString()) {
+                    "Más valoradas primero" -> strategies.sortByDescending { it.rating }
+                    "Menos valoradas primero" -> strategies.sortBy { it.rating }
+                    "Más veces favoritas" -> strategies.sortByDescending { it.favoritedBy.size }
+                    "Más comentadas" -> strategies.sortByDescending { it.comments.size }
+                    "Más movimientos" -> strategies.sortByDescending { it.movements.size } // Ordenar por cantidad de movimientos
+                }
 
                 strategyAdapter.notifyDataSetChanged()
+
                 if (strategies.isEmpty()) {
                     Toast.makeText(this, "No se encontraron estrategias", Toast.LENGTH_SHORT).show()
                 }
@@ -202,8 +249,77 @@ class SearchStrategyActivity : AppCompatActivity() {
             }
     }
 
+
     private fun openStrategyDetail(strategy: Strategy) {
-        Toast.makeText(this, "Estrategia seleccionada: ${strategy.title}", Toast.LENGTH_SHORT).show()
-        // Implementa la navegación al fragmento de detalle si es necesario
+        val strategyId = strategy.id
+
+        if (strategyId.isNotEmpty()) {
+            // Ocultar RecyclerView
+            findViewById<RecyclerView>(R.id.recyclerView).visibility = View.GONE
+            val fragmentContainer = findViewById<androidx.fragment.app.FragmentContainerView>(R.id.fragmentContainerView)
+            fragmentContainer.visibility = View.INVISIBLE // Mantenerlo invisible al inicio
+
+            // Crear y agregar el fragmento
+            val fragment = StrategyDetailFragment().apply {
+                arguments = Bundle().apply {
+                    putString("strategyId", strategy.id)
+                    putString("strategyTitle", strategy.title)
+                    putString("strategyDescription", strategy.description)
+                    putString("strategyAuthor", strategy.author)
+                    putString("strategyAvatarName", strategy.avatarName)
+                    putString("strategyAvatarUrl", strategy.avatarUrl)
+                    putStringArray("strategyIndicators", strategy.indicators.toTypedArray())
+                    putStringArray("strategyTimeframes", strategy.timeframes.toTypedArray())
+                    putStringArray("tradingStyles", strategy.tradingStyles.toTypedArray())
+                    putDouble("strategyRating", strategy.rating)
+                    putStringArray("strategySymbols", strategy.symbols.toTypedArray())
+                    putString("algorithmCode", strategy.algorithmCode)
+                }
+            }
+
+            supportFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.fade_in, // Animación de entrada
+                    R.anim.fade_out, // Animación de salida
+                    R.anim.fade_in, // Animación al retroceder
+                    R.anim.fade_out  // Animación al salir
+                )
+                .replace(R.id.fragmentContainerView, fragment)
+                .addToBackStack(null) // Agrega el fragmento a la pila de retroceso
+                .commit()
+
+            // Mostrar el contenedor después de un breve retraso
+            fragmentContainer.postDelayed({
+                fragmentContainer.visibility = View.VISIBLE
+            }, 300) // Retraso de 300 ms
+        } else {
+            Toast.makeText(this, "ID de estrategia no válido.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+
+    override fun onBackPressed() {
+        val fragmentManager = supportFragmentManager
+        if (fragmentManager.backStackEntryCount > 0) {
+            fragmentManager.popBackStack()
+            // Restaurar el RecyclerView cuando no quedan fragmentos
+            fragmentManager.executePendingTransactions()
+            val currentFragment = fragmentManager.findFragmentById(R.id.fragmentContainerView)
+            if (currentFragment == null) {
+                findViewById<RecyclerView>(R.id.recyclerView).visibility = View.VISIBLE
+                findViewById<androidx.fragment.app.FragmentContainerView>(R.id.fragmentContainerView).visibility =
+                    View.GONE
+            }
+        } else {
+            super.onBackPressed()
+            overridePendingTransition(
+                android.R.anim.fade_in,
+                android.R.anim.fade_out
+            ) // Transición al regresar
+        }
     }
 }
+
+
+

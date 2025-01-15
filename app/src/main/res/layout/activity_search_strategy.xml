@@ -1,195 +1,225 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <!-- Botón para mostrar/ocultar los filtros -->
-    <Button
-        android:id="@+id/toggleFiltersButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Mostrar filtros"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="8dp" />
-
-    <!-- Contenedor de filtros oculto por defecto -->
-    <LinearLayout
-        android:id="@+id/filtersContainer"
+    <!-- Imagen de fondo -->
+    <ImageView
+        android:id="@+id/torosyosos"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/toros_y_osos"
+        android:scaleType="centerCrop"
+        app:srcCompat="@drawable/torosyosos" />
+
+    <!-- Contenedor principal -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:padding="16dp">
 
-        <EditText
-            android:id="@+id/searchNameInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Buscar por nombre de estrategia"
-            android:inputType="text" />
-
-        <Spinner
-            android:id="@+id/ratingSpinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:entries="@array/rating_options"
-            android:layout_marginTop="16dp" />
-
-        <EditText
-            android:id="@+id/indicatorInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Buscar por indicador (ej. RSI, MACD)"
-            android:layout_marginTop="16dp"
-            android:inputType="text" />
-
-        <!-- CheckBox para estilos de trading -->
-        <TextView
+        <!-- Botón para mostrar/ocultar los filtros -->
+        <Button
+            android:id="@+id/toggleFiltersButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Estilo de Trading:" />
+            android:text="Mostrar filtros"
+            android:backgroundTint="@android:color/black"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="8dp" />
 
+        <!-- Contenedor de filtros -->
         <LinearLayout
-            android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:layout_height="wrap_content">
-
-            <CheckBox
-                android:id="@+id/checkDayTrading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Day Trading" />
-
-            <CheckBox
-                android:id="@+id/checkScalping"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Scalping" />
-
-            <CheckBox
-                android:id="@+id/checkSwingTrading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Swing Trading" />
-        </LinearLayout>
-
-        <!-- Texto descriptivo para marcos temporales -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Marcos Temporales:"
-            android:layout_marginTop="16dp"
-            android:textStyle="bold" />
-
-        <!-- Checkboxes organizados en 2 filas -->
-        <LinearLayout
+            android:id="@+id/filtersContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="8dp">
+            android:visibility="gone">
 
-            <!-- Primera fila -->
-            <LinearLayout
+            <EditText
+                android:id="@+id/searchNameInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:hint="Buscar por nombre de estrategia"
+                android:inputType="text" />
+
+            <Spinner
+                android:id="@+id/ratingSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:entries="@array/rating_options"
+                android:layout_marginTop="16dp" />
+
+            <EditText
+                android:id="@+id/indicatorInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Buscar por indicador (ej. RSI, MACD)"
+                android:layout_marginTop="16dp"
+                android:inputType="text" />
+
+            <!-- CheckBox para estilos de trading -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Estilo de Trading:" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+
+                <CheckBox
+                    android:id="@+id/checkDayTrading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Day Trading" />
+
+                <CheckBox
+                    android:id="@+id/checkScalping"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Scalping" />
+
+                <CheckBox
+                    android:id="@+id/checkSwingTrading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Swing Trading" />
+            </LinearLayout>
+
+            <!-- Texto para marcos temporales -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Marcos Temporales:"
+                android:layout_marginTop="16dp" />
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="5"
+                android:rowCount="2"
+                android:layout_marginBottom="16dp"
+                android:layout_gravity="center">
 
                 <CheckBox
                     android:id="@+id/checkM1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
                     android:text="M1" />
+
                 <CheckBox
                     android:id="@+id/checkM3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
                     android:text="M3" />
+
                 <CheckBox
                     android:id="@+id/checkM5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
                     android:text="M5" />
+
                 <CheckBox
                     android:id="@+id/checkM15"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
                     android:text="M15" />
+
                 <CheckBox
                     android:id="@+id/checkM30"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
                     android:text="M30" />
-            </LinearLayout>
-
-            <!-- Segunda fila -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
 
                 <CheckBox
                     android:id="@+id/checkH1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
                     android:text="H1" />
+
                 <CheckBox
                     android:id="@+id/checkH4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
                     android:text="H4" />
+
                 <CheckBox
                     android:id="@+id/checkD1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
                     android:text="D1" />
+
                 <CheckBox
                     android:id="@+id/checkW1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
                     android:text="W1" />
+
                 <CheckBox
                     android:id="@+id/checkOther"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
                     android:text="Otras" />
+            </GridLayout>
+
+            <!-- Bot Sí/No -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+                <CheckBox
+                    android:id="@+id/checkBotYes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Con Bot" />
+                <CheckBox
+                    android:id="@+id/checkBotNo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sin Bot"
+                    android:layout_marginStart="24dp"/>
             </LinearLayout>
+
+            <Button
+                android:id="@+id/searchButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Buscar"
+                android:backgroundTint="@android:color/black"
+                android:layout_marginTop="16dp" />
         </LinearLayout>
 
-        <!-- Bot Sí/No -->
-        <LinearLayout
+        <!-- RecyclerView siempre visible -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp">
-            <CheckBox
-                android:id="@+id/checkBotYes"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Con Bot" />
-            <CheckBox
-                android:id="@+id/checkBotNo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sin Bot" />
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/searchButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Buscar"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:layout_marginTop="16dp" />
+
+        <!-- FragmentContainerView -->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragmentContainerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:visibility="gone" />
     </LinearLayout>
-
-    <!-- RecyclerView siempre visible debajo del botón Buscar -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="16dp" />
-
-</LinearLayout>
+</FrameLayout>

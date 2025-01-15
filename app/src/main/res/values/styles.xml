@@ -33,18 +33,5 @@
         <item name="android:fontWeight">600</item>
     </style>
 
-    <string-array name="rating_options">
-        <item>Sin filtrar</item>
-        <item>Más valoradas primero</item>
-        <item>Menos valoradas primero</item>
-    </string-array>
-
-
-
-
-
-
-
-
 
 </resources>

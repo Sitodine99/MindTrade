@@ -127,7 +127,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         searchStrategyButton.setOnClickListener {
             val intent = Intent(this, SearchStrategyActivity::class.java)
             startActivity(intent)
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out) // Transición suave
         }
+
 
 
         // Listener para añadir estrategias
@@ -323,7 +325,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     putStringArrayListExtra("accountMovements", ArrayList(selectedAccount.movements))
                     putExtra("accountIsActive", selectedAccount.isActive)
                 }
-                startActivityForResult(intent, REQUEST_UPDATE_IMAGES)
+                startActivity(intent)
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
             }
         }
 

@@ -6,7 +6,7 @@ data class Strategy(
     var id: String = "",
     val title: String = "",
     val description: String = "",
-    val author: String = "",
+    var author: String = "",
     val avatarName: String? = null,
     val avatarUrl: String? = null,
     val rating: Double = 0.0,

@@ -135,6 +135,14 @@
         <item>Psico-</item>
     </string-array>
 
+    <string-array name="rating_options">
+        <item>Más valoradas primero</item>
+        <item>Menos valoradas primero</item>
+        <item>Más veces favoritas</item>
+        <item>Más comentadas</item>
+        <item>Más movimientos</item>
+    </string-array>
+
 
 
 
