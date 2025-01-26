@@ -101,10 +101,18 @@ class DescriptionFragment : Fragment() {
         val sectionStart = description.indexOf(sectionHeader)
         if (sectionStart == -1) return "" // Si no se encuentra la sección, devolver vacío
 
-        // Encontrar el final de la sección actual y el inicio de la siguiente
-        val sectionEnd = description.indexOf("\n\n", sectionStart + sectionHeader.length)
-        return if (sectionEnd == -1) {
-            description.substring(sectionStart + sectionHeader.length).trim()
+        // Buscar el siguiente título de sección para encontrar el final de esta
+        val nextSectionHeaders =
+            listOf("Condición de entrada:", "Condición de salida:", "Consideraciones generales:")
+        val sectionEnd = nextSectionHeaders
+            .filter { it != sectionHeader } // Excluir la cabecera actual
+            .mapNotNull { header ->
+                description.indexOf(header, sectionStart + sectionHeader.length).takeIf { it > 0 }
+            }
+            .minOrNull() // Obtener el primer header que aparece después
+
+        return if (sectionEnd == null) {
+            description.substring(sectionStart + sectionHeader.length).trim() // Última sección
         } else {
             description.substring(sectionStart + sectionHeader.length, sectionEnd).trim()
         }
