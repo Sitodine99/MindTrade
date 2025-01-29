@@ -176,29 +176,35 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                                 "Movimientos: ${accountMovements.size}"
 
                             // Actualizar el EditText para mostrar el balance de la cuenta
-                            val sharedPreferences = getSharedPreferences("MindTradePrefs", MODE_PRIVATE)
+                            val sharedPreferences =
+                                getSharedPreferences("MindTradePrefs", MODE_PRIVATE)
 
 // Obtener el depósito guardado
-                            var accountInitialBalance = sharedPreferences.getFloat("initialBalance_$accountId", -1f)
+                            var accountInitialBalance =
+                                sharedPreferences.getFloat("initialBalance_$accountId", -1f)
 
 // Si no existe, tomar el valor de Intent y guardarlo
                             if (accountInitialBalance == -1f) {
-                                accountInitialBalance = intent.getDoubleExtra("accountInitialBalance", 0.0).toFloat()
-                                sharedPreferences.edit().putFloat("initialBalance_$accountId", accountInitialBalance).apply()
+                                accountInitialBalance =
+                                    intent.getDoubleExtra("accountInitialBalance", 0.0).toFloat()
+                                sharedPreferences.edit()
+                                    .putFloat("initialBalance_$accountId", accountInitialBalance)
+                                    .apply()
                             }
 
                             Log.d("BalanceDebug", "Depósito Inicial: $accountInitialBalance")
 
-                            depositFixedValue = "%.2f".format(accountInitialBalance) // Guarda el depósito fijo
+                            depositFixedValue =
+                                "%.2f".format(accountInitialBalance) // Guarda el depósito fijo
 
-                            val depositEditText = movementsView.findViewById<EditText>(R.id.depositEditText)
+                            val depositEditText =
+                                movementsView.findViewById<EditText>(R.id.depositEditText)
 
-                         
-                            val savedDeposit = sharedPreferences.getFloat("initialBalance_$accountId", 0f)
+
+                            val savedDeposit =
+                                sharedPreferences.getFloat("initialBalance_$accountId", 0f)
 
                             depositEditText.setText("$%.2f".format(savedDeposit))
-
-
 
 
                             // Configura el RecyclerView de movimientos aquí
@@ -776,8 +782,6 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
     private fun saveMovement(movement: Movement, accountId: String, strategyId: String?) {
         val db = Firebase.firestore
 
-
-        // Guardar el movimiento en la colección de movimientos
         val movementData = hashMapOf(
             "id" to movement.id,
             "accountId" to accountId,
@@ -794,7 +798,6 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             "createdAt" to movement.createdAt,
             "strategyId" to strategyId,
             "emotionalState" to movement.emotionalState,
-            "strategyId" to strategyId,
             "emotion" to movement.emotion,
             "tradingStyle" to movement.tradingStyle,
             "comments" to movement.comments,
@@ -803,32 +806,38 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
 
         db.collection("accounts")
             .document(accountId)
-            .collection("movements") // Subcolección de movimientos
+            .collection("movements")
             .document(movement.id)
             .set(movementData)
             .addOnSuccessListener {
-                // 1️⃣ Obtener el balance actual de Firestore
                 db.collection("accounts").document(accountId)
                     .get()
                     .addOnSuccessListener { document ->
                         val currentBalance = document.getDouble("balance") ?: 0.0
-
-                        // 2️⃣ Calcular el nuevo balance sumando el profit
                         val updatedBalance = currentBalance + (movement.profit ?: 0.0)
 
-                        // 3️⃣ Actualizar el balance en Firestore
+                        // 🔹 Actualizar balance en Firestore
                         updateAccountBalance(accountId, updatedBalance)
-                        findViewById<EditText>(R.id.balanceEditText).setText("%.2f".format(updatedBalance))
 
+                        // 🔹 Actualizar balance en la UI **sin recargar**
+                        runOnUiThread {
+                            findViewById<EditText>(R.id.balanceEditText).setText(
+                                "%.2f".format(
+                                    updatedBalance
+                                )
+                            )
+                        }
                     }
+
                 val mediaPlayer = MediaPlayer.create(this, R.raw.cash)
                 mediaPlayer.start()
-                movementsList.add(movement) // Añadir el nuevo movimiento a la lista local
-                movementsAdapter.notifyItemInserted(movementsList.size - 1) // Notificar al adaptador sobre el cambio
-                updateMovementsCount() // Actualizar el contador
+
+                movementsList.add(movement)
+                movementsAdapter.notifyItemInserted(movementsList.size - 1)
+
+                updateMovementsCount() // 🔹 Asegurar que el contador se actualiza inmediatamente en UI
                 calculateMetrics()
 
-                // Actualizar la cuenta y estrategia, si corresponde
                 updateAccountWithMovement(accountId, movement.id)
                 strategyId?.let {
                     saveAndLinkMovementToStrategy(strategyId, movement)
@@ -836,7 +845,6 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
 
                 updateUserDynamicImages(movement)
 
-                // Devolver un resultado a MainActivity
                 val intent = Intent()
                 intent.putExtra("updateRequired", true)
                 setResult(RESULT_OK, intent)
@@ -1259,7 +1267,8 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         // 🔹 Paso 1: Obtener el balance actual antes de eliminar el movimiento
         accountRef.get().addOnSuccessListener { document ->
             val currentBalance = document.getDouble("balance") ?: 0.0
-            val updatedBalance = currentBalance - (movement.profit ?: 0.0) // 🔹 Restar el profit eliminado
+            val updatedBalance =
+                currentBalance - (movement.profit ?: 0.0) // 🔹 Restar el profit eliminado
 
             // 🔹 Paso 2: Eliminar el movimiento de Firestore
             movementRef.delete().addOnSuccessListener {
@@ -1285,7 +1294,11 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
     }
 
 
-    private fun deleteMovementFromStrategy(strategyId: String, movementId: String, onComplete: () -> Unit) {
+    private fun deleteMovementFromStrategy(
+        strategyId: String,
+        movementId: String,
+        onComplete: () -> Unit
+    ) {
         val db = FirebaseFirestore.getInstance()
         val strategyRef = db.collection("strategies").document(strategyId)
 
@@ -1295,11 +1308,17 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 // Eliminar el movimiento de la subcolección "movements" dentro de la estrategia
                 strategyRef.collection("movements").document(movementId).delete()
                     .addOnSuccessListener {
-                        Log.d("DeleteMovement", "Movimiento eliminado correctamente de la estrategia.")
+                        Log.d(
+                            "DeleteMovement",
+                            "Movimiento eliminado correctamente de la estrategia."
+                        )
                         onComplete()
                     }
                     .addOnFailureListener { e ->
-                        Log.e("DeleteMovement", "Error al eliminar de la subcolección: ${e.message}")
+                        Log.e(
+                            "DeleteMovement",
+                            "Error al eliminar de la subcolección: ${e.message}"
+                        )
                         Toast.makeText(
                             this,
                             "Error al eliminar de la estrategia: ${e.message}",
@@ -1316,8 +1335,6 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 ).show()
             }
     }
-
-
 
 
     // Mostrar un diálogo para ajustar el beneficio
@@ -1346,27 +1363,42 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
     // Actualizar el beneficio del movimiento
     private fun updateMovementProfit(position: Int, newProfit: Double) {
         val movement = movementsList[position]
+        val db = FirebaseFirestore.getInstance()
+        val accountRef = db.collection("accounts").document(movement.accountId)
+        val movementRef = accountRef.collection("movements").document(movement.id)
 
-        // Actualizar el beneficio directamente en Firestore
-        FirebaseFirestore.getInstance()
-            .collection("accounts")
-            .document(movement.accountId)
-            .collection("movements")
-            .document(movement.id)
-            .update("profit", newProfit)
-            .addOnSuccessListener {
-                // Actualizar la lista local
+        // 🔹 Paso 1: Obtener el balance actual de la cuenta
+        accountRef.get().addOnSuccessListener { document ->
+            val currentBalance = document.getDouble("balance") ?: 0.0
+
+            // 🔹 Paso 2: Calcular la diferencia de beneficio
+            val oldProfit = movement.profit ?: 0.0
+            val profitDifference = newProfit - oldProfit
+            val updatedBalance = currentBalance + profitDifference // 🔹 Ajustar el balance
+
+            // 🔹 Paso 3: Actualizar Firestore con el nuevo beneficio y el balance
+            db.runBatch { batch ->
+                batch.update(movementRef, "profit", newProfit) // Actualizar el movimiento
+                batch.update(
+                    accountRef,
+                    "balance",
+                    updatedBalance
+                ) // Actualizar el balance de la cuenta
+            }.addOnSuccessListener {
+                // 🔹 Paso 4: Actualizar la lista local y la UI
                 movementsList[position] = movement.copy(profit = newProfit)
-                movementsAdapter.notifyItemChanged(position) // Notificar al adaptador
+                movementsAdapter.notifyItemChanged(position)
 
-                Toast.makeText(this, "Beneficio ajustado manualmente", Toast.LENGTH_SHORT).show()
-
-                // Recalcular métricas generales
-                calculateMetrics()
+                findViewById<EditText>(R.id.balanceEditText).setText("%.2f".format(updatedBalance))
+                calculateMetrics() // 🔹 Recalcular métricas
+                Toast.makeText(this, "Beneficio y balance actualizados", Toast.LENGTH_SHORT).show()
+            }.addOnFailureListener { e ->
+                Toast.makeText(this, "Error al actualizar: ${e.message}", Toast.LENGTH_SHORT).show()
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Error al ajustar el beneficio: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+        }.addOnFailureListener { e ->
+            Toast.makeText(this, "Error al obtener el balance: ${e.message}", Toast.LENGTH_SHORT)
+                .show()
+        }
     }
 
 
@@ -1375,9 +1407,8 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         val db = FirebaseFirestore.getInstance()
         val accountRef = db.collection("accounts").document(accountId)
 
+        // 🔹 Actualizar Firestore con el nuevo número de movimientos
         accountRef.update("movementsCount", movementsList.size)
-
-
             .addOnSuccessListener {
                 Log.d("Firebase", "Movements count updated: ${movementsList.size}")
             }
@@ -1387,19 +1418,21 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                     "Error al actualizar contador: ${e.message}",
                     Toast.LENGTH_SHORT
                 ).show()
-                // Recalcular métricas después de actualizar el beneficio
-                calculateMetrics()
             }
+
+        // 🔹 También actualizar el TextView de la UI inmediatamente
+        val movementsCountTextView = findViewById<TextView>(R.id.accountMovementsCountTextView)
+        movementsCountTextView.text = "Movimientos: ${movementsList.size}"
     }
+
 
     private fun calculateMetrics() {
         val db = FirebaseFirestore.getInstance()
         val accountId = movementsList.firstOrNull()?.accountId ?: return
 
-        // 🔹 Obtener el balance actualizado desde Firestore
         val accountRef = db.collection("accounts").document(accountId)
         accountRef.get().addOnSuccessListener { document ->
-            val deposit = document.getDouble("balance") ?: 0.0
+            val updatedBalance = document.getDouble("balance") ?: 0.0
             val accountCurrency = document.getString("currency") ?: ""
 
             var totalSwap = 0.0
@@ -1415,20 +1448,19 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 totalNetProfit += profit
             }
 
-            val updatedBalance = deposit // 🔹 Usar el balance real de Firestore, no calcularlo manualmente
-
-            updateMetricsUI(
-                grossProfit = totalGrossProfit,
-                swap = totalSwap,
-                netProfit = totalNetProfit,
-                commission = totalCommission,
-                accountCurrency = accountCurrency,
-                accountBalance = updatedBalance
-            )
+            // 🔹 Actualizar balance en la UI inmediatamente
+            runOnUiThread {
+                updateMetricsUI(
+                    grossProfit = totalGrossProfit,
+                    swap = totalSwap,
+                    netProfit = totalNetProfit,
+                    commission = totalCommission,
+                    accountCurrency = accountCurrency,
+                    accountBalance = updatedBalance
+                )
+            }
         }
     }
-
-
 
 
 
@@ -1441,7 +1473,12 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         accountCurrency: String
     ) {
         findViewById<EditText>(R.id.TotalswapEditText).setText(String.format("%.2f", swap))
-        findViewById<EditText>(R.id.TotalcommissionEditText).setText(String.format("%.2f", commission))
+        findViewById<EditText>(R.id.TotalcommissionEditText).setText(
+            String.format(
+                "%.2f",
+                commission
+            )
+        )
         findViewById<EditText>(R.id.grossProfitEditText).setText(String.format("%.2f", grossProfit))
 
         // 🔹 Solo mostrar el balance, sin recalcularlo manualmente
@@ -1449,7 +1486,6 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             "%.2f %s".format(accountBalance, accountCurrency)
         )
     }
-
 
 
     private fun setupECharts(rootView: View, dataX: List<String>, dataY: List<Double>) {
@@ -1556,6 +1592,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             webView.evaluateJavascript("updatePieChart($pieData);", null)
         }
     }
+
     override fun showAdjustCommissionDialog(position: Int) {
         val movement = movementsList[position]
         val dialogView = layoutInflater.inflate(R.layout.dialog_adjust_profit, null)
@@ -1571,7 +1608,8 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 if (newCommission != null) {
                     updateMovementCommission(position, newCommission)
                 } else {
-                    Toast.makeText(this, "Por favor, introduce un valor válido", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Por favor, introduce un valor válido", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
             .setNegativeButton("Cancelar", null)
@@ -1598,7 +1636,8 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             .document(movement.id)
             .update("commission", newCommission, "profit", updatedProfit)
             .addOnSuccessListener {
-                movementsList[position] = movement.copy(commission = newCommission, profit = updatedProfit)
+                movementsList[position] =
+                    movement.copy(commission = newCommission, profit = updatedProfit)
                 movementsAdapter.notifyItemChanged(position)
                 Toast.makeText(this, "Comisión y beneficio actualizados", Toast.LENGTH_SHORT).show()
 
@@ -1625,7 +1664,8 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 if (newSwap != null) {
                     updateMovementSwap(position, newSwap)
                 } else {
-                    Toast.makeText(this, "Por favor, introduce un valor válido", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Por favor, introduce un valor válido", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
             .setNegativeButton("Cancelar", null)
@@ -1718,6 +1758,11 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             .update("balance", newBalance)
             .addOnSuccessListener {
                 Log.d("UpdateBalance", "Balance actualizado en Firestore: $newBalance")
+
+                // 🔹 Actualizar UI sin necesidad de recargar la actividad
+                runOnUiThread {
+                    findViewById<EditText>(R.id.balanceEditText).setText("%.2f".format(newBalance))
+                }
             }
             .addOnFailureListener { e ->
                 Log.e("UpdateBalance", "Error al actualizar balance: ${e.message}")
