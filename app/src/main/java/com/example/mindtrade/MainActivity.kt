@@ -277,14 +277,35 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    private val initialBalances = mutableMapOf<String, Double>() // HashMap para almacenar balances iniciales
+
     private fun fetchAccounts(onAccountsLoaded: (List<Account>) -> Unit) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-        if (userId == null) {
-            Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
-            return
-        }
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
         db.collection("accounts").whereEqualTo("userId", userId)
+            .addSnapshotListener { documents, error ->
+                if (error != null) {
+                    Log.e("FetchAccounts", "Error al obtener cuentas: ${error.message}")
+                    return@addSnapshotListener
+                }
+
+                if (documents != null) {
+                    val accounts = documents.map { doc ->
+                        val account = doc.toObject(Account::class.java)
+
+                        // Si la cuenta no tiene registrado un balance inicial, lo guardamos
+                        if (!initialBalances.containsKey(account.id)) {
+                            initialBalances[account.id] = account.balance
+                        }
+
+                        account
+                    }
+                    onAccountsLoaded(accounts)
+                }
+            }
+
+
+    db.collection("accounts").whereEqualTo("userId", userId)
             .addSnapshotListener { documents, error ->
                 if (error != null) {
                     Toast.makeText(this, "Error al obtener cuentas: ${error.message}", Toast.LENGTH_SHORT).show()
@@ -316,7 +337,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 val intent = Intent(this, AccountMovementsActivity::class.java).apply {
                     putExtra("accountName", selectedAccount.name)
                     putExtra("accountCreatedAt", selectedAccount.createdAt)
-                    putExtra("accountBalance", selectedAccount.balance)
+                    putExtra("accountInitialBalance", initialBalances[selectedAccount.id] ?: selectedAccount.balance)
                     putExtra("accountId", selectedAccount.id) // Enviar también el ID si es necesario
                     putExtra("accountCreationDate", selectedAccount.createdAt)
                     putExtra("accountCurrency", selectedAccount.currency)
@@ -1123,6 +1144,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Actualizar el RecyclerView de estrategias al volver al MainActivity
         setupRecyclerViews()
         updateDynamicImages()
+        fetchAccounts { accounts ->
+            setupAccountsRecyclerView(accounts)
+        }
+
     }
 
     // Método para eliminar la escucha al cerrar sesión
