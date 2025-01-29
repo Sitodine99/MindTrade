@@ -4,37 +4,24 @@
     <meta charset="UTF-8">
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
     <style>
-        /* Asegura que el contenedor del gráfico ocupa toda la pantalla */
         html, body {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
             display: flex;
-            flex-direction: column; /* Coloca el número y el gráfico en columna */
             justify-content: center;
             align-items: center;
             background-color: #ffffff;
         }
 
-        #successRate {
-            font-size: 42px; /* 🔹 Tamaño grande del número */
-            font-weight: bold;
-            color: #333;
-            margin-top: 20px; /* 🔹 Aumentado el margen superior */
-            margin-bottom: 8px; /* 🔹 Más espacio entre el número y el gráfico */
-        }
-
         #successRatioChart {
-            width: 90%; /* 🔹 Se amplió el gráfico */
-            height: 75%; /* 🔹 Mejor ajuste de altura */
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
 <body>
-
-<!-- 🔹 Número del porcentaje de éxito -->
-<div id="successRate">0%</div>
 
 <!-- 🔹 Gráfico de tasa de éxito -->
 <div id="successRatioChart"></div>
@@ -42,36 +29,56 @@
 <script>
     var chartDom = document.getElementById('successRatioChart');
     var myChart = echarts.init(chartDom);
-    var successRateText = document.getElementById('successRate');
 
     function updateSuccessRate(successRate) {
-        // 🔹 Actualiza el número grande del porcentaje
-        successRateText.innerText = successRate.toFixed(1) + "%";
-
         var option = {
-            tooltip: {
-                formatter: 'Ratio de Acierto: {c}%'
-            },
             series: [
                 {
                     type: 'gauge',
-                    radius: "100%", // 🔹 Hace que el gráfico ocupe toda la caja disponible
                     startAngle: 180,
                     endAngle: 0,
-                    pointer: {
-                        show: true,
-                        width: 5 // 🔹 Hace la aguja más visible
-                    },
+                    min: 0,
+                    max: 100,
+                    splitNumber: 10,
                     axisLine: {
                         lineStyle: {
-                            width: 15 // 🔹 Grosor del borde del gráfico
+                            width: 15,
+                            color: [[1, '#D4E6F1']]
                         }
                     },
-                    detail: { show: false }, // 🔹 Oculta el número dentro del gráfico
+                    pointer: {
+                        show: true,
+                        width: 10
+                    },
+                    axisTick: {
+                        show: true,
+                        distance: -10,
+                        length: 8
+                    },
+                    splitLine: {
+                        show: true,
+                        distance: -15,
+                        length: 15
+                    },
+                    axisLabel: {
+                        distance: 15,
+                        fontSize: 14,
+                        color: '#333'
+                    },
+                    detail: {
+                        show: true,
+                        fontSize: 40, // 🔹 Aumenta el tamaño del porcentaje
+                        fontWeight: 'bold',
+                        color: '#333',
+                        offsetCenter: [0, '80%'], // 🔹 Mueve el número más abajo
+                        formatter: function(value) {
+                            return value.toFixed(2) + " %"; // 🔹 Formato con 2 decimales
+                        }
+                    },
                     data: [
                         {
                             value: successRate,
-                            name: 'Éxito'
+                            name: '' // 🔹 Eliminado el texto "SCORE"
                         }
                     ]
                 }
@@ -81,7 +88,7 @@
     }
 
     // 🔹 Prueba con un valor inicial
-    updateSuccessRate(75);
+    updateSuccessRate(50.5);
 </script>
 
 </body>

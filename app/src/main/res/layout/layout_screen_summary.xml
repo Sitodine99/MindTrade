@@ -23,6 +23,47 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- Cabecera fija con estilo -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/border_black"
+                android:elevation="4dp"
+                android:padding="8dp"
+                android:layout_marginBottom="16dp">
+
+                <!-- Mayor ganancia operativa -->
+                <TextView
+                    android:id="@+id/maxOperationalGainTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Mayor ganancia operativa: $0.00"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"
+                    android:paddingBottom="4dp" />
+
+                <!-- Mayor pérdida operativa -->
+                <TextView
+                    android:id="@+id/maxOperationalLossTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Mayor pérdida operativa: $0.00"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"
+                    android:paddingBottom="4dp" />
+
+                <!-- Coeficiente de beneficio -->
+                <TextView
+                    android:id="@+id/profitCoefficientTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Coeficiente de beneficio: 0.00"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"
+                    android:paddingBottom="4dp" />
+            </LinearLayout>
+
             <!-- Título del gráfico de Tasa de Éxito -->
             <TextView
                 android:layout_width="match_parent"
@@ -31,16 +72,35 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:gravity="center"
-                android:paddingBottom="4dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
                 android:textColor="@android:color/black"/>
 
-            <!-- Gráfico de ratio de éxito -->
+            <!-- Gráfico de Tasa de Éxito -->
             <WebView
                 android:id="@+id/successRatioChartWebView"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"/>
+                android:layout_height="250dp"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Título del gráfico de Drawdown -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Drawdown"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:textColor="@android:color/black"/>
+
+            <!-- Gráfico de Drawdown -->
+            <WebView
+                android:id="@+id/drawdownChartWebView"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_marginBottom="16dp"/>
         </LinearLayout>
     </ScrollView>
 
