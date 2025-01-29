@@ -32,17 +32,17 @@
                     show: false // 🔹 Ocultar etiquetas del eje X
                 },
                 axisTick: {
-                    show: false // 🔹 Ocultar las marcas de los ticks en el eje X
+                    show: false // 🔹 Ocultar marcas de ticks en el eje X
                 },
                 boundaryGap: false
             },
             yAxis: {
                 type: 'value',
                 name: 'Balance ($)',
-                nameLocation: 'center', // 🔹 Centrar la etiqueta del eje Y
-                nameGap: 25, // 🔹 Espaciado para evitar corte
+                nameLocation: 'center',
+                nameGap: 40, // 🔹 Aumenta separación entre etiqueta y eje Y
                 nameTextStyle: {
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: 'bold'
                 },
                 axisLabel: {
@@ -66,10 +66,10 @@
                 }
             },
             grid: {
-                left: '15%',  // 🔹 Se aumentó de 10% a 15% para espacio en eje Y
+                left: '20%',  // 🔹 Mayor espacio a la izquierda para el eje Y
                 right: '10%',
-                bottom: '10%', // 🔹 Se reduce margen inferior ya que el eje X no tiene etiquetas
-                top: '10%', // 🔹 Se ajusta la parte superior
+                bottom: '10%',
+                top: '10%',
                 containLabel: true
             },
             series: [{

@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
     <style>
         html, body {
             margin: 0;
@@ -23,15 +24,17 @@
 </head>
 <body>
 
-<!-- 🔹 Gráfico de tasa de éxito -->
+<!-- 🔹 Contenedor del gráfico -->
 <div id="successRatioChart"></div>
 
 <script>
     var chartDom = document.getElementById('successRatioChart');
     var myChart = echarts.init(chartDom);
+    var animationDuration = 1500; // 🔹 Duración de la animación
 
     function updateSuccessRate(successRate) {
         var option = {
+            animationDuration: animationDuration, // 🔹 Animación solo al inicio
             series: [
                 {
                     type: 'gauge',
@@ -42,53 +45,48 @@
                     splitNumber: 10,
                     axisLine: {
                         lineStyle: {
-                            width: 15,
-                            color: [[1, '#D4E6F1']]
+                            width: 20,
+                            color: [[1, '#4B9CD3']]
                         }
                     },
                     pointer: {
                         show: true,
-                        width: 10
+                        width: 8
                     },
                     axisTick: {
-                        show: true,
-                        distance: -10,
-                        length: 8
+                        show: false
                     },
                     splitLine: {
-                        show: true,
-                        distance: -15,
-                        length: 15
+                        show: false
                     },
                     axisLabel: {
-                        distance: 15,
-                        fontSize: 14,
-                        color: '#333'
+                        show: false
                     },
                     detail: {
                         show: true,
-                        fontSize: 40, // 🔹 Aumenta el tamaño del porcentaje
+                        fontSize: 50,
                         fontWeight: 'bold',
-                        color: '#333',
-                        offsetCenter: [0, '80%'], // 🔹 Mueve el número más abajo
+                        color: '#4B9CD3',
+                        offsetCenter: [0, '70%'], // 🔹 Ubicación más baja
                         formatter: function(value) {
                             return value.toFixed(2) + " %"; // 🔹 Formato con 2 decimales
                         }
                     },
                     data: [
                         {
-                            value: successRate,
-                            name: '' // 🔹 Eliminado el texto "SCORE"
+                            value: successRate
                         }
                     ]
                 }
             ]
         };
+
         myChart.setOption(option);
     }
 
-    // 🔹 Prueba con un valor inicial
-    updateSuccessRate(50.5);
+    // 🔹 Prueba inicial con un valor
+    updateSuccessRate(75);
+
 </script>
 
 </body>

@@ -31,7 +31,8 @@ class AccountAdapter(
     override fun onBindViewHolder(holder: AccountViewHolder, position: Int) {
         val account = accounts[position]
         holder.accountName.text = account.name
-        holder.accountBalance.text = "Balance: $${account.balance}"
+        holder.accountBalance.text = "Balance: $${String.format("%.2f", account.balance)}"
+
 
         // Formatear la fecha de creación
         val creationDate = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())

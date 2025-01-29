@@ -232,6 +232,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                         } else {
                             Log.d("ViewPager", "Actualizando pantalla 3 con el gráfico de éxito")
                             setupSuccessRatioChart(screenSummaryView)
+                            setupDrawdownChart(screenSummaryView)
                         }
                     }
 
@@ -1786,6 +1787,50 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
 
                 // Llama a la función JavaScript del HTML con el porcentaje de éxito
                 val jsCode = "updateSuccessRate($successRate);"
+                webView.evaluateJavascript(jsCode, null)
+            }
+        }
+    }
+    private fun calculateDrawdown(): List<Double> {
+        val drawdownList = mutableListOf<Double>()
+
+        // 🔹 Convertir el depósito inicial a un número válido
+        val depositValue = depositFixedValue.replace(",", ".").toDoubleOrNull() ?: 0.0
+        var maxBalance = depositValue
+        var currentBalance = depositValue
+
+        for (movement in movementsList) {
+            currentBalance += movement.profit ?: 0.0
+
+            if (currentBalance > maxBalance) {
+                maxBalance = currentBalance
+            }
+
+            val drawdown = ((currentBalance - maxBalance) / maxBalance) * 100
+            drawdownList.add(drawdown)
+        }
+
+        return drawdownList
+    }
+
+
+
+
+
+    private fun setupDrawdownChart(rootView: View) {
+        val webView = rootView.findViewById<WebView>(R.id.drawdownChartWebView)
+        webView.settings.javaScriptEnabled = true
+        webView.loadUrl("file:///android_asset/drawdown_chart.html")
+
+        val drawdownData = calculateDrawdown()
+
+        webView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+
+                val jsonDrawdownData = drawdownData.joinToString(prefix = "[", postfix = "]")
+
+                val jsCode = "updateDrawdownChart($jsonDrawdownData);"
                 webView.evaluateJavascript(jsCode, null)
             }
         }

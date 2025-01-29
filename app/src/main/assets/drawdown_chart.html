@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+        }
+
+        #drawdownChart {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 🔹 Gráfico de Drawdown -->
+<div id="drawdownChart"></div>
+
+<script>
+    var chartDom = document.getElementById('drawdownChart');
+    var myChart = echarts.init(chartDom);
+
+    function updateDrawdownChart(drawdownData) {
+        var option = {
+            tooltip: {
+                trigger: 'axis',
+                formatter: function (params) {
+                    var value = params[0].value.toFixed(2) + "%";
+                    return `Drawdown: ${value}`;
+                },
+                backgroundColor: '#fff',
+                borderColor: '#ccc',
+                borderWidth: 1,
+                textStyle: {
+                    color: '#000'
+                }
+            },
+            grid: {
+                left: '5%',
+                right: '5%',
+                top: '5%',
+                bottom: '5%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: Array.from({length: drawdownData.length}, (_, i) => i + 1),
+                show: false // 🔹 Ocultar el eje X para hacerlo más visual
+            },
+            yAxis: {
+                type: 'value',
+                axisLabel: {
+                    formatter: '{value}%',
+                    fontSize: 12,
+                    color: '#ff4d4d'
+                },
+                splitLine: {
+                    lineStyle: {
+                        type: 'dashed',
+                        color: '#ddd'
+                    }
+                }
+            },
+            series: [
+                {
+                    type: 'line',
+                    data: drawdownData,
+                    smooth: true,
+                    lineStyle: {
+                        width: 2,
+                        color: '#ff4d4d'
+                    },
+                    itemStyle: {
+                        color: '#ff4d4d'
+                    },
+                    areaStyle: {
+                        color: 'rgba(255, 77, 77, 0.3)'
+                    }
+                }
+            ]
+        };
+
+        myChart.setOption(option);
+    }
+</script>
+
+</body>
+</html>
