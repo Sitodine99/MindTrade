@@ -171,19 +171,15 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                     0 -> { // Pantalla de movimientos
                         val screenMovementsView = viewPager.findViewWithTag<View>("f0")
                         screenMovementsView?.let { movementsView ->
-                            // Actualizar el TextView para mostrar el número de movimientos
                             movementsView.findViewById<TextView>(R.id.accountMovementsCountTextView).text =
                                 "Movimientos: ${accountMovements.size}"
 
-                            // Actualizar el EditText para mostrar el balance de la cuenta
                             val sharedPreferences =
                                 getSharedPreferences("MindTradePrefs", MODE_PRIVATE)
 
-// Obtener el depósito guardado
                             var accountInitialBalance =
                                 sharedPreferences.getFloat("initialBalance_$accountId", -1f)
 
-// Si no existe, tomar el valor de Intent y guardarlo
                             if (accountInitialBalance == -1f) {
                                 accountInitialBalance =
                                     intent.getDoubleExtra("accountInitialBalance", 0.0).toFloat()
@@ -195,20 +191,17 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                             Log.d("BalanceDebug", "Depósito Inicial: $accountInitialBalance")
 
                             depositFixedValue =
-                                "%.2f".format(accountInitialBalance) // Guarda el depósito fijo
+                                "%.2f".format(accountInitialBalance)
 
                             val depositEditText =
                                 movementsView.findViewById<EditText>(R.id.depositEditText)
-
 
                             val savedDeposit =
                                 sharedPreferences.getFloat("initialBalance_$accountId", 0f)
 
                             depositEditText.setText("$%.2f".format(savedDeposit))
 
-
-                            // Configura el RecyclerView de movimientos aquí
-                            setupMovementsView(movementsView, accountId) // Llama al método aquí
+                            setupMovementsView(movementsView, accountId)
                         }
                     }
 
@@ -217,17 +210,14 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                         screenDetailsView?.let {
                             val initialBalance = intent.getDoubleExtra("accountBalance", 0.0)
 
-                            // Configurar el gráfico del balance
                             val (dataX, dataY) = generateChartData(movementsList, initialBalance)
                             setupECharts(it, dataX, dataY)
 
-                            // Configurar el gráfico de emociones
                             setupEmotionChart(
-                                rootView = it, // Pasar la vista raíz
-                                emotionData = emotionCounts // Pasar el mapa de datos de emociones
+                                rootView = it,
+                                emotionData = emotionCounts
                             )
 
-                            // Actualizar información adicional en la pantalla de detalles
                             it.findViewById<TextView>(R.id.accountProfitTargetTextView).text =
                                 "Objetivo: $%.2f".format(accountProfitTarget)
                             it.findViewById<TextView>(R.id.accountMaxDailyLossTextView).text =
@@ -235,8 +225,17 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                         }
                     }
 
+                    2 -> { // Pantalla 3: Gráfico de ratio de éxito
+                        val screenSummaryView = viewPager.findViewWithTag<View>("f2")
+                        if (screenSummaryView == null) {
+                            Log.e("ViewPager", "No se encontró la vista de la pantalla 3 (f2)")
+                        } else {
+                            Log.d("ViewPager", "Actualizando pantalla 3 con el gráfico de éxito")
+                            setupSuccessRatioChart(screenSummaryView)
+                        }
+                    }
+
                     else -> {
-                        // Maneja más pantallas si es necesario
                         Log.d("PageChange", "Página seleccionada: $position")
                     }
                 }
@@ -244,7 +243,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         })
     }
 
-    private fun setupMovementsView(rootView: View, accountId: String) {
+        private fun setupMovementsView(rootView: View, accountId: String) {
         val recyclerView = rootView.findViewById<RecyclerView>(R.id.movementsRecyclerView)
         val addMovementButton = rootView.findViewById<ImageButton>(R.id.addMovementButton)
 
@@ -1489,50 +1488,49 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
 
 
     private fun setupECharts(rootView: View, dataX: List<String>, dataY: List<Double>) {
-        val webView = rootView.findViewById<WebView>(R.id.chartWebViewTest)
-
-        // Ajustar dinámicamente la altura del WebView
-        val layoutParams = webView.layoutParams
-        layoutParams.height = 800 // Aumenta la altura en píxeles si es necesario
-        webView.layoutParams = layoutParams
-
-        // Configurar el WebView
+        val webView = findViewById<WebView>(R.id.chartWebViewTest)
         webView.settings.javaScriptEnabled = true
-        webView.loadUrl("file:///android_asset/echarts.html") // Cargar el archivo HTML
+        webView.loadUrl("file:///android_asset/echarts.html")
 
-        // Esperar a que cargue el HTML
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
 
-                // Formatear datos como JSON
+                // Formatear datos para enviar al gráfico
                 val jsonX = dataX.joinToString(prefix = "[", postfix = "]") { "\"$it\"" }
                 val jsonY = dataY.joinToString(prefix = "[", postfix = "]")
 
-                // Ejecutar JavaScript para actualizar el gráfico
-                webView.evaluateJavascript("updateChart($jsonX, $jsonY);", null)
+                // Ejecutar JavaScript en WebView
+                val jsCode = "updateChart($jsonX, $jsonY);"
+                webView.evaluateJavascript(jsCode, null)
             }
         }
     }
 
 
+
     // Método para generar datos del gráfico
+    // Genera los datos para el gráfico de Movimientos vs Balance
     private fun generateChartData(
         movements: List<Movement>,
-        initialBalance: Double
+        initialDeposit: Double
     ): Pair<List<String>, List<Double>> {
         val dataX = mutableListOf<String>() // Eje X: Número de movimientos
         val dataY = mutableListOf<Double>() // Eje Y: Balance acumulado
 
-        var currentBalance = initialBalance
+        var currentBalance = initialDeposit
+        dataX.add("Depósito") // 🔹 Primera entrada del gráfico
+        dataY.add(initialDeposit) // 🔹 El balance comienza en el depósito inicial
+
         movements.forEachIndexed { index, movement ->
-            dataX.add("Movimiento ${index + 1}") // Etiqueta para el eje X
-            currentBalance += movement.profit ?: 0.0 // Sumar el profit
-            dataY.add(currentBalance) // Balance acumulado
+            currentBalance += movement.profit ?: 0.0 // 🔹 Sumar o restar la ganancia/pérdida
+            dataX.add("Movimiento ${index + 1}")
+            dataY.add(currentBalance)
         }
 
         return Pair(dataX, dataY)
     }
+
 
     private fun setupEmotionChart(rootView: View, emotionData: Map<String, Int>) {
         val webView = rootView.findViewById<WebView>(R.id.emotionsChartWebView)
@@ -1767,5 +1765,29 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             .addOnFailureListener { e ->
                 Log.e("UpdateBalance", "Error al actualizar balance: ${e.message}")
             }
+    }
+    private fun setupSuccessRatioChart(rootView: View) {
+        val webView = rootView.findViewById<WebView>(R.id.successRatioChartWebView)
+
+        webView.settings.javaScriptEnabled = true
+        webView.loadUrl("file:///android_asset/success_ratio_chart.html") // ✅ Archivo correcto
+
+        val totalTrades = movementsList.size
+        val successfulTrades = movementsList.count { it.profit ?: 0.0 > 0 }
+        val successRate = if (totalTrades > 0) (successfulTrades.toDouble() / totalTrades) * 100 else 0.0
+
+        Log.d("SuccessChart", "Total operaciones: $totalTrades, Exitosas: $successfulTrades, Ratio: $successRate")
+
+        // Esperar a que el HTML se cargue antes de llamar a la función de actualización
+        webView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                Log.d("SuccessChart", "ECharts HTML cargado correctamente, actualizando gráfico...")
+
+                // Llama a la función JavaScript del HTML con el porcentaje de éxito
+                val jsCode = "updateSuccessRate($successRate);"
+                webView.evaluateJavascript(jsCode, null)
+            }
+        }
     }
 }

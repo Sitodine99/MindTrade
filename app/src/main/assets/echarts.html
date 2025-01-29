@@ -2,28 +2,20 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
 </head>
 <body style="margin: 0; padding: 0; overflow: hidden;">
 <!-- Contenedor del gráfico -->
-<div id="main" style="width: 100%; height: 400px;"></div>
+<div id="main" style="width: 100vw; height: 100vh;"></div>
+
 <script>
     // Inicializar el gráfico
     var chart = echarts.init(document.getElementById('main'));
 
-    // Función para actualizar el gráfico
+    // Función para actualizar el gráfico desde Android
     function updateChart(dataX, dataY) {
-        // Configurar las opciones del gráfico
         var option = {
-            title: {
-                text: 'Movimientos vs Balance',
-                left: 'center',
-                textStyle: {
-                    fontSize: 18,
-                    fontWeight: 'bold'
-                }
-            },
             tooltip: {
                 trigger: 'axis',
                 backgroundColor: '#fff',
@@ -37,72 +29,78 @@
                 type: 'category',
                 data: dataX,
                 axisLabel: {
-                    rotate: 0, // Etiquetas horizontales
-                    fontSize: 12,
-                    color: '#333'
+                    show: false // 🔹 Ocultar etiquetas del eje X
                 },
-                position: 'bottom', // Asegurar que el eje X esté abajo
-                boundaryGap: false // Líneas pegadas al eje
+                axisTick: {
+                    show: false // 🔹 Ocultar las marcas de los ticks en el eje X
+                },
+                boundaryGap: false
             },
             yAxis: {
                 type: 'value',
                 name: 'Balance ($)',
+                nameLocation: 'center', // 🔹 Centrar la etiqueta del eje Y
+                nameGap: 25, // 🔹 Espaciado para evitar corte
+                nameTextStyle: {
+                    fontSize: 14,
+                    fontWeight: 'bold'
+                },
                 axisLabel: {
                     formatter: function (value) {
-                        return value.toFixed(0); // Redondear valores a enteros
+                        return value.toFixed(0); // 🔹 Redondear valores a enteros
                     },
                     fontSize: 12,
                     color: '#333'
                 },
                 min: function (value) {
-                    return Math.floor(value.min * 0.9); // Reducir un 10% el mínimo
+                    return Math.floor(value.min * 0.9);
                 },
                 max: function (value) {
-                    return Math.ceil(value.max * 1.1); // Aumentar un 10% el máximo
+                    return Math.ceil(value.max * 1.1);
                 },
                 splitLine: {
                     lineStyle: {
-                        type: 'dashed', // Líneas punteadas
+                        type: 'dashed',
                         color: '#ddd'
                     }
                 }
             },
             grid: {
-                left: '10%',  // Margen izquierdo para evitar solapamientos
-                right: '10%', // Margen derecho
-                bottom: '10%', // Margen inferior para espacio en etiquetas del eje X
-                top: '15%',   // Margen superior para el título
-                containLabel: true // Asegurar que las etiquetas se muestren
+                left: '15%',  // 🔹 Se aumentó de 10% a 15% para espacio en eje Y
+                right: '10%',
+                bottom: '10%', // 🔹 Se reduce margen inferior ya que el eje X no tiene etiquetas
+                top: '10%', // 🔹 Se ajusta la parte superior
+                containLabel: true
             },
             series: [{
                 name: 'Balance',
                 data: dataY,
                 type: 'line',
-                smooth: true, // Hacer la línea más suave
+                smooth: true,
                 lineStyle: {
-                    width: 3, // Grosor de la línea
-                    color: '#5470C6' // Color de la línea
+                    width: 3,
+                    color: '#5470C6'
                 },
                 itemStyle: {
-                    color: '#5470C6' // Color de los puntos
+                    color: '#5470C6'
                 },
                 areaStyle: {
-                    color: 'rgba(84,112,198,0.2)' // Fondo degradado bajo la línea
+                    color: 'rgba(84,112,198,0.2)'
                 },
-                symbol: 'circle', // Forma de los puntos
-                symbolSize: 8 // Tamaño de los puntos
+                symbol: 'circle',
+                symbolSize: 8
             }]
         };
 
-        // Establecer la configuración del gráfico
+        // Aplicar la configuración al gráfico
         chart.setOption(option);
     }
 
-    // Prueba con datos ficticios
-    updateChart(
-        ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
-        [4800, 5000, 5200, 5400, 5600, 5675]
-    );
+    // Ajustar el tamaño del gráfico cuando la ventana cambie
+    window.onresize = function() {
+        chart.resize();
+    };
+
 </script>
 </body>
 </html>

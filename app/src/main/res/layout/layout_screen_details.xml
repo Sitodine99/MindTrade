@@ -6,7 +6,7 @@
     <ImageView
         android:id="@+id/backgroundImageView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:scaleType="centerCrop"
         android:src="@drawable/torosyosos"
         android:contentDescription="@string/toros_y_osos" />
@@ -62,23 +62,44 @@
                     android:textSize="16sp"
                     android:textColor="@android:color/black"
                     android:paddingBottom="4dp" />
-
             </LinearLayout>
 
-            <!-- Gráfico -->
+            <!-- Título del gráfico de Movimientos vs Balance -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Movimientos vs Balance"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:textColor="@android:color/black"/>
+
+            <!-- Gráfico de Movimientos vs Balance -->
             <WebView
                 android:id="@+id/chartWebViewTest"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginTop="0dp"
+                android:layout_height="220dp"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Gráfico de emociones -->
+            <!-- Título del gráfico de Estado Emocional -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Estado emocional"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:textColor="@android:color/black"/>
+
+            <!-- Gráfico de Estado emocional -->
             <WebView
                 android:id="@+id/emotionsChartWebView"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginTop="16dp"
+                android:layout_height="220dp"
                 android:layout_marginBottom="16dp" />
         </LinearLayout>
     </ScrollView>
