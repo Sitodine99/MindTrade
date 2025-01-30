@@ -1024,6 +1024,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 )
                 restoreMainView() // Asegúrate de que las vistas principales se muestren
             }
+
+            R.id.nav_profile -> {
+                val intent = Intent(this, ProfileActivity::class.java)
+                startActivity(intent)
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+            }
+
+
             R.id.nav_strategies -> {
                 // Ocultar vistas del MainActivity
                 findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.GONE
@@ -1099,6 +1107,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     .commit()
             }
 
+            R.id.nav_guide -> { // Nuevo caso para la Guía de Uso
+                val intent = Intent(this, GuideActivity::class.java)
+                startActivity(intent)
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+            }
 
 
             R.id.nav_logout -> {

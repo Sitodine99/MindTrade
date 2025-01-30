@@ -15,6 +15,9 @@
     <color name="blue_normal">#0000FF</color>
     <color name="Sky_blue">#87CEEB</color>
     <color name="blue_light">#3333FF</color>
+    <color name="blue">#2196F3</color> <!-- Azul Material Design -->
+    <color name="red">#F44336</color>  <!-- Rojo Material Design -->
+
 
     <color name="shimmer_placeholder">#E0E0E0</color>
 

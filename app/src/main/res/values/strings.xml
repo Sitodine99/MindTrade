@@ -144,7 +144,12 @@
     </string-array>
 
 
-
+    <string name="my_profile">Mi Perfil</string>
+    <string name="user_alias">Alias del Usuario</string>
+    <string name="user_email">Correo electrónico</string>
+    <string name="trading_style">Estilo de Trading</string>
+    <string name="psico_state">Estado Psicológico</string>
+    <string name="emotion_state">Emoción Predominante</string>
 
 
 

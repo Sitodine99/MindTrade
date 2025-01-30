@@ -10,7 +10,7 @@
     <!-- Opción: Perfil -->
     <item
         android:id="@+id/nav_profile"
-        android:icon="@drawable/interrogacion"
+        android:icon="@drawable/ic_person"
         android:title="Mi Perfil" />
 
     <!-- Opción: Estrategias -->
@@ -33,9 +33,9 @@
 
     <!-- Opción: Configuración -->
     <item
-        android:id="@+id/nav_settings"
+        android:id="@+id/nav_guide"
         android:icon="@drawable/ic_settings"
-        android:title="Configuración" />
+        android:title="Guía de uso" />
 
     <!-- Opción: Cerrar Sesión -->
     <item
