@@ -13,7 +13,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #ffffff;
+            background-color: #ffffff; /* 🔹 Mantiene el fondo blanco */
         }
 
         #successRatioChart {
@@ -34,7 +34,7 @@
 
     function updateSuccessRate(successRate) {
         var option = {
-            animationDuration: animationDuration, // 🔹 Animación solo al inicio
+            animationDuration: animationDuration, // 🔹 Animación al inicio
             series: [
                 {
                     type: 'gauge',
@@ -46,12 +46,15 @@
                     axisLine: {
                         lineStyle: {
                             width: 20,
-                            color: [[1, '#4B9CD3']]
+                            color: [[1, '#000000']] // 🔹 Borde negro
                         }
                     },
                     pointer: {
                         show: true,
-                        width: 8
+                        width: 8,
+                        itemStyle: {
+                            color: '#000000' // 🔹 Flecha negra
+                        }
                     },
                     axisTick: {
                         show: false
@@ -66,7 +69,7 @@
                         show: true,
                         fontSize: 50,
                         fontWeight: 'bold',
-                        color: '#4B9CD3',
+                        color: '#000000', // 🔹 Texto negro
                         offsetCenter: [0, '70%'], // 🔹 Ubicación más baja
                         formatter: function(value) {
                             return value.toFixed(2) + " %"; // 🔹 Formato con 2 decimales

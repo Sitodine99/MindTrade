@@ -1914,26 +1914,24 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
     private fun calculateDrawdown(): List<Double> {
         val drawdownList = mutableListOf<Double>()
 
-        // 🔹 Convertir el depósito inicial a un número válido
-        val depositValue = depositFixedValue.replace(",", ".").toDoubleOrNull() ?: 0.0
-        var maxBalance = depositValue
-        var currentBalance = depositValue
+        var maxBalance = depositFixedValue.replace(",", ".").toDoubleOrNull() ?: 0.0
+        var currentBalance = maxBalance
 
         for (movement in movementsList) {
             currentBalance += movement.profit ?: 0.0
 
+            // Actualizar el máximo balance alcanzado hasta ahora
             if (currentBalance > maxBalance) {
                 maxBalance = currentBalance
             }
 
+            // 🔹 Calcular drawdown como la caída porcentual desde el último máximo alcanzado
             val drawdown = ((currentBalance - maxBalance) / maxBalance) * 100
             drawdownList.add(drawdown)
         }
 
         return drawdownList
     }
-
-
 
 
 

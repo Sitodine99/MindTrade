@@ -1,4 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -23,7 +25,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Cabecera fija con estilo -->
+            <!-- Cabecera fija con borde negro -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -33,7 +35,6 @@
                 android:padding="8dp"
                 android:layout_marginBottom="16dp">
 
-                <!-- Objetivo de beneficio -->
                 <TextView
                     android:id="@+id/accountProfitTargetTextView"
                     android:layout_width="match_parent"
@@ -43,7 +44,6 @@
                     android:textColor="@android:color/black"
                     android:paddingBottom="4dp" />
 
-                <!-- Máxima pérdida diaria -->
                 <TextView
                     android:id="@+id/accountMaxDailyLossTextView"
                     android:layout_width="match_parent"
@@ -53,7 +53,6 @@
                     android:textColor="@android:color/black"
                     android:paddingBottom="4dp" />
 
-                <!-- Rentabilidad -->
                 <TextView
                     android:id="@+id/accountReturnTextView"
                     android:layout_width="match_parent"
@@ -76,12 +75,29 @@
                 android:paddingBottom="8dp"
                 android:textColor="@android:color/black"/>
 
-            <!-- Gráfico de Movimientos vs Balance -->
-            <WebView
-                android:id="@+id/chartWebViewTest"
+            <!-- Gráfico de Movimientos vs Balance con borde negro -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
-                android:layout_marginBottom="16dp" />
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="@android:color/white"
+                android:layout_marginBottom="16dp"
+                app:cardUseCompatPadding="true">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/black"
+                    android:padding="2dp">
+
+                    <WebView
+                        android:id="@+id/chartWebViewTest"
+                        android:layout_width="match_parent"
+                        android:layout_height="220dp"
+                        android:background="@android:color/white"/>
+                </FrameLayout>
+            </androidx.cardview.widget.CardView>
 
             <!-- Título del gráfico de Estado Emocional -->
             <TextView
@@ -93,14 +109,33 @@
                 android:gravity="center"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
-                android:textColor="@android:color/black"/>
+                android:textColor="@android:color/black" />
 
-            <!-- Gráfico de Estado emocional -->
-            <WebView
-                android:id="@+id/emotionsChartWebView"
+            <!-- Gráfico de Estado emocional con borde negro -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
-                android:layout_marginBottom="16dp" />
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="@android:color/white"
+                android:layout_marginBottom="16dp"
+                app:cardUseCompatPadding="true">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/black"
+                    android:padding="2dp">
+
+                    <WebView
+                        android:id="@+id/emotionsChartWebView"
+                        android:layout_width="match_parent"
+                        android:layout_height="220dp"
+                        android:background="@android:color/white"/>
+                </FrameLayout>
+            </androidx.cardview.widget.CardView>
+
         </LinearLayout>
     </ScrollView>
+
 </FrameLayout>
