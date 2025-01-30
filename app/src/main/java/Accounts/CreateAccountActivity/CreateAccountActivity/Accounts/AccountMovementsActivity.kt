@@ -11,6 +11,9 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputFilter
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -227,24 +230,87 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                         }
                     }
 
-                    2 -> { // Pantalla 3: Gráfico de ratio de éxito
-                        val screenSummaryView = viewPager.findViewWithTag<View>("f2")
-                        if (screenSummaryView == null) {
-                            Log.e("ViewPager", "No se encontró la vista de la pantalla 3 (f2)")
-                        } else {
-                            Log.d("ViewPager", "Actualizando pantalla 3 con el gráfico de éxito")
-                            setupSuccessRatioChart(screenSummaryView)
-                            setupDrawdownChart(screenSummaryView)
-                        }
-                    }
+                    2 -> { // Pantalla 3: Gráfico de ratio de éxito y drawdown
+                        viewPager.post {
+                            val screenSummaryView = viewPager.findViewWithTag<View>("f2")
 
-                    else -> {
-                        Log.d("PageChange", "Página seleccionada: $position")
+                            if (screenSummaryView == null) {
+                                Log.e(
+                                    "ViewPager",
+                                    "No se encontró la vista de la pantalla 3 (f2), intentando de nuevo..."
+                                )
+                                viewPager.postDelayed({
+                                    updateScreenSummary()
+                                }, 500) // 🔹 Intentar actualizar después de 500ms
+                            } else {
+                                updateScreenSummary()
+                            }
+                        }
                     }
                 }
             }
         })
     }
+
+    private fun updateScreenSummary() {
+        val viewPager = findViewById<ViewPager2>(R.id.viewPager)
+        val screenSummaryView = viewPager.findViewWithTag<View>("f2")
+
+        if (screenSummaryView == null) {
+            Log.e("ViewPager", "No se pudo actualizar la pantalla 3, la vista aún es null.")
+            return
+        }
+
+        Log.d("ViewPager", "Actualizando métricas de la pantalla 3 (Resumen)")
+
+        val maxGainTextView = screenSummaryView.findViewById<TextView>(R.id.maxOperationalGainTextView)
+        val maxLossTextView = screenSummaryView.findViewById<TextView>(R.id.maxOperationalLossTextView)
+        val profitCoefficientTextView = screenSummaryView.findViewById<TextView>(R.id.profitCoefficientTextView)
+
+        val maxOperationalGain = movementsList.maxOfOrNull { it.profit ?: 0.0 } ?: 0.0
+        val maxOperationalLoss = movementsList.minOfOrNull { it.profit ?: 0.0 } ?: 0.0
+        val totalProfit = movementsList.sumOf { it.profit ?: 0.0 }
+        val totalLoss = movementsList.filter { (it.profit ?: 0.0) < 0 }.sumOf { kotlin.math.abs(it.profit ?: 0.0) }
+        val profitCoefficient = if (totalLoss > 0) totalProfit / totalLoss else totalProfit
+
+        val forestGreen = ContextCompat.getColor(this, R.color.forest_green)
+        val myRed = ContextCompat.getColor(this, R.color.my_red)
+
+        // 🔹 Formateo de valores numéricos
+        val maxGainText = "Mayor ganancia operativa: $%.2f".format(maxOperationalGain)
+        val maxLossText = "Mayor pérdida operativa: $%.2f".format(maxOperationalLoss)
+        val profitCoefficientText = "Coeficiente de beneficio: %.2f".format(profitCoefficient)
+
+        // 🔹 Aplicar color solo a los valores numéricos
+        val spannableMaxGain = SpannableString(maxGainText).apply {
+            setSpan(ForegroundColorSpan(forestGreen), maxGainText.indexOf("$"), maxGainText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        val spannableMaxLoss = SpannableString(maxLossText).apply {
+            setSpan(ForegroundColorSpan(myRed), maxLossText.indexOf("$"), maxLossText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        val spannableProfitCoefficient = SpannableString(profitCoefficientText).apply {
+            val color = if (profitCoefficient >= 1.0) forestGreen else myRed
+            setSpan(ForegroundColorSpan(color), profitCoefficientText.indexOf(":") + 2, profitCoefficientText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        // 🔹 Asignar los SpannableString a los TextView
+        maxGainTextView.text = spannableMaxGain
+        maxGainTextView.setTextColor(Color.BLACK) // Mantener el texto base en negro
+
+        maxLossTextView.text = spannableMaxLoss
+        maxLossTextView.setTextColor(Color.BLACK) // Mantener el texto base en negro
+
+        profitCoefficientTextView.text = spannableProfitCoefficient
+        profitCoefficientTextView.setTextColor(Color.BLACK) // Mantener el texto base en negro
+
+        setupSuccessRatioChart(screenSummaryView)
+        setupDrawdownChart(screenSummaryView)
+    }
+
+
+
 
     private fun setupMovementsView(rootView: View, accountId: String) {
         val recyclerView = rootView.findViewById<RecyclerView>(R.id.movementsRecyclerView)
@@ -1409,6 +1475,14 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         val db = FirebaseFirestore.getInstance()
         val accountRef = db.collection("accounts").document(accountId)
 
+        // 🔹 Verificar si la vista está inflada antes de actualizar el contador
+        val movementsCountTextView = findViewById<TextView>(R.id.accountMovementsCountTextView)
+
+        if (movementsCountTextView == null) {
+            Log.e("updateMovementsCount", "El TextView de movimientos es null, esperando ViewPager...")
+            return
+        }
+
         // 🔹 Actualizar Firestore con el nuevo número de movimientos
         accountRef.update("movementsCount", movementsList.size)
             .addOnSuccessListener {
@@ -1423,9 +1497,9 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             }
 
         // 🔹 También actualizar el TextView de la UI inmediatamente
-        val movementsCountTextView = findViewById<TextView>(R.id.accountMovementsCountTextView)
         movementsCountTextView.text = "Movimientos: ${movementsList.size}"
     }
+
 
 
     private fun calculateMetrics() {
@@ -1442,14 +1516,11 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             val viewPager = findViewById<ViewPager2>(R.id.viewPager)
             val screenDetailsView = viewPager.findViewWithTag<View>("f1")
 
-            // 🔹 Verificamos que la vista exista antes de actualizarla
+            // 🔹 Actualiza el TextView de rentabilidad
             screenDetailsView?.findViewById<TextView>(R.id.accountReturnTextView)?.apply {
                 text = "Rentabilidad: %.2f %%".format(profitability)
-
-                // 🔹 Usamos colores personalizados desde colors.xml
                 val forestGreen = ContextCompat.getColor(context, R.color.forest_green)
                 val myRed = ContextCompat.getColor(context, R.color.my_red)
-
                 setTextColor(if (profitability >= 0) forestGreen else myRed)
             }
 
@@ -1458,13 +1529,28 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
             var totalGrossProfit = 0.0
             var totalNetProfit = 0.0
 
+            var maxOperationalGain = Double.MIN_VALUE
+            var maxOperationalLoss = Double.MAX_VALUE
+
+            var totalProfit = 0.0
+            var totalLoss = 0.0
+
             movementsList.forEach { movement ->
                 val profit = movement.profit ?: 0.0
                 totalGrossProfit += profit
                 totalSwap += movement.swap ?: 0.0
                 totalCommission += movement.commission ?: 0.0
                 totalNetProfit += profit
+
+                // 🔹 Calcular la mayor ganancia y la mayor pérdida operativa
+                if (profit > maxOperationalGain) maxOperationalGain = profit
+                if (profit < maxOperationalLoss) maxOperationalLoss = profit
+
+                if (profit > 0) totalProfit += profit else totalLoss += kotlin.math.abs(profit)
             }
+
+            // 🔹 Calcular coeficiente de beneficio
+            val profitCoefficient = if (totalLoss > 0) totalProfit / totalLoss else totalProfit
 
             runOnUiThread {
                 // 🔹 Verificamos si la vista está inflada antes de actualizar
@@ -1477,8 +1563,23 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                         accountBalance = updatedBalance,
                         accountCurrency = accountCurrency
                     )
-                } else {
-                    Log.e("UI Error", "La vista aún no está disponible.")
+                }
+
+                // 🔹 Actualizar métricas en la pantalla 3 (ViewPager 3)
+                val screenSummaryView = viewPager.findViewWithTag<View>("f2")
+                screenSummaryView?.let {
+                    it.findViewById<TextView>(R.id.maxOperationalGainTextView)?.text =
+                        "Mayor ganancia operativa: $%.2f".format(maxOperationalGain)
+
+                    it.findViewById<TextView>(R.id.maxOperationalLossTextView)?.text =
+                        "Mayor pérdida operativa: $%.2f".format(maxOperationalLoss)
+
+                    it.findViewById<TextView>(R.id.profitCoefficientTextView)?.apply {
+                        text = "Coeficiente de beneficio: %.2f".format(profitCoefficient)
+                        val forestGreen = ContextCompat.getColor(context, R.color.forest_green)
+                        val myRed = ContextCompat.getColor(context, R.color.my_red)
+                        setTextColor(if (profitCoefficient >= 1.0) forestGreen else myRed)
+                    }
                 }
             }
         }
