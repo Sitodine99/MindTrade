@@ -29,6 +29,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -208,6 +209,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                     1 -> { // Pantalla de detalles
                         val screenDetailsView = viewPager.findViewWithTag<View>("f1")
                         screenDetailsView?.let {
+                            calculateMetrics()
                             val initialBalance = intent.getDoubleExtra("accountBalance", 0.0)
 
                             val (dataX, dataY) = generateChartData(movementsList, initialBalance)
@@ -244,7 +246,7 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         })
     }
 
-        private fun setupMovementsView(rootView: View, accountId: String) {
+    private fun setupMovementsView(rootView: View, accountId: String) {
         val recyclerView = rootView.findViewById<RecyclerView>(R.id.movementsRecyclerView)
         val addMovementButton = rootView.findViewById<ImageButton>(R.id.addMovementButton)
 
@@ -1434,6 +1436,22 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         accountRef.get().addOnSuccessListener { document ->
             val updatedBalance = document.getDouble("balance") ?: 0.0
             val accountCurrency = document.getString("currency") ?: ""
+            val depositValue = depositFixedValue.replace(",", ".").toDoubleOrNull() ?: 1.0
+            val profitability = ((updatedBalance - depositValue) / depositValue) * 100
+
+            val viewPager = findViewById<ViewPager2>(R.id.viewPager)
+            val screenDetailsView = viewPager.findViewWithTag<View>("f1")
+
+            // 🔹 Verificamos que la vista exista antes de actualizarla
+            screenDetailsView?.findViewById<TextView>(R.id.accountReturnTextView)?.apply {
+                text = "Rentabilidad: %.2f %%".format(profitability)
+
+                // 🔹 Usamos colores personalizados desde colors.xml
+                val forestGreen = ContextCompat.getColor(context, R.color.forest_green)
+                val myRed = ContextCompat.getColor(context, R.color.my_red)
+
+                setTextColor(if (profitability >= 0) forestGreen else myRed)
+            }
 
             var totalSwap = 0.0
             var totalCommission = 0.0
@@ -1448,20 +1466,23 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
                 totalNetProfit += profit
             }
 
-            // 🔹 Actualizar balance en la UI inmediatamente
             runOnUiThread {
-                updateMetricsUI(
-                    grossProfit = totalGrossProfit,
-                    swap = totalSwap,
-                    netProfit = totalNetProfit,
-                    commission = totalCommission,
-                    accountCurrency = accountCurrency,
-                    accountBalance = updatedBalance
-                )
+                // 🔹 Verificamos si la vista está inflada antes de actualizar
+                if (findViewById<EditText>(R.id.balanceEditText) != null) {
+                    updateMetricsUI(
+                        grossProfit = totalGrossProfit,
+                        swap = totalSwap,
+                        netProfit = totalNetProfit,
+                        commission = totalCommission,
+                        accountBalance = updatedBalance,
+                        accountCurrency = accountCurrency
+                    )
+                } else {
+                    Log.e("UI Error", "La vista aún no está disponible.")
+                }
             }
         }
     }
-
 
 
     private fun updateMetricsUI(
@@ -1472,20 +1493,18 @@ class AccountMovementsActivity : AppCompatActivity(), MovementsAdapter.MovementA
         accountBalance: Double,
         accountCurrency: String
     ) {
-        findViewById<EditText>(R.id.TotalswapEditText).setText(String.format("%.2f", swap))
-        findViewById<EditText>(R.id.TotalcommissionEditText).setText(
-            String.format(
-                "%.2f",
-                commission
-            )
-        )
-        findViewById<EditText>(R.id.grossProfitEditText).setText(String.format("%.2f", grossProfit))
+        // Verificar si la vista existe antes de actualizarla
+        val swapEditText = findViewById<EditText>(R.id.TotalswapEditText)
+        val commissionEditText = findViewById<EditText>(R.id.TotalcommissionEditText)
+        val grossProfitEditText = findViewById<EditText>(R.id.grossProfitEditText)
+        val balanceEditText = findViewById<EditText>(R.id.balanceEditText)
 
-        // 🔹 Solo mostrar el balance, sin recalcularlo manualmente
-        findViewById<EditText>(R.id.balanceEditText).setText(
-            "%.2f %s".format(accountBalance, accountCurrency)
-        )
+        swapEditText?.setText(String.format("%.2f", swap))
+        commissionEditText?.setText(String.format("%.2f", commission))
+        grossProfitEditText?.setText(String.format("%.2f", grossProfit))
+        balanceEditText?.setText("%.2f %s".format(accountBalance, accountCurrency))
     }
+
 
 
     private fun setupECharts(rootView: View, dataX: List<String>, dataY: List<Double>) {
