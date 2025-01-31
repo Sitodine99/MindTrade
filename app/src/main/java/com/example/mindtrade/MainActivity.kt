@@ -24,6 +24,8 @@ import adapters.StrategyAdapter
 import android.app.AlertDialog
 import android.app.Dialog
 import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
 import android.text.InputFilter
 import android.util.Log
 import android.view.View
@@ -1026,10 +1028,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
 
             R.id.nav_profile -> {
-                val intent = Intent(this, ProfileActivity::class.java)
-                startActivity(intent)
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+
+                Handler(Looper.getMainLooper()).postDelayed({
+                    val intent = Intent(this, ProfileActivity::class.java)
+                    startActivity(intent)
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+
+                    // Restaura la visibilidad de MainActivity después de iniciar ProfileActivity
+                    findViewById<View>(R.id.mainContentLayout).postDelayed({
+                        findViewById<View>(R.id.mainContentLayout).visibility = View.VISIBLE
+                    }, 300)
+                }, 150) // Retraso antes de iniciar la actividad (ajústalo según prefieras)
             }
+
+
+
 
 
             R.id.nav_strategies -> {

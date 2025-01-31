@@ -3,10 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/profileContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileActivity">
+    tools:context=".ProfileActivity"
+    android:visibility="invisible"> <!-- Oculta la UI inicialmente -->
 
     <!-- Imagen de fondo -->
     <ImageView
@@ -15,210 +16,161 @@
         android:layout_height="match_parent"
         android:contentDescription="@string/buildings_image_description"
         android:scaleType="centerCrop"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/edificios" />
 
-    <!-- Título de la pantalla -->
-    <TextView
-        android:id="@+id/profileTitle"
-        android:layout_width="wrap_content"
+    <!-- Contenedor de información -->
+    <LinearLayout
+        android:id="@+id/mainLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
-        android:fontFamily="serif"
-        android:text="@string/my_profile"
-        android:textAlignment="center"
-        android:textColor="#070707"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <!-- Avatar circular con bordes -->
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/profileAvatar"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="20dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/interrogacion"
-        android:padding="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/profileTitle"
-        app:shapeAppearanceOverlay="@style/CircularImage"
-        app:strokeColor="@android:color/black"
-        app:strokeWidth="7.5dp" />
+        <!-- Título -->
+        <TextView
+            android:id="@+id/profileTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/my_profile"
+            android:textColor="#070707"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="20dp" />
 
-    <!-- Alias del usuario -->
-    <TextView
-        android:id="@+id/profileAlias"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:fontFamily="serif"
-        android:text="@string/user_alias"
-        android:textAlignment="center"
-        android:textColor="#070707"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/profileAvatar" />
+        <!-- Avatar -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/profileAvatar"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/interrogacion"
+            android:padding="5dp"
+            app:shapeAppearanceOverlay="@style/CircularImage"
+            app:strokeColor="@android:color/black"
+            app:strokeWidth="5dp"
+            android:layout_marginBottom="15dp"/>
 
-    <!-- Correo electrónico -->
-    <TextView
-        android:id="@+id/profileEmail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/user_email"
-        android:textSize="16sp"
-        android:textColor="@android:color/darker_gray"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/profileAlias" />
+        <!-- Alias -->
+        <TextView
+            android:id="@+id/profileAlias"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/user_alias"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#070707"
+            android:layout_marginBottom="5dp"/>
 
-    <!-- Estilo de Trading -->
-    <TextView
-        android:id="@+id/profileTradingStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="@string/trading_style"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="#070707"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/profileEmail" />
+        <!-- Correo electrónico -->
+        <TextView
+            android:id="@+id/profileEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/user_email"
+            android:textSize="16sp"
+            android:textColor="@android:color/darker_gray"
+            android:layout_marginBottom="20dp"/>
 
-    <!-- Estado Psicológico -->
-    <TextView
-        android:id="@+id/profilePsicoState"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/psico_state"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="#070707"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/profileTradingStyle" />
+        <!-- Datos de Trading -->
+        <TextView
+            android:id="@+id/profileTradingStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/trading_style"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#070707"
+            android:layout_marginBottom="8dp"/>
 
-    <!-- Emoción Predominante -->
-    <TextView
-        android:id="@+id/profileEmotion"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/emotion_state"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="#070707"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/profilePsicoState" />
+        <TextView
+            android:id="@+id/profilePsicoState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/psico_state"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#070707"
+            android:layout_marginBottom="8dp"/>
 
-    <!-- **Sección de Estadísticas** -->
+        <TextView
+            android:id="@+id/profileEmotion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/emotion_state"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#070707"
+            android:layout_marginBottom="20dp"/>
 
-    <!-- Edad -->
-    <TextView
-        android:id="@+id/profileAge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Edad: --"
-        android:textSize="18sp"
-        android:textColor="#000000"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/profileEmotion"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="10dp"/>
+        <!-- Sección de Estadísticas -->
+        <TextView
+            android:id="@+id/profileAge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Edad: --"
+            android:textSize="18sp"
+            android:textColor="#000000"
+            android:layout_marginBottom="5dp"/>
 
-    <!-- Estrategias publicadas -->
-    <TextView
-        android:id="@+id/profileStrategies"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Estrategias publicadas: --"
-        android:textSize="18sp"
-        android:textColor="#000000"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/profileAge"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="5dp"/>
+        <TextView
+            android:id="@+id/profileStrategies"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estrategias publicadas: --"
+            android:textSize="18sp"
+            android:textColor="#000000"
+            android:layout_marginBottom="5dp"/>
 
-    <!-- Cuentas creadas -->
-    <TextView
-        android:id="@+id/profileAccounts"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Cuentas creadas: --"
-        android:textSize="18sp"
-        android:textColor="#000000"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/profileStrategies"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="5dp"/>
+        <TextView
+            android:id="@+id/profileAccounts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cuentas creadas: --"
+            android:textSize="18sp"
+            android:textColor="#000000"
+            android:layout_marginBottom="5dp"/>
 
-    <!-- Número de operaciones -->
-    <TextView
-        android:id="@+id/profileTrades"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Nº de operaciones: --"
-        android:textSize="18sp"
-        android:textColor="#000000"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/profileAccounts"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="5dp"/>
+        <TextView
+            android:id="@+id/profileTrades"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nº de operaciones: --"
+            android:textSize="18sp"
+            android:textColor="#000000"
+            android:layout_marginBottom="5dp"/>
 
-    <!-- Número de comentarios -->
-    <TextView
-        android:id="@+id/profileComments"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Nº de comentarios: --"
-        android:textSize="18sp"
-        android:textColor="#000000"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/profileTrades"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="5dp"/>
-    <!-- Valoración media -->
-    <TextView
-        android:id="@+id/profileAverageRating"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Valoración media: --"
-        android:textSize="18sp"
-        android:textColor="#000000"
-        app:layout_constraintTop_toBottomOf="@id/profileComments"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="5dp"/>
+        <TextView
+            android:id="@+id/profileComments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nº de comentarios: --"
+            android:textSize="18sp"
+            android:textColor="#000000"
+            android:layout_marginBottom="5dp"/>
 
-    <!-- Activo favorito -->
-    <TextView
-        android:id="@+id/profileFavoriteAsset"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Activo favorito: --"
-        android:textSize="18sp"
-        android:textColor="#000000"
-        app:layout_constraintTop_toBottomOf="@id/profileAverageRating"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="5dp"/>
+        <TextView
+            android:id="@+id/profileAverageRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valoración media: --"
+            android:textSize="18sp"
+            android:textColor="#000000"
+            android:layout_marginBottom="5dp"/>
+
+        <TextView
+            android:id="@+id/profileFavoriteAsset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Activo favorito: --"
+            android:textSize="18sp"
+            android:textColor="#000000"
+            android:layout_marginBottom="5dp"/>
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
