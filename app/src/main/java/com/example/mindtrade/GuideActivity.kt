@@ -80,6 +80,7 @@ class GuideActivity : AppCompatActivity() {
         val spannableString = SpannableString(guideText)
         val boldSections = listOf(
             "📌 Bienvenido a Mind Trade",
+            "🔹 Crear una cuenta simulada",
             "🔹 Cómo registrar una estrategia",
             "🔹 Registro de operaciones en cuentas simuladas",
             "🔹 Búsqueda y consulta de estrategias",
