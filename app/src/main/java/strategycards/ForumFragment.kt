@@ -1,10 +1,8 @@
-//Este fragmento gestionará la vista y la lógica de los comentarios.
-
 package strategycards
-
 
 import adapters.CommentsAdapter
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +12,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mindtrade.MainActivity
 import com.example.mindtrade.R
 import com.example.mindtrade.model.Strategy
 import com.google.firebase.auth.FirebaseAuth
@@ -34,7 +33,7 @@ class ForumFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val view = inflater.inflate(R.layout.fragment_forum, container, false)
 
         commentsRecyclerView = view.findViewById(R.id.commentsRecyclerView)
@@ -95,16 +94,20 @@ class ForumFragment : Fragment() {
                             db.collection("strategies").document(strategyId).update(
                                 "comments", updatedComments
                             ).addOnFailureListener {
-                                Toast.makeText(
-                                    context,
-                                    "Error al actualizar comentarios",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast.makeText(context, "Error al actualizar comentarios", Toast.LENGTH_SHORT).show()
                             }
                         }
 
                         // Mostrar los comentarios actualizados
                         commentsAdapter.setComments(updatedComments)
+
+                        // 🔹 Guardar el último comentario leído
+                        val lastCommentTimestamp = updatedComments.maxOfOrNull { it.timestamp } ?: 0
+                        setLastReadTimestamp(strategyId, lastCommentTimestamp)
+
+                        // 🔹 Volver a verificar si hay notificaciones pendientes
+                        val mainActivity = activity as? MainActivity
+                        mainActivity?.checkForNewComments()
                     }
                     .addOnFailureListener {
                         Toast.makeText(context, "Error al recuperar datos del usuario", Toast.LENGTH_SHORT).show()
@@ -115,11 +118,17 @@ class ForumFragment : Fragment() {
             }
     }
 
+    private fun setLastReadTimestamp(strategyId: String, timestamp: Long) {
+        val sharedPreferences = requireContext().getSharedPreferences(
+            "MindTradePrefs",
+            android.content.Context.MODE_PRIVATE
+        )
+        sharedPreferences.edit().putLong("last_read_comment_$strategyId", timestamp).apply()
+    }
 
     private fun addComment(content: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
-        // Recuperar el alias y avatar desde Firestore
         db.collection("users").document(userId).get()
             .addOnSuccessListener { userDoc ->
                 val userAlias = userDoc.getString("alias") ?: "Anónimo"
@@ -137,21 +146,68 @@ class ForumFragment : Fragment() {
                 )
 
                 strategyId?.let { id ->
-                    db.collection("strategies").document(id).update(
-                        "comments", FieldValue.arrayUnion(newComment)
-                    ).addOnSuccessListener {
-                        commentEditText.text.clear()
-                        loadComments(id)
-                        Toast.makeText(context, "Comentario añadido", Toast.LENGTH_SHORT).show()
-                    }.addOnFailureListener {
-                        Toast.makeText(context, "Error al añadir comentario", Toast.LENGTH_SHORT)
-                            .show()
-                    }
+                    val strategyRef = db.collection("strategies").document(id)
+
+                    // 🔹 Actualizamos el array de comentarios en Firestore
+                    strategyRef.update("comments", FieldValue.arrayUnion(newComment))
+                        .addOnSuccessListener {
+                            Log.d("Firestore", "Comentario añadido correctamente a la estrategia.")
+                            commentEditText.text.clear() // Borrar campo de texto
+                            loadComments(id) // Recargar comentarios
+                            Toast.makeText(context, "Comentario añadido", Toast.LENGTH_SHORT).show()
+
+                            // 🔥 Notificar al creador de la estrategia
+                            markStrategyAsNewComment(id)
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("Firestore", "Error al añadir comentario: ${e.message}")
+                            Toast.makeText(context, "Error al añadir comentario", Toast.LENGTH_SHORT).show()
+                        }
                 }
             }
-            .addOnFailureListener {
-                Toast.makeText(context, "Error al recuperar datos del usuario", Toast.LENGTH_SHORT)
-                    .show()
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error al obtener datos del usuario: ${e.message}")
+                Toast.makeText(context, "Error al obtener datos del usuario", Toast.LENGTH_SHORT).show()
             }
     }
+
+
+
+    private fun markStrategyAsNewComment(strategyId: String) {
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        db.collection("strategies").document(strategyId).get()
+            .addOnSuccessListener { strategyDoc ->
+                val strategyOwnerId = strategyDoc.getString("createdBy") ?: return@addOnSuccessListener
+                val strategyTitle = strategyDoc.getString("title") ?: "Estrategia sin nombre"
+
+                // 🔹 No notificar si el usuario comenta su propia estrategia
+                if (strategyOwnerId == currentUserId) return@addOnSuccessListener
+
+                val notificationRef = db.collection("notifications").document(strategyOwnerId)
+
+                notificationRef.get().addOnSuccessListener { document ->
+                    val newComments = document.get("newComments") as? MutableList<Map<String, String>> ?: mutableListOf()
+
+                    // 🔥 Si la estrategia aún no está en las notificaciones, añadirla con su nombre
+                    if (newComments.none { it["id"] == strategyId }) {
+                        newComments.add(mapOf("id" to strategyId, "title" to strategyTitle))
+                    }
+
+                    // 🔹 Guardamos la notificación en Firestore
+                    notificationRef.set(mapOf("newComments" to newComments))
+                        .addOnSuccessListener {
+                            Log.d("Firestore", "Notificación enviada a $strategyOwnerId con título: $strategyTitle")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("Firestore", "Error al guardar notificación: ${e.message}")
+                        }
+                }.addOnFailureListener { e ->
+                    Log.e("Firestore", "Error al obtener notificaciones: ${e.message}")
+                }
+            }.addOnFailureListener { e ->
+                Log.e("Firestore", "Error al obtener estrategia: ${e.message}")
+            }
+    }
+
 }

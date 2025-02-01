@@ -64,6 +64,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var strategiesWithImagesRecyclerView: RecyclerView
     private lateinit var addStrategyButton: ImageButton
     private lateinit var searchStrategyButton: ImageButton
+    private lateinit var notificationButton: ImageButton
 
 
     private lateinit var navAvatarImage: ImageView
@@ -91,6 +92,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        notificationButton = findViewById(R.id.notificationButton)
+        checkForNewComments() // Llamamos a la función para verificar si hay comentarios no leídos
+        listenForNewComments()
 
         // Inicializar el botón de búsqueda
         searchStrategyButton = findViewById(R.id.searchStrategyButton)
@@ -115,7 +119,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
 
-
         // Inicializar botones principales
         val addAccountButton: ImageButton = findViewById(R.id.addAccountButton)
         addStrategyButton = findViewById(R.id.addStrategyButton)
@@ -126,12 +129,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             showCreateAccountDialog()
         }
 
+        notificationButton.setOnClickListener {
+            showNewCommentsDialog()
+        }
+
+
         searchStrategyButton.setOnClickListener {
             val intent = Intent(this, SearchStrategyActivity::class.java)
             startActivity(intent)
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out) // Transición suave
+            overridePendingTransition(
+                android.R.anim.fade_in,
+                android.R.anim.fade_out
+            ) // Transición suave
         }
-
 
 
         // Listener para añadir estrategias
@@ -258,7 +268,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     // Método para actualizar las estrategias del usuario
-    private fun updateUserStrategies(newAlias: String, newAvatarUrl: String?, newAvatarName: String) {
+    private fun updateUserStrategies(
+        newAlias: String,
+        newAvatarUrl: String?,
+        newAvatarName: String
+    ) {
         userId?.let { id ->
             // Buscar todas las estrategias creadas por el usuario
             db.collection("strategies").whereEqualTo("createdBy", id).get()
@@ -274,12 +288,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }
                 }
                 .addOnFailureListener { e ->
-                    Toast.makeText(this, "Error actualizando estrategias: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        "Error actualizando estrategias: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
         }
     }
 
-    private val initialBalances = mutableMapOf<String, Double>() // HashMap para almacenar balances iniciales
+    private val initialBalances =
+        mutableMapOf<String, Double>() // HashMap para almacenar balances iniciales
 
     private fun fetchAccounts(onAccountsLoaded: (List<Account>) -> Unit) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -307,10 +326,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
 
 
-    db.collection("accounts").whereEqualTo("userId", userId)
+        db.collection("accounts").whereEqualTo("userId", userId)
             .addSnapshotListener { documents, error ->
                 if (error != null) {
-                    Toast.makeText(this, "Error al obtener cuentas: ${error.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        "Error al obtener cuentas: ${error.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     return@addSnapshotListener
                 }
 
@@ -339,13 +362,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 val intent = Intent(this, AccountMovementsActivity::class.java).apply {
                     putExtra("accountName", selectedAccount.name)
                     putExtra("accountCreatedAt", selectedAccount.createdAt)
-                    putExtra("accountInitialBalance", initialBalances[selectedAccount.id] ?: selectedAccount.balance)
-                    putExtra("accountId", selectedAccount.id) // Enviar también el ID si es necesario
+                    putExtra(
+                        "accountInitialBalance",
+                        initialBalances[selectedAccount.id] ?: selectedAccount.balance
+                    )
+                    putExtra(
+                        "accountId",
+                        selectedAccount.id
+                    ) // Enviar también el ID si es necesario
                     putExtra("accountCreationDate", selectedAccount.createdAt)
                     putExtra("accountCurrency", selectedAccount.currency)
                     putExtra("accountProfitTarget", selectedAccount.profitTarget ?: 0.0)
                     putExtra("accountMaxDailyLoss", selectedAccount.maxDailyLoss ?: 0.0)
-                    putStringArrayListExtra("accountMovements", ArrayList(selectedAccount.movements))
+                    putStringArrayListExtra(
+                        "accountMovements",
+                        ArrayList(selectedAccount.movements)
+                    )
                     putExtra("accountIsActive", selectedAccount.isActive)
                 }
                 startActivity(intent)
@@ -364,13 +396,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         findViewById<View>(R.id.changeAccountsButton)?.setOnClickListener {
             val accountNames = allAccounts.map { it.name }.toTypedArray()
             val selectedIndices = mutableListOf<Int>() // Almacena las cuentas seleccionadas
-            val selectedItems = BooleanArray(accountNames.size) // Estados seleccionados para el diálogo
+            val selectedItems =
+                BooleanArray(accountNames.size) // Estados seleccionados para el diálogo
 
             val builder = AlertDialog.Builder(this)
                 .setTitle("Seleccionar cuentas")
 
             // Crear y almacenar una referencia explícita al AlertDialog
-            val dialog = builder.setMultiChoiceItems(accountNames, selectedItems) { dialogInterface, index, isChecked ->
+            val dialog = builder.setMultiChoiceItems(
+                accountNames,
+                selectedItems
+            ) { dialogInterface, index, isChecked ->
                 val alertDialog = dialogInterface as AlertDialog // Cast explícito
                 if (isChecked) {
                     if (selectedIndices.size < 2) {
@@ -379,7 +415,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         // Si ya hay 2 seleccionadas, desmarcamos visualmente y mostramos mensaje
                         selectedItems[index] = false
                         alertDialog.listView.setItemChecked(index, false) // Desmarcamos visualmente
-                        Toast.makeText(this, "Solo puedes seleccionar un máximo de dos cuentas", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this,
+                            "Solo puedes seleccionar un máximo de dos cuentas",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 } else {
                     selectedIndices.remove(index)
@@ -402,7 +442,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    fun showAccountSelectionDialog(allAccounts: List<Account>, onSelectionDone: (List<Account>) -> Unit) {
+    fun showAccountSelectionDialog(
+        allAccounts: List<Account>,
+        onSelectionDone: (List<Account>) -> Unit
+    ) {
         val accountNames = allAccounts.map { it.name }.toTypedArray()
         val selectedIndices = mutableListOf<Int>() // Almacena las cuentas seleccionadas
         val selectedItems = BooleanArray(accountNames.size) // Estados seleccionados para el diálogo
@@ -411,7 +454,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             .setTitle("Seleccionar cuentas")
 
         // Crear y almacenar una referencia explícita al AlertDialog
-        val dialog = builder.setMultiChoiceItems(accountNames, selectedItems) { dialogInterface, index, isChecked ->
+        val dialog = builder.setMultiChoiceItems(
+            accountNames,
+            selectedItems
+        ) { dialogInterface, index, isChecked ->
             val alertDialog = dialogInterface as AlertDialog // Cast explícito
             if (isChecked) {
                 if (selectedIndices.size < 2) {
@@ -420,7 +466,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     // Si ya hay 2 seleccionadas, desmarcamos visualmente y mostramos mensaje
                     selectedItems[index] = false
                     alertDialog.listView.setItemChecked(index, false) // Desmarcamos visualmente
-                    Toast.makeText(this, "Solo puedes seleccionar un máximo de dos cuentas", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        "Solo puedes seleccionar un máximo de dos cuentas",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } else {
                 selectedIndices.remove(index)
@@ -436,9 +486,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         dialog.show()
     }
-
-
-
 
 
     private fun startAutoScroll(recyclerView: RecyclerView, itemCount: Int) {
@@ -516,7 +563,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     putStringArray("tradingStyles", strategy.tradingStyles.toTypedArray())
                     putDouble("strategyRating", strategy.rating)
                     putStringArray("strategySymbols", strategy.symbols.toTypedArray())
-                    putString("algorithmCode", strategy.algorithmCode) // Pasar el campo algorithmCode
+                    putString(
+                        "algorithmCode",
+                        strategy.algorithmCode
+                    ) // Pasar el campo algorithmCode
                 }
             }
 
@@ -540,7 +590,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Toast.makeText(this, "ID de estrategia no válido.", Toast.LENGTH_SHORT).show()
         }
     }
-
 
 
     private fun setupRecyclerViews() {
@@ -647,7 +696,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 // Es un recurso local
                 val avatarImageResource = getAvatarImageResource(userAvatarName)
                 val intent = Intent(this, ImageDetailActivity::class.java).apply {
-                    putExtra("imageResId", avatarImageResource ?: R.drawable.interrogacion) // Recurso local o imagen predeterminada
+                    putExtra(
+                        "imageResId",
+                        avatarImageResource ?: R.drawable.interrogacion
+                    ) // Recurso local o imagen predeterminada
                     putExtra("imageName", alias) // Alias del usuario
                 }
                 startActivityWithFade(intent)
@@ -715,7 +767,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
-
     private fun openImageDetail(imageResId: Int?, imageName: String, imageUrl: String? = null) {
         val intent = Intent(this, ImageDetailActivity::class.java)
 
@@ -770,7 +821,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
-
     private fun updateNavigationView(avatarUrl: String?, avatarName: String?) {
         // Actualizar avatar en el NavigationView
         if (!avatarUrl.isNullOrEmpty() && avatarUrl.startsWith("https://")) {
@@ -807,12 +857,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             "Day trader" -> navTradingStyleText.setTextColor(
                 resources.getColor(R.color.turquoise_blue, theme)
             )
+
             "Scalper" -> navTradingStyleText.setTextColor(
                 resources.getColor(R.color.orange, theme)
             )
+
             "Swing trader" -> navTradingStyleText.setTextColor(
                 resources.getColor(R.color.blue_light, theme)
             )
+
             else -> navTradingStyleText.setTextColor(
                 resources.getColor(android.R.color.white, theme)
             )
@@ -828,9 +881,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             "Psico +" -> navPsicoStateText.setTextColor(
                 resources.getColor(R.color.highlight_green, theme)
             )
+
             "Psico -" -> navPsicoStateText.setTextColor(
                 resources.getColor(R.color.my_red, theme)
             )
+
             else -> navPsicoStateText.setTextColor(
                 resources.getColor(android.R.color.white, theme)
             )
@@ -885,9 +940,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             in negativeEmotionTexts -> navEmotionText.setTextColor(
                 resources.getColor(R.color.my_red, theme)
             )
+
             in positiveEmotionTexts -> navEmotionText.setTextColor(
                 resources.getColor(R.color.highlight_green, theme)
             )
+
             else -> navEmotionText.setTextColor(
                 resources.getColor(android.R.color.white, theme)
             )
@@ -917,7 +974,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             avatarImage.setImageResource(R.drawable.interrogacion)
         }
     }
-
 
 
     private fun setTradingStyleImage(tradingStyle: String?) {
@@ -1009,11 +1065,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         findViewById<ImageButton>(R.id.changeAccountsButton).visibility = View.VISIBLE
 
 
-
         // Ocultar el contenedor de fragmentos
         findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility = View.GONE
     }
-
 
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -1042,15 +1096,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
 
 
-
-
-
             R.id.nav_strategies -> {
                 // Ocultar vistas del MainActivity
                 findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.GONE
                 findViewById<TextView>(R.id.accountsSummary).visibility = View.GONE
                 findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.GONE
-                findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility = View.GONE
+                findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility =
+                    View.GONE
                 findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.GONE
                 findViewById<ImageButton>(R.id.addStrategyButton).visibility = View.GONE
                 findViewById<ImageButton>(R.id.addAccountButton).visibility = View.GONE
@@ -1058,9 +1110,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 findViewById<ImageButton>(R.id.changeAccountsButton).visibility = View.GONE
 
 
-
                 // Mostrar contenedor de fragmentos
-                findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility = View.VISIBLE
+                findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility =
+                    View.VISIBLE
 
                 // Reemplazar el fragmento
                 val fragment = MyStrategiesFragment()
@@ -1074,7 +1126,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.GONE
                 findViewById<TextView>(R.id.accountsSummary).visibility = View.GONE
                 findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.GONE
-                findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility = View.GONE
+                findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility =
+                    View.GONE
                 findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.GONE
                 findViewById<ImageButton>(R.id.addStrategyButton).visibility = View.GONE
                 findViewById<ImageButton>(R.id.addAccountButton).visibility = View.GONE
@@ -1082,9 +1135,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 findViewById<ImageButton>(R.id.changeAccountsButton).visibility = View.GONE
 
 
-
                 // Mostrar contenedor de fragmentos
-                findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility = View.VISIBLE
+                findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility =
+                    View.VISIBLE
 
                 // Reemplazar el fragmento
                 val fragment = FavoriteStrategiesFragment()
@@ -1100,7 +1153,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 findViewById<RecyclerView>(R.id.accountsRecyclerView).visibility = View.GONE
                 findViewById<TextView>(R.id.accountsSummary).visibility = View.GONE
                 findViewById<RecyclerView>(R.id.strategiesRecyclerView).visibility = View.GONE
-                findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility = View.GONE
+                findViewById<RecyclerView>(R.id.strategiesWithImagesRecyclerView).visibility =
+                    View.GONE
                 findViewById<TextView>(R.id.tradingStrategiesSummary).visibility = View.GONE
                 findViewById<ImageButton>(R.id.addStrategyButton).visibility = View.GONE
                 findViewById<ImageButton>(R.id.addAccountButton).visibility = View.GONE
@@ -1108,9 +1162,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 findViewById<ImageButton>(R.id.changeAccountsButton).visibility = View.GONE
 
 
-
                 // Asegurarte de que el contenedor de fragmentos esté visible
-                findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility = View.VISIBLE
+                findViewById<FragmentContainerView>(R.id.fragmentContainer).visibility =
+                    View.VISIBLE
 
                 // Reemplazar el contenido del contenedor con el fragmento MyAccountsFragment
                 val fragment = MyAccountsFragment()
@@ -1246,7 +1300,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val maxDailyLoss = maxDailyLossInput.text.toString().toDoubleOrNull() ?: 0.0
 
             if (name.isEmpty()) {
-                Toast.makeText(this, "El nombre de la cuenta es obligatorio", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "El nombre de la cuenta es obligatorio", Toast.LENGTH_SHORT)
+                    .show()
                 return@setOnClickListener
             }
 
@@ -1256,12 +1311,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
 
             if (maxDailyLoss > balance) {
-                Toast.makeText(this, "La pérdida máxima diaria no puede ser mayor que el balance", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "La pérdida máxima diaria no puede ser mayor que el balance",
+                    Toast.LENGTH_SHORT
+                ).show()
                 return@setOnClickListener
             }
 
             if (profitTarget < balance) {
-                Toast.makeText(this, "El objetivo de beneficio no puede ser menor que el balance", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "El objetivo de beneficio no puede ser menor que el balance",
+                    Toast.LENGTH_SHORT
+                ).show()
                 return@setOnClickListener
             }
 
@@ -1286,7 +1349,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         dialog.dismiss() // Cierra el diálogo
                     }
                     .addOnFailureListener { e ->
-                        Toast.makeText(this, "Error al guardar la cuenta: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this,
+                            "Error al guardar la cuenta: ${e.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
             } else {
                 Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
@@ -1310,9 +1377,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     if (snapshot.exists()) {
                         val predominantPsico = snapshot.getString("psico") ?: "No definido"
                         val predominantEmotion = snapshot.getString("emotion") ?: "No definido"
-                        val predominantTradingStyle = snapshot.getString("trading_style") ?: "No definido"
+                        val predominantTradingStyle =
+                            snapshot.getString("trading_style") ?: "No definido"
 
-                        Log.d("DynamicImages", "Psico: $predominantPsico, Emotion: $predominantEmotion, Style: $predominantTradingStyle")
+                        Log.d(
+                            "DynamicImages",
+                            "Psico: $predominantPsico, Emotion: $predominantEmotion, Style: $predominantTradingStyle"
+                        )
 
                         // Aquí actualizamos las imágenes con los nuevos datos
                         setPsicoImage(predominantPsico)
@@ -1328,13 +1399,96 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    fun checkForNewComments() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val notificationRef = db.collection("notifications").document(userId)
 
-    // Método auxiliar para calcular el valor predominante en una lista
-    private fun calculatePredominant(values: List<String?>): String? {
-        return values.filterNotNull() // Ignorar valores nulos
-            .groupingBy { it }
-            .eachCount()
-            .maxByOrNull { it.value }?.key // Obtener el más frecuente
+        notificationRef.get().addOnSuccessListener { document ->
+            val newComments = document.get("newComments") as? List<String> ?: emptyList()
+
+            updateNotificationIcon(newComments.isNotEmpty()) // 🔔 Actualiza el icono de notificación
+
+            if (newComments.isNotEmpty()) {
+                val sharedPreferences = getSharedPreferences("MindTradePrefs", MODE_PRIVATE)
+                sharedPreferences.edit()
+                    .putStringSet("new_comments_strategies", newComments.toSet()).apply()
+            }
+        }.addOnFailureListener { e ->
+            Log.e("Firestore", "Error al obtener notificaciones: ${e.message}")
+        }
     }
+
+
+    private fun updateNotificationIcon(hasNewComments: Boolean) {
+        val notificationButton = findViewById<ImageButton>(R.id.notificationButton)
+        if (hasNewComments) {
+            notificationButton.setImageResource(R.drawable.ic_notifications_active)
+        } else {
+            notificationButton.setImageResource(R.drawable.ic_notifications)
+        }
+    }
+
+    private fun showNewCommentsDialog() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val notificationRef = db.collection("notifications").document(userId)
+
+        notificationRef.get().addOnSuccessListener { document ->
+            val newComments = document.get("newComments") as? List<Map<String, String>> ?: emptyList()
+
+            if (newComments.isEmpty()) {
+                Toast.makeText(this, "No tienes nuevas notificaciones", Toast.LENGTH_SHORT).show()
+                return@addOnSuccessListener
+            }
+
+            val titles = newComments.map { "Tienes nuevos comentarios en la estrategia: ${it["title"]}" }
+
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Nuevas notificaciones")
+            builder.setItems(titles.toTypedArray()) { _, _ -> }
+            builder.setPositiveButton("OK") { _, _ ->
+                markAllCommentsAsRead(userId) // 🔹 Marcar todos los comentarios como leídos
+            }
+            builder.show()
+        }
+    }
+
+
+    private fun markCommentsAsRead(strategyId: String) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val notificationRef = db.collection("notifications").document(userId)
+
+        notificationRef.get().addOnSuccessListener { document ->
+            val newComments = document.get("newComments") as? MutableList<String> ?: mutableListOf()
+            newComments.remove(strategyId)
+
+            notificationRef.set(mapOf("newComments" to newComments)).addOnSuccessListener {
+                updateNotificationIcon(newComments.isNotEmpty())
+            }
+        }
+    }
+
+
+    private fun listenForNewComments() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        db.collection("strategies")
+            .whereEqualTo("createdBy", userId)
+            .addSnapshotListener { snapshots, error ->
+                if (error != null) {
+                    return@addSnapshotListener
+                }
+
+                checkForNewComments() // Revisar si hay nuevos comentarios no leídos
+            }
+    }
+
+    private fun markAllCommentsAsRead(userId: String) {
+        val notificationRef = db.collection("notifications").document(userId)
+        notificationRef.update("newComments", emptyList<String>())
+            .addOnSuccessListener {
+                updateNotificationIcon(false) // Restablece el icono de notificación
+            }
+    }
+
 
 }

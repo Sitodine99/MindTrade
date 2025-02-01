@@ -6,8 +6,7 @@
     android:id="@+id/profileContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileActivity"
-    android:visibility="invisible"> <!-- Oculta la UI inicialmente -->
+    tools:context=".ProfileActivity">
 
     <!-- Imagen de fondo -->
     <ImageView
@@ -115,6 +114,7 @@
             android:text="Edad: --"
             android:textSize="18sp"
             android:textColor="#000000"
+            android:textStyle="bold"
             android:layout_marginBottom="5dp"/>
 
         <TextView
@@ -123,6 +123,7 @@
             android:layout_height="wrap_content"
             android:text="Estrategias publicadas: --"
             android:textSize="18sp"
+            android:textStyle="bold"
             android:textColor="#000000"
             android:layout_marginBottom="5dp"/>
 
@@ -131,6 +132,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cuentas creadas: --"
+            android:textStyle="bold"
             android:textSize="18sp"
             android:textColor="#000000"
             android:layout_marginBottom="5dp"/>
@@ -141,6 +143,7 @@
             android:layout_height="wrap_content"
             android:text="Nº de operaciones: --"
             android:textSize="18sp"
+            android:textStyle="bold"
             android:textColor="#000000"
             android:layout_marginBottom="5dp"/>
 
@@ -150,6 +153,7 @@
             android:layout_height="wrap_content"
             android:text="Nº de comentarios: --"
             android:textSize="18sp"
+            android:textStyle="bold"
             android:textColor="#000000"
             android:layout_marginBottom="5dp"/>
 
@@ -160,6 +164,7 @@
             android:text="Valoración media: --"
             android:textSize="18sp"
             android:textColor="#000000"
+            android:textStyle="bold"
             android:layout_marginBottom="5dp"/>
 
         <TextView
@@ -169,6 +174,7 @@
             android:text="Activo favorito: --"
             android:textSize="18sp"
             android:textColor="#000000"
+            android:textStyle="bold"
             android:layout_marginBottom="5dp"/>
 
     </LinearLayout>
