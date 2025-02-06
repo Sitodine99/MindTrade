@@ -245,5 +245,4 @@ class StrategyDetailFragment : Fragment() {
         favoriteIcon.setImageResource(iconRes)
     }
 
-
 }

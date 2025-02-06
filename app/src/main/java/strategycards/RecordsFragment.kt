@@ -92,15 +92,4 @@ class RecordsFragment : Fragment() {
             recordsAdapter.notifyDataSetChanged() // Notificar al Adapter
         }
     }
-
-    companion object {
-        // Método para crear una nueva instancia con strategyId como argumento
-        fun newInstance(strategyId: String): RecordsFragment {
-            val fragment = RecordsFragment()
-            val args = Bundle()
-            args.putString("STRATEGY_ID", strategyId)
-            fragment.arguments = args
-            return fragment
-        }
-    }
 }

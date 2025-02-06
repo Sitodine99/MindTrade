@@ -13,7 +13,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #ffffff; /* 🔹 Mantiene el fondo blanco */
+            background-color: #ffffff; /* Mantiene el fondo blanco */
         }
 
         #successRatioChart {
@@ -24,17 +24,17 @@
 </head>
 <body>
 
-<!-- 🔹 Contenedor del gráfico -->
+<!--Contenedor del gráfico -->
 <div id="successRatioChart"></div>
 
 <script>
     var chartDom = document.getElementById('successRatioChart');
     var myChart = echarts.init(chartDom);
-    var animationDuration = 1500; // 🔹 Duración de la animación
+    var animationDuration = 1500; // Duración de la animación
 
     function updateSuccessRate(successRate) {
         var option = {
-            animationDuration: animationDuration, // 🔹 Animación al inicio
+            animationDuration: animationDuration, // Animación al inicio
             series: [
                 {
                     type: 'gauge',
@@ -46,14 +46,14 @@
                     axisLine: {
                         lineStyle: {
                             width: 20,
-                            color: [[1, '#000000']] // 🔹 Borde negro
+                            color: [[1, '#000000']] // Borde negro
                         }
                     },
                     pointer: {
                         show: true,
                         width: 8,
                         itemStyle: {
-                            color: '#000000' // 🔹 Flecha negra
+                            color: '#000000' // Flecha negra
                         }
                     },
                     axisTick: {
@@ -69,10 +69,10 @@
                         show: true,
                         fontSize: 50,
                         fontWeight: 'bold',
-                        color: '#000000', // 🔹 Texto negro
-                        offsetCenter: [0, '70%'], // 🔹 Ubicación más baja
+                        color: '#000000', // Texto negro
+                        offsetCenter: [0, '70%'], // Ubicación más baja
                         formatter: function(value) {
-                            return value.toFixed(2) + " %"; // 🔹 Formato con 2 decimales
+                            return value.toFixed(2) + " %"; // Formato con 2 decimales
                         }
                     },
                     data: [

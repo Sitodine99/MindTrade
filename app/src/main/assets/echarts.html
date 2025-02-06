@@ -29,10 +29,10 @@
                 type: 'category',
                 data: dataX,
                 axisLabel: {
-                    show: false // 🔹 Ocultar etiquetas del eje X
+                    show: false // Ocultar etiquetas del eje X
                 },
                 axisTick: {
-                    show: false // 🔹 Ocultar marcas de ticks en el eje X
+                    show: false // Ocultar marcas de ticks en el eje X
                 },
                 boundaryGap: false
             },
@@ -40,14 +40,14 @@
                 type: 'value',
                 name: 'Balance ($)',
                 nameLocation: 'center',
-                nameGap: 40, // 🔹 Aumenta separación entre etiqueta y eje Y
+                nameGap: 40, // Aumenta separación entre etiqueta y eje Y
                 nameTextStyle: {
                     fontSize: 16,
                     fontWeight: 'bold'
                 },
                 axisLabel: {
                     formatter: function (value) {
-                        return value.toFixed(0); // 🔹 Redondear valores a enteros
+                        return value.toFixed(0); // Redondear valores a enteros
                     },
                     fontSize: 12,
                     color: '#333'
@@ -66,7 +66,7 @@
                 }
             },
             grid: {
-                left: '20%',  // 🔹 Mayor espacio a la izquierda para el eje Y
+                left: '20%',  // Mayor espacio a la izquierda para el eje Y
                 right: '10%',
                 bottom: '10%',
                 top: '10%',

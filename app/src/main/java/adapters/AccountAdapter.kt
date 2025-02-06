@@ -30,7 +30,7 @@ class AccountAdapter(
 
     override fun onBindViewHolder(holder: AccountViewHolder, position: Int) {
         val account = accounts[position]
-        val context = holder.itemView.context  // 🔹 Obtenemos el contexto desde el ViewHolder
+        val context = holder.itemView.context  // Obtenemos el contexto desde el ViewHolder
 
         holder.accountName.text = account.name
         holder.accountBalance.text = "Balance: $${String.format("%.2f", account.balance)}"
@@ -40,7 +40,7 @@ class AccountAdapter(
             .format(java.util.Date(account.createdAt))
         holder.accountCreationDate.text = "Creado: $creationDate"
 
-        // 🔹 Ahora pasamos el contexto a calculateProfitability
+        // Ahora pasamos el contexto a calculateProfitability
         calculateProfitability(context, account) { profitability ->
             holder.accountProfitability.text = "Rentabilidad: ${String.format("%.2f", profitability)}%"
             if (profitability >= 0) {
@@ -78,7 +78,7 @@ class AccountAdapter(
     ) {
         val firestore = FirebaseFirestore.getInstance()
 
-        // 🔹 Recuperamos el balance inicial desde SharedPreferences
+        // Recuperamos el balance inicial desde SharedPreferences
         val sharedPreferences =
             context.getSharedPreferences("MindTradePrefs", android.content.Context.MODE_PRIVATE)
         val initialBalance =

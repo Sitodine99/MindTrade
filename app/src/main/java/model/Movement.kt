@@ -7,8 +7,8 @@ data class Movement(
     val type: String = "Buy", // Tipo de operación (Buy/Sell)
     val entryPrice: Double = 0.0, // Precio de entrada
     val exitPrice: Double = 0.0, // Precio de salida
-    val entryTime: Long, // Agregado
-    val exitTime: Long?, // Agregado
+    val entryTime: Long,
+    val exitTime: Long?,
     val swap: Double = 0.0, // Swap
     val commission: Double = 0.0, // Comisión
     val profit: Double = 0.0, // Beneficio neto
@@ -17,7 +17,7 @@ data class Movement(
     val strategyId: String? = null, // Estrategia asociada
     val emotionalState: String?,
     val emotion: String? = null, // Emoción asociada
-    val tradingStyle: String, // Agregado
+    val tradingStyle: String,
     val comments: String?, // Comentarios
     val photos: List<String>?, // Fotos asociadas
     val lotes: Double = 0.0 // Número de lotes por operación

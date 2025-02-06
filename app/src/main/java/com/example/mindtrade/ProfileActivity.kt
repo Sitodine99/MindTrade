@@ -128,7 +128,7 @@ class ProfileActivity : AppCompatActivity() {
                         fetchAverageRating(userId)
                         fetchFavoriteAsset(userId)
 
-                        // 🔹 Aplicar fade-in cuando los datos ya están listos
+                        // Aplicar fade-in cuando los datos ya están listos
                         Handler(Looper.getMainLooper()).postDelayed({
                             profileContainer.visibility = View.VISIBLE
                             profileContainer.alpha = 0f
@@ -260,11 +260,11 @@ class ProfileActivity : AppCompatActivity() {
 
                 if (accountIds.isEmpty()) {
                     profileFavoriteAsset.text = "Activo favorito: No disponible"
-                    println("🔴 No se encontraron cuentas para el usuario.")
+                    println("No se encontraron cuentas para el usuario.")
                     return@addOnSuccessListener
                 }
 
-                println("✅ Se encontraron ${accounts.size()} cuentas.")
+                println("Se encontraron ${accounts.size()} cuentas.")
 
                 val assetFrequency = mutableMapOf<String, Pair<Int, Long>>() // Símbolo -> (Frecuencia, createdAt más reciente)
                 var pendingRequests = accountIds.size
@@ -277,7 +277,7 @@ class ProfileActivity : AppCompatActivity() {
                                 val symbol = movement.getString("symbol") ?: continue
                                 val createdAt = movement.getLong("createdAt") ?: 0L
 
-                                println("🔹 Movimiento encontrado - Símbolo: $symbol, Fecha: $createdAt")
+                                println("Movimiento encontrado - Símbolo: $symbol, Fecha: $createdAt")
 
                                 // Si el símbolo ya existe, aumentar el contador y actualizar createdAt si es más reciente
                                 val current = assetFrequency[symbol]
@@ -323,12 +323,9 @@ class ProfileActivity : AppCompatActivity() {
             compareBy({ it.value.first }, { it.value.second })
         )?.key ?: "--"
 
-        println("✅ Activo favorito determinado: $favoriteAsset")
+        println("Activo favorito determinado: $favoriteAsset")
         profileFavoriteAsset.text = "Activo favorito: $favoriteAsset"
     }
-
-
-
 
 
     private fun getAvatarImageResource(avatarName: String?): Int? {

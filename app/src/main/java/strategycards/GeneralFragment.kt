@@ -1,13 +1,13 @@
 package strategycards
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RatingBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.mindtrade.R
 import com.google.firebase.auth.FirebaseAuth
@@ -15,6 +15,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class GeneralFragment : Fragment() {
     private lateinit var ratingBar: RatingBar
+    private lateinit var successRateTextView: TextView
+    private lateinit var totalMovementsTextView: TextView
+    private lateinit var buyMovementsTextView: TextView
+    private lateinit var sellMovementsTextView: TextView
+    private lateinit var mostUsedSymbolTextView: TextView
+
     private val db = FirebaseFirestore.getInstance()
     private var strategyId: String? = null
 
@@ -25,72 +31,123 @@ class GeneralFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_general, container, false)
 
         // Vincular las vistas
-        val tradingStyleTextView: TextView = view.findViewById(R.id.tradingStyleTextView)
-        val indicatorsTextView: TextView = view.findViewById(R.id.strategyIndicatorsTextView)
-        val timeframesTextView: TextView = view.findViewById(R.id.strategyTimeframesTextView)
-        val symbolsTextView: TextView = view.findViewById(R.id.strategySymbolsTextViewTest)
         ratingBar = view.findViewById(R.id.strategyRatingBar)
+        successRateTextView = view.findViewById(R.id.strategySuccessRateTextView)
+        totalMovementsTextView = view.findViewById(R.id.strategyTotalMovementsTextView)
+        buyMovementsTextView = view.findViewById(R.id.strategyBuyMovementsTextView)
+        sellMovementsTextView = view.findViewById(R.id.strategySellMovementsTextView)
+        mostUsedSymbolTextView = view.findViewById(R.id.strategyMostUsedSymbolTextView)
 
         // Obtener datos desde los argumentos
-        val tradingStyles = arguments?.getStringArray("tradingStyles")?.joinToString(", ")
-        val indicators = arguments?.getStringArray("indicators")?.joinToString(", ")
-        val timeframes = arguments?.getStringArray("timeframes")?.joinToString(", ")
-        val symbols = arguments?.getStringArray("symbols")?.joinToString(", ") ?: "Sin símbolos"
-        val rating = arguments?.getFloat("rating", 0f) ?: 0f
         strategyId = arguments?.getString("strategyId")
 
-        // Configurar las vistas
-        tradingStyleTextView.text = tradingStyles ?: "Sin estilos"
-        indicatorsTextView.text = indicators ?: "Sin indicadores"
-        timeframesTextView.text = timeframes ?: "Sin temporalidades"
-        symbolsTextView.text = symbols
-        ratingBar.rating = rating
-
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-
-        strategyId?.let { id ->
-            db.collection("strategies").document(id).get().addOnSuccessListener { document ->
-                val userRatings = document.get("userRatings") as? Map<String, Double> ?: emptyMap()
-
-                if (userId != null && userRatings.containsKey(userId)) {
-                    // Mostrar la valoración actual del usuario
-                    val userRating = userRatings[userId]?.toFloat() ?: 0f
-                    ratingBar.rating = userRating
-                }
-
-                // Permitir interacción para usuarios autenticados
-                ratingBar.setIsIndicator(false)
-            }.addOnFailureListener {
-                Toast.makeText(context, "Error al cargar los datos", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        // Configurar interacción del usuario con el RatingBar
-        if (userId != null) {
-            var isUserTouching = false
-
-            // Detectar cuando el usuario interactúa directamente con el RatingBar
-            ratingBar.setOnTouchListener { _, event ->
-                if (event.action == android.view.MotionEvent.ACTION_DOWN) {
-                    isUserTouching = true
-                }
-                false // Permite que otros listeners también funcionen
-            }
-
-            // Solo guardar y mostrar el toast si el usuario cambia el valor manualmente
-            ratingBar.setOnRatingBarChangeListener { _, newRating, _ ->
-                if (isUserTouching) {
-                    isUserTouching = false // Reiniciar la bandera
-                    saveRating(newRating)
-                }
-            }
-        } else {
-            ratingBar.setIsIndicator(true)
+        // Cargar estadísticas
+        strategyId?.let {
+            loadStrategyStatistics(it)
+            loadRating(it)
         }
 
         return view
     }
 
+    /**
+     * Carga estadísticas de la estrategia desde Firebase.
+     */
+    private fun loadStrategyStatistics(strategyId: String) {
+        db.collection("strategies").document(strategyId)
+            .collection("movements")
+            .get()
+            .addOnSuccessListener { documents ->
+                val totalMovements = documents.size()
+                var successfulMovements = 0
+                var buyMovements = 0
+                var sellMovements = 0
+                val symbolCount = mutableMapOf<String, Int>()
+
+                for (doc in documents) {
+                    val profit = doc.getDouble("profit") ?: 0.0
+                    val type = doc.getString("type") ?: "Unknown"
+                    val symbol = doc.getString("symbol") ?: "Desconocido"
+
+                    if (profit > 0) successfulMovements++
+                    if (type.equals("Buy", ignoreCase = true)) buyMovements++
+                    if (type.equals("Sell", ignoreCase = true)) sellMovements++
+
+                    symbolCount[symbol] = symbolCount.getOrDefault(symbol, 0) + 1
+                }
+
+                val successRate = if (totalMovements > 0) {
+                    (successfulMovements.toDouble() / totalMovements.toDouble()) * 100
+                } else {
+                    0.0
+                }
+
+                val mostUsedSymbol = symbolCount.maxByOrNull { it.value }?.key ?: "Desconocido"
+
+                // Actualizar las vistas
+                successRateTextView.text = "Porcentaje de éxito: ${String.format("%.2f", successRate)}%"
+                totalMovementsTextView.text = "Operaciones registradas: $totalMovements"
+
+                // Aplicar color y actualizar texto dinámicamente
+                buyMovementsTextView.text = "Operaciones Buy: $buyMovements"
+                buyMovementsTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.blue_normal))
+
+                sellMovementsTextView.text = "Operaciones Sell: $sellMovements"
+                sellMovementsTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.my_red))
+
+                mostUsedSymbolTextView.text = "Símbolo más utilizado: $mostUsedSymbol"
+            }
+            .addOnFailureListener {
+                successRateTextView.text = "Porcentaje de éxito: Error al cargar"
+                totalMovementsTextView.text = "Operaciones registradas: Error"
+                buyMovementsTextView.text = "Operaciones Buy: Error"
+                sellMovementsTextView.text = "Operaciones Sell: Error"
+                mostUsedSymbolTextView.text = "Símbolo más utilizado: Error"
+
+                Toast.makeText(context, "Error al obtener las estadísticas", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    /**
+     * Carga la valoración del usuario y la estrategia desde Firebase.
+     */
+    private fun loadRating(strategyId: String) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+
+        db.collection("strategies").document(strategyId).get().addOnSuccessListener { document ->
+            val userRatings = document.get("userRatings") as? Map<String, Double> ?: emptyMap()
+
+            if (userId != null && userRatings.containsKey(userId)) {
+                val userRating = userRatings[userId]?.toFloat() ?: 0f
+                ratingBar.rating = userRating
+            }
+
+            ratingBar.setIsIndicator(false) // Permitir que el usuario edite su valoración
+
+            // Configurar interacción del usuario con el RatingBar
+            var isUserTouching = false
+
+            ratingBar.setOnTouchListener { _, event ->
+                if (event.action == android.view.MotionEvent.ACTION_DOWN) {
+                    isUserTouching = true
+                }
+                false
+            }
+
+            ratingBar.setOnRatingBarChangeListener { _, newRating, _ ->
+                if (isUserTouching) {
+                    isUserTouching = false
+                    saveRating(newRating)
+                }
+            }
+        }.addOnFailureListener {
+            Toast.makeText(context, "Error al cargar la valoración", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * Guarda la nueva valoración del usuario en Firebase.
+     */
     private fun saveRating(userRating: Float) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         strategyId?.let { id ->
@@ -123,13 +180,8 @@ class GeneralFragment : Fragment() {
             }.addOnSuccessListener {
                 Toast.makeText(context, "¡Valoración actualizada!", Toast.LENGTH_SHORT).show()
             }.addOnFailureListener { e ->
-                Toast.makeText(
-                    context,
-                    "Error al actualizar valoración: ${e.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(context, "Error al actualizar valoración: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }
 }
-

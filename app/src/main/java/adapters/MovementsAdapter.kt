@@ -87,8 +87,6 @@ class MovementsAdapter(
             true
         }
 
-
-
         // Tipo (Buy/Sell) y lotes
         holder.typeTextView.text = "${movement.type}, ${movement.lotes}"
         holder.typeTextView.setTextColor(
@@ -133,8 +131,6 @@ class MovementsAdapter(
             holder.emotionTextView.setTextColor(ContextCompat.getColor(context, R.color.my_red)) // Rojo para negativo
             holder.emotionTextView.setTypeface(null, Typeface.BOLD)
         }
-
-
 
         // Vista expandida
         holder.entryDateTextView.text = Html.fromHtml("<b>Fecha de entrada:</b> ${formatDate(movement.entryTime)}")
@@ -305,8 +301,6 @@ class MovementsAdapter(
     }
 
 
-
-
     private fun showPhotosDialog(photos: List<String>) {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_photos, null)
         val photosRecyclerView = dialogView.findViewById<RecyclerView>(R.id.photosRecyclerView)
@@ -328,7 +322,6 @@ class MovementsAdapter(
         fun showAdjustCommissionDialog(position: Int) // Nueva función para ajustar comisión
         fun showAdjustSwapDialog(position: Int) // Nueva función para ajustar swap
     }
-
 
 
 }

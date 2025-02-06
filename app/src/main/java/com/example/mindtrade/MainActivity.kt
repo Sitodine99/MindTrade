@@ -258,15 +258,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-
-    private fun getUserDateOfBirthFromFirestore(): String? {
-        // Devuelve la fecha de nacimiento en el formato que uses en Firestore (por ejemplo, "dd/MM/yyyy")
-        // Este valor debe haberse extraído previamente en loadUserData si existe en Firestore
-        return db.collection("users").document(userId!!).get()
-            .result
-            ?.getString("dateOfBirth")
-    }
-
     // Método para actualizar las estrategias del usuario
     private fun updateUserStrategies(
         newAlias: String,
@@ -1242,7 +1233,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         removeListener()
     }
 
-    // En tu lógica de logout (por ejemplo, en el botón de logout):
     private fun logout() {
         removeListener()
         FirebaseAuth.getInstance().signOut()
@@ -1453,21 +1443,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
-    private fun markCommentsAsRead(strategyId: String) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val notificationRef = db.collection("notifications").document(userId)
-
-        notificationRef.get().addOnSuccessListener { document ->
-            val newComments = document.get("newComments") as? MutableList<String> ?: mutableListOf()
-            newComments.remove(strategyId)
-
-            notificationRef.set(mapOf("newComments" to newComments)).addOnSuccessListener {
-                updateNotificationIcon(newComments.isNotEmpty())
-            }
-        }
-    }
-
-
     private fun listenForNewComments() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
@@ -1489,6 +1464,5 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 updateNotificationIcon(false) // Restablece el icono de notificación
             }
     }
-
 
 }

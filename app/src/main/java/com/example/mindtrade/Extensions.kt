@@ -3,7 +3,6 @@ package com.example.mindtrade
 import android.app.ActivityOptions
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
-import com.example.mindtrade.R
 
 // Función de extensión para iniciar una Activity con transición de fade
 fun AppCompatActivity.startActivityWithFade(intent: Intent) {

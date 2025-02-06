@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; }
+        #chart { width: 100%; height: 100%; }
+    </style>
+</head>
+<body>
+<div id="chart"></div>
+<script>
+    var chart = echarts.init(document.getElementById('chart'));
+
+    function updateStrategySuccessChart(strategies, successRates) {
+        var option = {
+            title: {
+                text: 'Éxito de Estrategias',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { type: 'shadow' },
+                formatter: function(params) {
+                    return params[0].name + ": " + params[0].value.toFixed(2) + "%";
+                }
+            },
+            xAxis: {
+                type: 'category',
+                data: strategies,
+                axisLabel: { rotate: 30, fontSize: 12 }
+            },
+            yAxis: {
+                type: 'value',
+                axisLabel: { formatter: '{value}%' },
+                max: 100
+            },
+            series: [{
+                name: 'Porcentaje de éxito',
+                data: successRates,
+                type: 'bar',
+                itemStyle: { color: '#007BFF' }
+            }]
+        };
+        chart.setOption(option);
+    }
+</script>
+</body>
+</html>

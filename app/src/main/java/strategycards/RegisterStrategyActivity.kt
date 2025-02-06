@@ -21,7 +21,6 @@ import com.google.firebase.storage.FirebaseStorage
 class RegisterStrategyActivity : AppCompatActivity() {
 
     private lateinit var titleEditText: EditText
-    private lateinit var descriptionEditText: EditText
     private lateinit var entryConditionEditText: EditText
     private lateinit var exitConditionEditText: EditText
     private lateinit var generalConsiderationsEditText: EditText
@@ -61,7 +60,6 @@ class RegisterStrategyActivity : AppCompatActivity() {
     private var entryImageUrl: String? = null
     private var exitImageUrl: String? = null
     private var selectedImageType: String = "" // "entry" o "exit"
-    private lateinit var binding: ActivityRegisterStrategyBinding
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -171,8 +169,6 @@ class RegisterStrategyActivity : AppCompatActivity() {
     }
 
 
-
-
     private fun setupPredefinedIndicators() {
         val predefinedIndicators = listOf(
             "Sin Indicadores", "EMA21", "EMA50", "EMA200", "SMA21", "SMA50", "SMA200",
@@ -209,8 +205,6 @@ class RegisterStrategyActivity : AppCompatActivity() {
         // Elimina todos los chips del grupo personalizado de indicadores
         chipGroup.removeAllViews()
     }
-
-
 
 
     private fun setupPredefinedSymbols() {
@@ -296,14 +290,12 @@ class RegisterStrategyActivity : AppCompatActivity() {
     }
 
 
-
     // Método general para verificar si un chip específico está seleccionado en cualquier ChipGroup
     private fun isChipSelected(chipGroup: ChipGroup, text: String): Boolean {
         return chipGroup.children
             .filterIsInstance<Chip>()
             .any { it.text.toString() == text }
     }
-
 
 
 
@@ -384,7 +376,6 @@ class RegisterStrategyActivity : AppCompatActivity() {
     }
 
 
-
     private fun addIndicatorToChipGroup(indicator: String) {
         // Verificar si el indicador ya existe
         if (isChipSelected(chipGroup, indicator)) {
@@ -401,7 +392,6 @@ class RegisterStrategyActivity : AppCompatActivity() {
 
         chipGroup.addView(chip)
     }
-
 
 
     private fun saveStrategyToFirestore() {
@@ -563,7 +553,6 @@ class RegisterStrategyActivity : AppCompatActivity() {
             }
         }
     }
-
 
 
     override fun onBackPressed() {

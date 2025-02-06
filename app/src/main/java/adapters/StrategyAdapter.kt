@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.mindtrade.R
 import com.example.mindtrade.model.Strategy
-import com.google.firebase.firestore.FirebaseFirestore
 
 class StrategyAdapter(
     private val strategies: List<Strategy>,

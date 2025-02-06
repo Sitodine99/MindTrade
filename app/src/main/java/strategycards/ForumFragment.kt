@@ -101,11 +101,11 @@ class ForumFragment : Fragment() {
                         // Mostrar los comentarios actualizados
                         commentsAdapter.setComments(updatedComments)
 
-                        // 🔹 Guardar el último comentario leído
+                        // Guardar el último comentario leído
                         val lastCommentTimestamp = updatedComments.maxOfOrNull { it.timestamp } ?: 0
                         setLastReadTimestamp(strategyId, lastCommentTimestamp)
 
-                        // 🔹 Volver a verificar si hay notificaciones pendientes
+                        // Volver a verificar si hay notificaciones pendientes
                         val mainActivity = activity as? MainActivity
                         mainActivity?.checkForNewComments()
                     }
@@ -148,7 +148,7 @@ class ForumFragment : Fragment() {
                 strategyId?.let { id ->
                     val strategyRef = db.collection("strategies").document(id)
 
-                    // 🔹 Actualizamos el array de comentarios en Firestore
+                    // Actualizamos el array de comentarios en Firestore
                     strategyRef.update("comments", FieldValue.arrayUnion(newComment))
                         .addOnSuccessListener {
                             Log.d("Firestore", "Comentario añadido correctamente a la estrategia.")
@@ -156,7 +156,7 @@ class ForumFragment : Fragment() {
                             loadComments(id) // Recargar comentarios
                             Toast.makeText(context, "Comentario añadido", Toast.LENGTH_SHORT).show()
 
-                            // 🔥 Notificar al creador de la estrategia
+                            // Notificar al creador de la estrategia
                             markStrategyAsNewComment(id)
                         }
                         .addOnFailureListener { e ->
@@ -181,7 +181,7 @@ class ForumFragment : Fragment() {
                 val strategyOwnerId = strategyDoc.getString("createdBy") ?: return@addOnSuccessListener
                 val strategyTitle = strategyDoc.getString("title") ?: "Estrategia sin nombre"
 
-                // 🔹 No notificar si el usuario comenta su propia estrategia
+                // No notificar si el usuario comenta su propia estrategia
                 if (strategyOwnerId == currentUserId) return@addOnSuccessListener
 
                 val notificationRef = db.collection("notifications").document(strategyOwnerId)
@@ -189,12 +189,12 @@ class ForumFragment : Fragment() {
                 notificationRef.get().addOnSuccessListener { document ->
                     val newComments = document.get("newComments") as? MutableList<Map<String, String>> ?: mutableListOf()
 
-                    // 🔥 Si la estrategia aún no está en las notificaciones, añadirla con su nombre
+                    // Si la estrategia aún no está en las notificaciones, añadirla con su nombre
                     if (newComments.none { it["id"] == strategyId }) {
                         newComments.add(mapOf("id" to strategyId, "title" to strategyTitle))
                     }
 
-                    // 🔹 Guardamos la notificación en Firestore
+                    // Guardamos la notificación en Firestore
                     notificationRef.set(mapOf("newComments" to newComments))
                         .addOnSuccessListener {
                             Log.d("Firestore", "Notificación enviada a $strategyOwnerId con título: $strategyTitle")

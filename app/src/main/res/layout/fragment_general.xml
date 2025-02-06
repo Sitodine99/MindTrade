@@ -94,5 +94,53 @@
             android:stepSize="0.5"
             android:isIndicator="true" />
 
+        <TextView
+            android:id="@+id/strategySuccessRateTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Porcentaje de éxito: -%"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp" />
+
+        <!-- Número total de operaciones -->
+        <TextView
+            android:id="@+id/strategyTotalMovementsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Operaciones registradas: -"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Número de operaciones Buy -->
+        <TextView
+            android:id="@+id/strategyBuyMovementsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Operaciones Buy: -"
+            android:textSize="16sp"
+            android:layout_marginTop="4dp"/>
+
+        <!-- Número de operaciones Sell -->
+        <TextView
+            android:id="@+id/strategySellMovementsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Operaciones Sell: -"
+            android:textSize="16sp"
+            android:layout_marginTop="4dp"/>
+
+        <!-- Símbolo más utilizado -->
+        <TextView
+            android:id="@+id/strategyMostUsedSymbolTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Símbolo más utilizado: -"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"/>
+
+
     </LinearLayout>
 </ScrollView>
