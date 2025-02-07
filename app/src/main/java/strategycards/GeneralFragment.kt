@@ -45,6 +45,7 @@ class GeneralFragment : Fragment() {
         strategyId?.let {
             loadStrategyStatistics(it)
             loadRating(it)
+            loadStrategyDetails(it)
         }
 
         return view
@@ -85,15 +86,26 @@ class GeneralFragment : Fragment() {
                 val mostUsedSymbol = symbolCount.maxByOrNull { it.value }?.key ?: "Desconocido"
 
                 // Actualizar las vistas
-                successRateTextView.text = "Porcentaje de éxito: ${String.format("%.2f", successRate)}%"
+                successRateTextView.text =
+                    "Porcentaje de éxito: ${String.format("%.2f", successRate)}%"
                 totalMovementsTextView.text = "Operaciones registradas: $totalMovements"
 
                 // Aplicar color y actualizar texto dinámicamente
                 buyMovementsTextView.text = "Operaciones Buy: $buyMovements"
-                buyMovementsTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.blue_normal))
+                buyMovementsTextView.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.blue_normal
+                    )
+                )
 
                 sellMovementsTextView.text = "Operaciones Sell: $sellMovements"
-                sellMovementsTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.my_red))
+                sellMovementsTextView.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.my_red
+                    )
+                )
 
                 mostUsedSymbolTextView.text = "Símbolo más utilizado: $mostUsedSymbol"
             }
@@ -104,7 +116,8 @@ class GeneralFragment : Fragment() {
                 sellMovementsTextView.text = "Operaciones Sell: Error"
                 mostUsedSymbolTextView.text = "Símbolo más utilizado: Error"
 
-                Toast.makeText(context, "Error al obtener las estadísticas", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Error al obtener las estadísticas", Toast.LENGTH_SHORT)
+                    .show()
             }
     }
 
@@ -180,8 +193,55 @@ class GeneralFragment : Fragment() {
             }.addOnSuccessListener {
                 Toast.makeText(context, "¡Valoración actualizada!", Toast.LENGTH_SHORT).show()
             }.addOnFailureListener { e ->
-                Toast.makeText(context, "Error al actualizar valoración: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    "Error al actualizar valoración: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
+
+    private fun loadStrategyDetails(strategyId: String) {
+        db.collection("strategies").document(strategyId).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    // Recuperar correctamente los datos
+                    val tradingStyles =
+                        (document.get("tradingStyles") as? List<*>)?.joinToString(", ") ?: "N/A"
+                    val indicators =
+                        (document.get("indicators") as? List<*>)?.joinToString(", ") ?: "N/A"
+                    val timeframes =
+                        (document.get("timeframes") as? List<*>)?.joinToString(", ") ?: "N/A"
+                    val symbols = (document.get("symbols") as? List<*>)?.joinToString(", ") ?: "N/A"
+
+                    // Asegurar que los IDs coincidan con los del XML
+                    val tradingStyleTextView: TextView =
+                        requireView().findViewById(R.id.tradingStyleTextView)
+                    val indicatorsTextView: TextView =
+                        requireView().findViewById(R.id.strategyIndicatorsTextView)
+                    val timeframesTextView: TextView =
+                        requireView().findViewById(R.id.strategyTimeframesTextView)
+                    val symbolsTextView: TextView =
+                        requireView().findViewById(R.id.strategySymbolsTextViewTest)
+
+                    // Asignar los valores a las vistas SIN repetir el título
+                    tradingStyleTextView.text = tradingStyles
+                    indicatorsTextView.text = indicators
+                    timeframesTextView.text = timeframes
+                    symbolsTextView.text = symbols
+                } else {
+                    Toast.makeText(context, "Error: La estrategia no existe.", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(
+                    context,
+                    "Error al cargar detalles de la estrategia",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+    }
 }
+

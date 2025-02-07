@@ -148,7 +148,7 @@ class AvatarSelectionActivity : AppCompatActivity() {
             "avatar_mujer" -> R.drawable.avatarmujer
             "avatar_frankenstein" -> R.drawable.avatarfrankenstein
             "avatar_lobo" -> R.drawable.avatarlobo
-            "avatar_vampira" -> R.drawable.avatarvampira
+            "avatar_vampira" -> R.drawable.avatar_vampira
             else -> null
         }
     }
@@ -161,7 +161,7 @@ class AvatarSelectionActivity : AppCompatActivity() {
         val avatarImages = intArrayOf(
             R.drawable.avatarbebe, R.drawable.avatarhombre, R.drawable.avatarmujer,
             R.drawable.avataralien, R.drawable.avatarfrankenstein, R.drawable.avatarlobo,
-            R.drawable.avatarvampira
+            R.drawable.avatar_vampira
         )
 
         val avatarNames = arrayOf(

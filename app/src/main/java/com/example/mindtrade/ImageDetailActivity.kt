@@ -37,8 +37,8 @@ class ImageDetailActivity : AppCompatActivity() {
                 .load(imageUrl)
                 .skipMemoryCache(true)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .placeholder(R.drawable.interrogacion)
-                .error(R.drawable.interrogacion)
+                .placeholder(R.drawable.interrogacion_icon)
+                .error(R.drawable.interrogacion_icon)
                 .into(imageView)
 
         } else if (imageResId != 0) {
@@ -46,7 +46,7 @@ class ImageDetailActivity : AppCompatActivity() {
             imageView.setImageResource(imageResId)
         } else {
             // Imagen predeterminada
-            imageView.setImageResource(R.drawable.interrogacion)
+            imageView.setImageResource(R.drawable.interrogacion_icon)
         }
 
         // Configurar OnClickListener para cerrar la actividad al tocar la pantalla

@@ -143,8 +143,8 @@ class StrategyDetailFragment : Fragment() {
             // Cargar desde URL
             Glide.with(this)
                 .load(avatarUrl)
-                .placeholder(R.drawable.interrogacion) // Imagen de carga
-                .error(R.drawable.interrogacion) // Imagen de error
+                .placeholder(R.drawable.interrogacion_icon) // Imagen de carga
+                .error(R.drawable.interrogacion_icon) // Imagen de error
                 .circleCrop()
                 .into(imageView)
         } else {
@@ -159,7 +159,7 @@ class StrategyDetailFragment : Fragment() {
                 // Usar imagen predeterminada si no se encuentra el recurso local
                 Toast.makeText(requireContext(), "Avatar local no encontrado, usando predeterminado", Toast.LENGTH_SHORT).show()
                 Glide.with(this)
-                    .load(R.drawable.interrogacion)
+                    .load(R.drawable.interrogacion_icon)
                     .circleCrop()
                     .into(imageView)
             }
@@ -174,7 +174,7 @@ class StrategyDetailFragment : Fragment() {
             "avatar_mujer" -> R.drawable.avatarmujer
             "avatar_frankenstein" -> R.drawable.avatarfrankenstein
             "avatar_lobo" -> R.drawable.avatarlobo
-            "avatar_vampira" -> R.drawable.avatarvampira
+            "avatar_vampira" -> R.drawable.avatar_vampira
             else -> {
                 // Log para depuración si el nombre no coincide
                 println("Nombre de avatar no reconocido: $avatarName")

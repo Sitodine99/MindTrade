@@ -41,8 +41,8 @@ class AvatarAdapter(
             val url = urlAvatars!![position - localAvatars.size]
             Glide.with(context)
                 .load(url)
-                .placeholder(R.drawable.interrogacion) // Imagen predeterminada mientras carga
-                .error(R.drawable.interrogacion) // Imagen en caso de error
+                .placeholder(R.drawable.interrogacion_icon) // Imagen predeterminada mientras carga
+                .error(R.drawable.interrogacion_icon) // Imagen en caso de error
                 .into(avatarImage)
         }
 

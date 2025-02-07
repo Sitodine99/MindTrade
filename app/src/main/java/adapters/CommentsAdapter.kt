@@ -76,7 +76,7 @@ class CommentsAdapter : RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>(
                 "avatar_alien" -> R.drawable.avataralien
                 "avatar_frankenstein" -> R.drawable.avatarfrankenstein
                 "avatar_lobo" -> R.drawable.avatarlobo
-                "avatar_vampira" -> R.drawable.avatarvampira
+                "avatar_vampira" -> R.drawable.avatar_vampira
                 else -> R.drawable.ic_placeholder
             }
         }

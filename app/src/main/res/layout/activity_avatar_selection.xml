@@ -53,7 +53,7 @@
         android:onClick="openAvatarSelectionDialog"
         android:padding="5dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/interrogacion"
+        android:src="@drawable/interrogacion_icon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"

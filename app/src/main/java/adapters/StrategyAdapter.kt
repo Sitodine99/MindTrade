@@ -40,8 +40,8 @@ class StrategyAdapter(
         if (!strategy.avatarUrl.isNullOrEmpty() && strategy.avatarUrl.startsWith("https://")) {
             Glide.with(holder.avatarImageView.context)
                 .load(strategy.avatarUrl)
-                .placeholder(R.drawable.interrogacion)
-                .error(R.drawable.interrogacion)
+                .placeholder(R.drawable.interrogacion_icon)
+                .error(R.drawable.interrogacion_icon)
                 .circleCrop()
                 .into(holder.avatarImageView)
         } else {
@@ -69,7 +69,7 @@ class StrategyAdapter(
             "avatar_alien" -> R.drawable.avataralien
             "avatar_frankenstein" -> R.drawable.avatarfrankenstein
             "avatar_lobo" -> R.drawable.avatarlobo
-            "avatar_vampira" -> R.drawable.avatarvampira
+            "avatar_vampira" -> R.drawable.avatar_vampira
             else -> R.drawable.ic_placeholder
         }
     }

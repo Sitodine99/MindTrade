@@ -17,9 +17,9 @@ data class Strategy(
     val tradingStyles: List<String> = emptyList(),
     val symbols: List<String> = emptyList(),
     val algorithmCode: String = "",
-    val favoritedBy: List<String> = emptyList(),
+    var favoritedBy: List<String> = emptyList(),
     val userRatings: Map<String, Double> = emptyMap(),
-    val comments: List<Comment> = emptyList(),
+    var comments: List<Comment> = emptyList(),
     val entryConditionImageUrl: String? = null, // Imagen para condiciones de entrada
     val exitConditionImageUrl: String? = null, // Imagen para condiciones de salida
     val movements: List<String> = emptyList() // IDs de los movimientos asociados

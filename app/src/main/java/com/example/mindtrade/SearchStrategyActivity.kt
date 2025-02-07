@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mindtrade.model.Strategy
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import model.Comment
 import strategycards.StrategyDetailFragment
 
 class SearchStrategyActivity : AppCompatActivity() {
@@ -102,49 +103,71 @@ class SearchStrategyActivity : AppCompatActivity() {
     }
 
     private fun fetchAllStrategies() {
+        Log.d("SearchDebug", "📢 Cargando estrategias desde Firestore...")
+
         db.collection("strategies")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { result ->
                 strategies.clear()
+
                 for (document in result) {
-                    val authorAlias = document.getString("authorAlias") ?: "Anónimo"
-                    Log.d("FirestoreCheck", "ID: ${document.id} - Author: $authorAlias")
+                    val favoritedByList = (document.get("favoritedBy") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
+                    val commentsList = (document.get("comments") as? List<*>)?.mapNotNull { comment ->
+                        val commentMap = comment as? Map<*, *>
+                        commentMap?.let {
+                            Comment(
+                                id = it["id"] as? String ?: "",
+                                userId = it["userId"] as? String ?: "",
+                                userAlias = it["userAlias"] as? String ?: "Anónimo",
+                                avatarUrl = it["avatarUrl"] as? String,
+                                avatarName = it["avatarName"] as? String,
+                                content = it["content"] as? String ?: "",
+                                timestamp = it["timestamp"] as? Long ?: System.currentTimeMillis(),
+                                replies = emptyList() // No cargamos respuestas por ahora
+                            )
+                        }
+                    } ?: emptyList()
 
                     val strategy = Strategy(
                         id = document.id,
                         title = document.getString("title") ?: "Sin título",
                         description = document.getString("description") ?: "Sin descripción",
-                        author = authorAlias,  // Verifica que esto tenga un valor
+                        author = document.getString("authorAlias") ?: "Anónimo",
                         avatarName = document.getString("avatarName"),
                         avatarUrl = document.getString("avatarUrl"),
                         rating = document.getDouble("rating") ?: 0.0,
                         createdBy = document.getString("createdBy") ?: "",
-                        indicators = (document.get("indicators") as? List<*>)?.filterIsInstance<String>()
-                            ?: emptyList(),
-                        timeframes = (document.get("timeframes") as? List<*>)?.filterIsInstance<String>()
-                            ?: emptyList(),
-                        tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>()
-                            ?: emptyList(),
-                        symbols = (document.get("symbols") as? List<*>)?.filterIsInstance<String>()
-                            ?: emptyList(),
+                        indicators = (document.get("indicators") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                        timeframes = (document.get("timeframes") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                        tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                        symbols = (document.get("symbols") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
                         algorithmCode = document.getString("algorithmCode") ?: "",
                         entryConditionImageUrl = document.getString("entryConditionImageUrl"),
-                        exitConditionImageUrl = document.getString("exitConditionImageUrl")
+                        exitConditionImageUrl = document.getString("exitConditionImageUrl"),
+                        movements = (document.get("movements") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                        favoritedBy = favoritedByList,
+                        comments = commentsList
                     )
+
+                    Log.d("SearchDebug", "Estrategia cargada: ${strategy.title} | Favoritos: ${favoritedByList.size} | Comentarios: ${commentsList.size}")
 
                     strategies.add(strategy)
                 }
+
+                Log.d("SearchDebug", "Estrategias cargadas correctamente.")
                 strategyAdapter.notifyDataSetChanged()
             }
             .addOnFailureListener { e ->
-                Log.e("SearchStrategyActivity", "Error al cargar estrategias: ${e.message}", e)
+                Log.e("SearchDebug", "Error al cargar estrategias: ${e.message}", e)
                 Toast.makeText(this, "Error al cargar estrategias", Toast.LENGTH_SHORT).show()
             }
     }
 
 
+
     private fun performSearch() {
+        Log.d("SearchDebug", "Iniciando búsqueda y conteo de favoritos y comentarios...")
+
         val nameQuery = searchNameInput.text.toString().trim().lowercase()
         val keywords = nameQuery.split(" ").filter { it.isNotBlank() }
 
@@ -168,85 +191,51 @@ class SearchStrategyActivity : AppCompatActivity() {
         val includeBots = checkBotYes.isChecked
         val excludeBots = checkBotNo.isChecked
 
-        // Crear la consulta base
-        var query: Query = db.collection("strategies")
-
-        // Filtro por indicadores
-        val indicatorQuery = indicatorInput.text.toString().trim()
-        if (indicatorQuery.isNotEmpty()) {
-            query = query.whereArrayContains("indicators", indicatorQuery)
-        }
-
-        // Filtro por estilos de trading
-        if (selectedTradingStyles.isNotEmpty()) {
-            query = query.whereArrayContainsAny("tradingStyles", selectedTradingStyles)
-        }
-
-        // Filtro por marcos temporales
-        if (selectedTimeframes.isNotEmpty()) {
-            query = query.whereArrayContainsAny("timeframes", selectedTimeframes)
-        }
-
-        // Filtro por bots
-        if (includeBots && !excludeBots) {
-            query = query.whereNotEqualTo("algorithmCode", "")
-        } else if (excludeBots && !includeBots) {
-            query = query.whereEqualTo("algorithmCode", "")
-        }
-
-        // Ejecutar la consulta Firebase
-        query.get()
-            .addOnSuccessListener { result ->
-                strategies.clear()
-
-                for (document in result) {
-                    val movements = (document.get("movements") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
-
-                    val strategy = Strategy(
-                        id = document.id,
-                        title = document.getString("title") ?: "Sin título",
-                        description = document.getString("description") ?: "Sin descripción",
-                        author = document.getString("authorAlias") ?: "Anónimo",
-                        avatarName = document.getString("avatarName"),
-                        avatarUrl = document.getString("avatarUrl"),
-                        rating = document.getDouble("rating") ?: 0.0,
-                        createdBy = document.getString("createdBy") ?: "",
-                        indicators = (document.get("indicators") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
-                        timeframes = (document.get("timeframes") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
-                        tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
-                        symbols = (document.get("symbols") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
-                        algorithmCode = document.getString("algorithmCode") ?: "",
-                        entryConditionImageUrl = document.getString("entryConditionImageUrl"),
-                        exitConditionImageUrl = document.getString("exitConditionImageUrl"),
-                        movements = movements // Lista de movimientos
-                    )
-
-                    if (keywords.isEmpty() || keywords.any { keyword ->
-                            strategy.title.contains(keyword, ignoreCase = true)
-                        }) {
-                        strategies.add(strategy)
-                    }
-                }
-
-                // Ordenar las estrategias de acuerdo a la opción seleccionada en el Spinner
-                when (ratingSpinner.selectedItem.toString()) {
-                    "Más valoradas primero" -> strategies.sortByDescending { it.rating }
-                    "Menos valoradas primero" -> strategies.sortBy { it.rating }
-                    "Más veces favoritas" -> strategies.sortByDescending { it.favoritedBy.size }
-                    "Más comentadas" -> strategies.sortByDescending { it.comments.size }
-                    "Más movimientos" -> strategies.sortByDescending { it.movements.size } // Ordenar por cantidad de movimientos
-                }
-
-                strategyAdapter.notifyDataSetChanged()
-
-                if (strategies.isEmpty()) {
-                    Toast.makeText(this, "No se encontraron estrategias", Toast.LENGTH_SHORT).show()
-                }
+        // Filtrar sobre la lista ya cargada en lugar de hacer una nueva consulta a Firestore
+        val filteredStrategies = strategies.filter { strategy ->
+            val matchesName = keywords.isEmpty() || keywords.any { keyword ->
+                strategy.title.contains(keyword, ignoreCase = true)
             }
-            .addOnFailureListener { e ->
-                Log.e("SearchStrategyActivity", "Error al realizar la búsqueda: ${e.message}", e)
-                Toast.makeText(this, "Error al buscar estrategias", Toast.LENGTH_SHORT).show()
+
+            val matchesTradingStyle = selectedTradingStyles.isEmpty() || strategy.tradingStyles.any { it in selectedTradingStyles }
+            val matchesTimeframe = selectedTimeframes.isEmpty() || strategy.timeframes.any { it in selectedTimeframes }
+            val matchesBot = when {
+                includeBots && !excludeBots -> strategy.algorithmCode.isNotBlank()
+                excludeBots && !includeBots -> strategy.algorithmCode.isBlank()
+                else -> true
             }
+
+            matchesName && matchesTradingStyle && matchesTimeframe && matchesBot
+        }.toMutableList()
+
+        Log.d("SearchDebug", "Estrategias filtradas: ${filteredStrategies.size}")
+
+        // Verificar los datos ANTES de ordenar
+        for (strategy in filteredStrategies) {
+            Log.d("SearchDebug", "Antes de ordenar -> Estrategia: ${strategy.title}, Rating: ${strategy.rating}, Favoritos: ${strategy.favoritedBy.size}, Comentarios: ${strategy.comments.size}, Movimientos: ${strategy.movements.size}")
+        }
+
+        // Aplicar ordenación
+        when (ratingSpinner.selectedItem.toString()) {
+            "Más valoradas primero" -> filteredStrategies.sortByDescending { it.rating }
+            "Menos valoradas primero" -> filteredStrategies.sortBy { it.rating }
+            "Más veces favoritas" -> filteredStrategies.sortByDescending { it.favoritedBy.size }
+            "Más comentadas" -> filteredStrategies.sortByDescending { it.comments.size }
+            "Más movimientos" -> filteredStrategies.sortByDescending { it.movements.size }
+        }
+
+        // Verificar los datos DESPUÉS de ordenar
+        Log.d("SearchDebug", "Después de ordenar:")
+        for (strategy in filteredStrategies) {
+            Log.d("SearchDebug", "Estrategia: ${strategy.title}, Rating: ${strategy.rating}, Favoritos: ${strategy.favoritedBy.size}, Comentarios: ${strategy.comments.size}, Movimientos: ${strategy.movements.size}")
+        }
+
+        // Actualizar la lista de estrategias en el adaptador
+        strategies.clear()
+        strategies.addAll(filteredStrategies)
+        strategyAdapter.notifyDataSetChanged()
+
+        Log.d("SearchDebug", "Ordenación y filtrado completados.")
     }
 
 
@@ -296,9 +285,7 @@ class SearchStrategyActivity : AppCompatActivity() {
             Toast.makeText(this, "ID de estrategia no válido.", Toast.LENGTH_SHORT).show()
         }
     }
-
-
-
+    
     override fun onBackPressed() {
         val fragmentManager = supportFragmentManager
         if (fragmentManager.backStackEntryCount > 0) {

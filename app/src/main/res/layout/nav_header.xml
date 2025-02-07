@@ -25,7 +25,7 @@
             android:scaleType="centerCrop"
             app:strokeColor="@android:color/white"
             app:strokeWidth="3dp"
-            android:src="@drawable/interrogacion"
+            android:src="@drawable/interrogacion_icon"
             android:contentDescription="Avatar del usuario"
             app:shapeAppearanceOverlay="@style/CircularImage"
             android:layout_gravity="center_horizontal"

@@ -1,12 +1,8 @@
 package com.example.mindtrade
 
-import android.graphics.Typeface
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.StyleSpan
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -113,7 +109,7 @@ class ProfileActivity : AppCompatActivity() {
                             if (avatarResId != null) {
                                 profileAvatar.setImageResource(avatarResId)
                             } else {
-                                profileAvatar.setImageResource(R.drawable.interrogacion) // Imagen por defecto
+                                profileAvatar.setImageResource(R.drawable.interrogacion_icon) // Imagen por defecto
                             }
                             }
 
@@ -336,7 +332,7 @@ class ProfileActivity : AppCompatActivity() {
             "avatar_mujer" -> R.drawable.avatarmujer
             "avatar_frankenstein" -> R.drawable.avatarfrankenstein
             "avatar_lobo" -> R.drawable.avatarlobo
-            "avatar_vampira" -> R.drawable.avatarvampira
+            "avatar_vampira" -> R.drawable.avatar_vampira
             else -> null
         }
     }

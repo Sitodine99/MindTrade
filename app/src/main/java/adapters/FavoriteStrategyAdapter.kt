@@ -7,12 +7,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
-import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.mindtrade.R
 import com.example.mindtrade.model.Strategy
-import com.google.android.material.imageview.ShapeableImageView
 
 class FavoriteStrategyAdapter(
     private val strategies: List<Strategy>,
@@ -44,8 +42,8 @@ class FavoriteStrategyAdapter(
             // Cargar desde URL
             Glide.with(holder.avatarImageView.context)
                 .load(strategy.avatarUrl)
-                .placeholder(R.drawable.interrogacion) // Placeholder mientras carga
-                .error(R.drawable.interrogacion) // Imagen si hay error
+                .placeholder(R.drawable.interrogacion_icon) // Placeholder mientras carga
+                .error(R.drawable.interrogacion_icon) // Imagen si hay error
                 .circleCrop()
                 .into(holder.avatarImageView)
         } else {
@@ -71,7 +69,7 @@ class FavoriteStrategyAdapter(
             "avatar_alien" -> R.drawable.avataralien
             "avatar_frankenstein" -> R.drawable.avatarfrankenstein
             "avatar_lobo" -> R.drawable.avatarlobo
-            "avatar_vampira" -> R.drawable.avatarvampira
+            "avatar_vampira" -> R.drawable.avatar_vampira
             else -> R.drawable.ic_placeholder // Recurso predeterminado en caso de que el avatar no coincida
         }
     }

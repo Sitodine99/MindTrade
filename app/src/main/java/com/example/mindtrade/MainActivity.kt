@@ -1,7 +1,6 @@
 package com.example.mindtrade
 
 import AccountAdapter
-import MyAccountsAdapter
 import MyAccountsFragment
 import StrategyWithImageAdapter
 import android.content.Intent
@@ -23,7 +22,6 @@ import auth.LoginActivity
 import adapters.StrategyAdapter
 import android.app.AlertDialog
 import android.app.Dialog
-import android.graphics.Color
 import android.os.Handler
 import android.os.Looper
 import android.text.InputFilter
@@ -32,9 +30,7 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.ListView
 import android.widget.Spinner
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentContainerView
 import com.bumptech.glide.Glide
 import com.example.mindtrade.model.Strategy
@@ -49,7 +45,6 @@ import strategycards.RegisterStrategyActivity
 import strategycards.StrategyDetailFragment
 import welcome.AvatarSelectionActivity
 import com.example.mindtrade.model.Account
-import com.example.mindtrade.model.Movement
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyStrategiesFragment.OnStrategyDeletedListener {
@@ -292,9 +287,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mutableMapOf<String, Double>() // HashMap para almacenar balances iniciales
 
     private fun fetchAccounts(onAccountsLoaded: (List<Account>) -> Unit) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val user = FirebaseAuth.getInstance().currentUser
 
-        db.collection("accounts").whereEqualTo("userId", userId)
+        // 🔹 Si el usuario no está autenticado, no intentes obtener cuentas
+        if (user == null) {
+            Log.d("FetchAccounts", "No hay usuario autenticado, no se obtienen cuentas.")
+            return
+        }
+
+        val userId = user.uid
+
+        // 🔹 Eliminar cualquier listener anterior para evitar múltiples llamadas
+        listenerRegistration?.remove()
+
+        listenerRegistration = db.collection("accounts")
+            .whereEqualTo("userId", userId)
             .addSnapshotListener { documents, error ->
                 if (error != null) {
                     Log.e("FetchAccounts", "Error al obtener cuentas: ${error.message}")
@@ -305,7 +312,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     val accounts = documents.map { doc ->
                         val account = doc.toObject(Account::class.java)
 
-                        // Si la cuenta no tiene registrado un balance inicial, lo guardamos
+                        // Guardar balance inicial si aún no está registrado
                         if (!initialBalances.containsKey(account.id)) {
                             initialBalances[account.id] = account.balance
                         }
@@ -315,25 +322,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     onAccountsLoaded(accounts)
                 }
             }
-
-
-        db.collection("accounts").whereEqualTo("userId", userId)
-            .addSnapshotListener { documents, error ->
-                if (error != null) {
-                    Toast.makeText(
-                        this,
-                        "Error al obtener cuentas: ${error.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    return@addSnapshotListener
-                }
-
-                if (documents != null) {
-                    val accounts = documents.map { doc -> doc.toObject(Account::class.java) }
-                    onAccountsLoaded(accounts)
-                }
-            }
     }
+
+
 
 
     private fun setupAccountsRecyclerView(allAccounts: List<Account>) {
@@ -689,7 +680,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 val intent = Intent(this, ImageDetailActivity::class.java).apply {
                     putExtra(
                         "imageResId",
-                        avatarImageResource ?: R.drawable.interrogacion
+                        avatarImageResource ?: R.drawable.interrogacion_icon
                     ) // Recurso local o imagen predeterminada
                     putExtra("imageName", alias) // Alias del usuario
                 }
@@ -818,8 +809,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             // Si hay una URL válida, cargar desde la URL
             Glide.with(this)
                 .load(avatarUrl)
-                .placeholder(R.drawable.interrogacion) // Imagen de carga
-                .error(R.drawable.interrogacion) // Imagen en caso de error
+                .placeholder(R.drawable.interrogacion_icon) // Imagen de carga
+                .error(R.drawable.interrogacion_icon) // Imagen en caso de error
                 .into(navAvatarImage)
         } else if (!avatarName.isNullOrEmpty()) {
             // Si no hay URL, usar un recurso local basado en avatarName
@@ -827,7 +818,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             avatarResource?.let { navAvatarImage.setImageResource(it) }
         } else {
             // Si no hay avatar definido, usar imagen predeterminada
-            navAvatarImage.setImageResource(R.drawable.interrogacion)
+            navAvatarImage.setImageResource(R.drawable.interrogacion_icon)
         }
 
         // Actualizar alias del usuario
@@ -947,8 +938,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (!avatarUrl.isNullOrEmpty() && avatarUrl.startsWith("https://")) {
             Glide.with(this)
                 .load(avatarUrl)
-                .placeholder(R.drawable.interrogacion)
-                .error(R.drawable.interrogacion)
+                .placeholder(R.drawable.interrogacion_icon)
+                .error(R.drawable.interrogacion_icon)
                 .circleCrop()
                 .into(avatarImage)
         } else if (!avatarName.isNullOrEmpty()) {
@@ -959,10 +950,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     .circleCrop()
                     .into(avatarImage)
             } else {
-                avatarImage.setImageResource(R.drawable.interrogacion)
+                avatarImage.setImageResource(R.drawable.interrogacion_icon)
             }
         } else {
-            avatarImage.setImageResource(R.drawable.interrogacion)
+            avatarImage.setImageResource(R.drawable.interrogacion_icon)
         }
     }
 
@@ -990,7 +981,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             "avatar_mujer" -> R.drawable.avatarmujer
             "avatar_frankenstein" -> R.drawable.avatarfrankenstein
             "avatar_lobo" -> R.drawable.avatarlobo
-            "avatar_vampira" -> R.drawable.avatarvampira
+            "avatar_vampira" -> R.drawable.avatar_vampira
             else -> null
         }
     }
@@ -1235,11 +1226,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun logout() {
         removeListener()
+
+        // 🔹 Limpiar SharedPreferences
+        val sharedPreferences = getSharedPreferences("MindTradePrefs", MODE_PRIVATE)
+        sharedPreferences.edit().clear().apply()
+
         FirebaseAuth.getInstance().signOut()
+
+        // 🔹 Detener cualquier llamada a Firestore antes de salir
+        listenerRegistration?.remove()
+        listenerRegistration = null
+
         val intent = Intent(this, LoginActivity::class.java)
         startActivity(intent)
         finish()
     }
+
 
     private fun showCreateAccountDialog() {
         val dialog = Dialog(this)

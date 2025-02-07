@@ -47,7 +47,7 @@
             android:layout_width="160dp"
             android:layout_height="160dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/interrogacion"
+            android:src="@drawable/interrogacion_icon"
             android:padding="5dp"
             app:shapeAppearanceOverlay="@style/CircularImage"
             app:strokeColor="@android:color/black"
