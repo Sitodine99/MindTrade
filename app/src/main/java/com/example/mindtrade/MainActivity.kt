@@ -26,6 +26,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.InputFilter
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -77,6 +78,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var userTradingStyle: String? = null
     private var userPsico: String? = null
     private var userEmotion: String? = null
+    private var isAutoScrolling = false
+    private var autoScrollHandler: Handler? = null
+    private var autoScrollRunnable: Runnable? = null
     private lateinit var registerStrategyLauncher: ActivityResultLauncher<Intent>
 
     companion object {
@@ -471,42 +475,42 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
     private fun startAutoScroll(recyclerView: RecyclerView, itemCount: Int) {
-        if (itemCount <= 1) return // Si no hay suficientes elementos, no iniciar el scroll
+        if (itemCount <= 1 || isAutoScrolling) return  // Evitar múltiples ejecuciones
+        isAutoScrolling = true
 
-        val handler = android.os.Handler()
-        val inactivityHandler = android.os.Handler() // Handler para la inactividad
+        autoScrollHandler = Handler(Looper.getMainLooper())
         var currentIndex = 0
 
-        val runnable = object : Runnable {
+        autoScrollRunnable = object : Runnable {
             override fun run() {
-                if (currentIndex < itemCount) {
-                    recyclerView.smoothScrollToPosition(currentIndex)
-                    currentIndex++
-                } else {
-                    currentIndex = 0 // Reiniciar al inicio cuando lleguemos al final
-                    recyclerView.smoothScrollToPosition(currentIndex)
+                if (currentIndex >= itemCount) {
+                    currentIndex = 0 // Reiniciar desde el inicio
                 }
-                handler.postDelayed(this, 3000) // Cambiar cada 3 segundos
+                recyclerView.smoothScrollToPosition(currentIndex)
+                currentIndex++
+                autoScrollHandler?.postDelayed(this, 3000) // Ajusta la frecuencia según sea necesario
             }
         }
 
-        handler.postDelayed(runnable, 3000)
+        autoScrollHandler?.postDelayed(autoScrollRunnable!!, 3000)
 
-        // Configurar el tiempo de inactividad antes de reanudar el scroll (5 segundos)
-        val INACTIVITY_DELAY = 5000L
+        // Detectar interacción del usuario y pausar el auto-scroll
+        recyclerView.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                stopAutoScroll()
 
-        // Opción para detener el scroll si el usuario interactúa
-        recyclerView.setOnTouchListener { _, _ ->
-            handler.removeCallbacks(runnable) // Detener el scroll automático
-            inactivityHandler.removeCallbacksAndMessages(null) // Cancelar reinicios previos
-
-            // Configurar el reinicio automático después de la inactividad
-            inactivityHandler.postDelayed({
-                handler.postDelayed(runnable, 3000) // Reanudar el scroll automático
-            }, INACTIVITY_DELAY)
-
-            false // Permitir que el RecyclerView maneje el evento táctil
+                // Reactivar auto-scroll después de 5s de inactividad
+                Handler(Looper.getMainLooper()).postDelayed({
+                    if (!isAutoScrolling) startAutoScroll(recyclerView, itemCount)
+                }, 5000)
+            }
+            false
         }
+    }
+
+    private fun stopAutoScroll() {
+        autoScrollHandler?.removeCallbacks(autoScrollRunnable!!)
+        isAutoScrolling = false
     }
 
 

@@ -166,77 +166,125 @@ class SearchStrategyActivity : AppCompatActivity() {
 
 
     private fun performSearch() {
-        Log.d("SearchDebug", "Iniciando búsqueda y conteo de favoritos y comentarios...")
+        Log.d("SearchDebug", "Reiniciando búsqueda en Firestore...")
 
-        val nameQuery = searchNameInput.text.toString().trim().lowercase()
-        val keywords = nameQuery.split(" ").filter { it.isNotBlank() }
+        // 🔹 Cargar TODAS las estrategias antes de filtrar
+        db.collection("strategies").get()
+            .addOnSuccessListener { result ->
+                val allStrategies = mutableListOf<Strategy>()
 
-        val selectedTradingStyles = mutableListOf<String>()
-        if (checkDayTrading.isChecked) selectedTradingStyles.add("Day Trading")
-        if (checkScalping.isChecked) selectedTradingStyles.add("Scalping")
-        if (checkSwingTrading.isChecked) selectedTradingStyles.add("Swing Trading")
+                for (document in result) {
+                    val strategy = Strategy(
+                        id = document.id,
+                        title = document.getString("title") ?: "Sin título",
+                        description = document.getString("description") ?: "Sin descripción",
+                        author = document.getString("authorAlias") ?: "Anónimo",
+                        avatarName = document.getString("avatarName"),
+                        avatarUrl = document.getString("avatarUrl"),
+                        rating = document.getDouble("rating") ?: 0.0,
+                        createdBy = document.getString("createdBy") ?: "",
+                        indicators = (document.get("indicators") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                        timeframes = (document.get("timeframes") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                        tradingStyles = (document.get("tradingStyles") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                        symbols = (document.get("symbols") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                        algorithmCode = document.getString("algorithmCode") ?: "",
+                        entryConditionImageUrl = document.getString("entryConditionImageUrl"),
+                        exitConditionImageUrl = document.getString("exitConditionImageUrl"),
+                        movements = (document.get("movements") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                        favoritedBy = (document.get("favoritedBy") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+                        comments = (document.get("comments") as? List<*>)?.mapNotNull { comment ->
+                            val commentMap = comment as? Map<*, *>
+                            commentMap?.let {
+                                Comment(
+                                    id = it["id"] as? String ?: "",
+                                    userId = it["userId"] as? String ?: "",
+                                    userAlias = it["userAlias"] as? String ?: "Anónimo",
+                                    avatarUrl = it["avatarUrl"] as? String,
+                                    avatarName = it["avatarName"] as? String,
+                                    content = it["content"] as? String ?: "",
+                                    timestamp = it["timestamp"] as? Long ?: System.currentTimeMillis(),
+                                    replies = emptyList()
+                                )
+                            }
+                        } ?: emptyList()
+                    )
+                    allStrategies.add(strategy)
+                }
 
-        val selectedTimeframes = mutableListOf<String>()
-        if (checkM1.isChecked) selectedTimeframes.add("M1")
-        if (checkM3.isChecked) selectedTimeframes.add("M3")
-        if (checkM5.isChecked) selectedTimeframes.add("M5")
-        if (checkM15.isChecked) selectedTimeframes.add("M15")
-        if (checkM30.isChecked) selectedTimeframes.add("M30")
-        if (checkH1.isChecked) selectedTimeframes.add("H1")
-        if (checkH4.isChecked) selectedTimeframes.add("H4")
-        if (checkD1.isChecked) selectedTimeframes.add("D1")
-        if (checkW1.isChecked) selectedTimeframes.add("W1")
-        if (checkOther.isChecked) selectedTimeframes.add("Otras")
+                // 🔹 Aplicamos los filtros sobre TODAS las estrategias cargadas
+                val nameQuery = searchNameInput.text.toString().trim().lowercase()
+                val keywords = nameQuery.split(" ").filter { it.isNotBlank() }
 
-        val includeBots = checkBotYes.isChecked
-        val excludeBots = checkBotNo.isChecked
+                val selectedTradingStyles = mutableListOf<String>()
+                if (checkDayTrading.isChecked) selectedTradingStyles.add("Day Trading")
+                if (checkScalping.isChecked) selectedTradingStyles.add("Scalping")
+                if (checkSwingTrading.isChecked) selectedTradingStyles.add("Swing Trading")
 
-        // Filtrar sobre la lista ya cargada en lugar de hacer una nueva consulta a Firestore
-        val filteredStrategies = strategies.filter { strategy ->
-            val matchesName = keywords.isEmpty() || keywords.any { keyword ->
-                strategy.title.contains(keyword, ignoreCase = true)
+                val selectedTimeframes = mutableListOf<String>()
+                if (checkM1.isChecked) selectedTimeframes.add("M1")
+                if (checkM3.isChecked) selectedTimeframes.add("M3")
+                if (checkM5.isChecked) selectedTimeframes.add("M5")
+                if (checkM15.isChecked) selectedTimeframes.add("M15")
+                if (checkM30.isChecked) selectedTimeframes.add("M30")
+                if (checkH1.isChecked) selectedTimeframes.add("H1")
+                if (checkH4.isChecked) selectedTimeframes.add("H4")
+                if (checkD1.isChecked) selectedTimeframes.add("D1")
+                if (checkW1.isChecked) selectedTimeframes.add("W1")
+                if (checkOther.isChecked) selectedTimeframes.add("Otras")
+
+                val includeBots = checkBotYes.isChecked
+                val excludeBots = checkBotNo.isChecked
+                val indicatorQuery = indicatorInput.text.toString().trim()
+
+                val filteredStrategies = allStrategies.filter { strategy ->
+                    val matchesName = keywords.isEmpty() || keywords.any { keyword ->
+                        strategy.title.contains(keyword, ignoreCase = true)
+                    }
+
+                    val matchesTradingStyle = selectedTradingStyles.isEmpty() || strategy.tradingStyles.any { it in selectedTradingStyles }
+                    val matchesTimeframe = selectedTimeframes.isEmpty() || strategy.timeframes.any { it in selectedTimeframes }
+                    val matchesBot = when {
+                        includeBots && !excludeBots -> strategy.algorithmCode.isNotBlank()
+                        excludeBots && !includeBots -> strategy.algorithmCode.isBlank()
+                        else -> true
+                    }
+
+                    // 🔹 **Filtro por indicador corregido**
+                    val matchesIndicator = indicatorQuery.isEmpty() || strategy.indicators.any { indicator ->
+                        indicator.contains(indicatorQuery, ignoreCase = true)
+                    }
+
+                    matchesName && matchesTradingStyle && matchesTimeframe && matchesBot && matchesIndicator
+                }.toMutableList()
+
+                Log.d("SearchDebug", "Estrategias filtradas: ${filteredStrategies.size}")
+
+                // 🔹 Aplicar ordenación
+                when (ratingSpinner.selectedItem.toString()) {
+                    "Más valoradas primero" -> filteredStrategies.sortByDescending { it.rating }
+                    "Menos valoradas primero" -> filteredStrategies.sortBy { it.rating }
+                    "Más veces favoritas" -> filteredStrategies.sortByDescending { it.favoritedBy.size }
+                    "Más comentadas" -> filteredStrategies.sortByDescending { it.comments.size }
+                    "Más movimientos" -> filteredStrategies.sortByDescending { it.movements.size }
+                }
+
+                // 🔹 Mostrar estrategias ordenadas en el Log
+                filteredStrategies.forEach {
+                    Log.d("SearchDebug", "Estrategia: ${it.title}, Rating: ${it.rating}, Favoritos: ${it.favoritedBy.size}, Comentarios: ${it.comments.size}, Movimientos: ${it.movements.size}")
+                }
+
+                // 🔹 Actualizar la lista de estrategias en el adaptador
+                strategies.clear()
+                strategies.addAll(filteredStrategies)
+                strategyAdapter.notifyDataSetChanged()
             }
-
-            val matchesTradingStyle = selectedTradingStyles.isEmpty() || strategy.tradingStyles.any { it in selectedTradingStyles }
-            val matchesTimeframe = selectedTimeframes.isEmpty() || strategy.timeframes.any { it in selectedTimeframes }
-            val matchesBot = when {
-                includeBots && !excludeBots -> strategy.algorithmCode.isNotBlank()
-                excludeBots && !includeBots -> strategy.algorithmCode.isBlank()
-                else -> true
+            .addOnFailureListener { e ->
+                Log.e("SearchDebug", "Error en la búsqueda: ${e.message}", e)
+                Toast.makeText(this, "Error al buscar estrategias", Toast.LENGTH_SHORT).show()
             }
-
-            matchesName && matchesTradingStyle && matchesTimeframe && matchesBot
-        }.toMutableList()
-
-        Log.d("SearchDebug", "Estrategias filtradas: ${filteredStrategies.size}")
-
-        // Verificar los datos ANTES de ordenar
-        for (strategy in filteredStrategies) {
-            Log.d("SearchDebug", "Antes de ordenar -> Estrategia: ${strategy.title}, Rating: ${strategy.rating}, Favoritos: ${strategy.favoritedBy.size}, Comentarios: ${strategy.comments.size}, Movimientos: ${strategy.movements.size}")
-        }
-
-        // Aplicar ordenación
-        when (ratingSpinner.selectedItem.toString()) {
-            "Más valoradas primero" -> filteredStrategies.sortByDescending { it.rating }
-            "Menos valoradas primero" -> filteredStrategies.sortBy { it.rating }
-            "Más veces favoritas" -> filteredStrategies.sortByDescending { it.favoritedBy.size }
-            "Más comentadas" -> filteredStrategies.sortByDescending { it.comments.size }
-            "Más movimientos" -> filteredStrategies.sortByDescending { it.movements.size }
-        }
-
-        // Verificar los datos DESPUÉS de ordenar
-        Log.d("SearchDebug", "Después de ordenar:")
-        for (strategy in filteredStrategies) {
-            Log.d("SearchDebug", "Estrategia: ${strategy.title}, Rating: ${strategy.rating}, Favoritos: ${strategy.favoritedBy.size}, Comentarios: ${strategy.comments.size}, Movimientos: ${strategy.movements.size}")
-        }
-
-        // Actualizar la lista de estrategias en el adaptador
-        strategies.clear()
-        strategies.addAll(filteredStrategies)
-        strategyAdapter.notifyDataSetChanged()
-
-        Log.d("SearchDebug", "Ordenación y filtrado completados.")
     }
+
+
 
 
     private fun openStrategyDetail(strategy: Strategy) {
@@ -285,7 +333,7 @@ class SearchStrategyActivity : AppCompatActivity() {
             Toast.makeText(this, "ID de estrategia no válido.", Toast.LENGTH_SHORT).show()
         }
     }
-    
+
     override fun onBackPressed() {
         val fragmentManager = supportFragmentManager
         if (fragmentManager.backStackEntryCount > 0) {
@@ -307,6 +355,3 @@ class SearchStrategyActivity : AppCompatActivity() {
         }
     }
 }
-
-
-
