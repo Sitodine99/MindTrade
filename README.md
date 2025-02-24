@@ -27,7 +27,7 @@ Este proyecto fue creado como parte de mi **fin de ciclo en Desarrollo de Aplica
 
 ## 📄 Documentación
 📑 [Memoria del Proyecto](02_Memoria_JoseAntonio_Montero_Fernandez.pdf)  
-📑 [Presentación del Proyecto](03_Presentación_JoseAntonio_Montero_Fernandez.pdf)
+📑 [Presentación del Proyecto](03_Presentacion_JoseAntonio_Montero_Fernandez.pdf)
 
 ---
 
